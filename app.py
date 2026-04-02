@@ -792,6 +792,89 @@ def nouvelle_conversation():
 
 # ─── SYNTHÈSE DOCUMENT ────────────────────────────────────────────────────────
 
+
+# ─── MÉMOIRE PERSISTANTE ─────────────────────────────────────────────────────
+
+@app.route("/memoire/sauvegarder", methods=["POST"])
+@jwt_required()
+def sauvegarder_memoire():
+    try:
+        data       = request.json
+        session_id = data.get("session_id", "")
+        historique = data.get("historique", [])
+        tenant_id  = get_current_tenant_id()
+
+        if not historique or len(historique) < 2:
+            return jsonify({"ok": False, "raison": "Conversation trop courte"})
+
+        lignes = []
+        for m in historique[-10:]:
+            role = "Avocat" if m["role"] == "user" else "Odyxia"
+            lignes.append(role + ": " + str(m.get("content", ""))[:300])
+        texte_conv = " | ".join(lignes)
+
+        prompt_resume = (
+            "Résume cette conversation juridique en 3 phrases max. "
+            "Format strict sur 3 lignes separees : "
+            "RESUME: [résumé] "
+            "MOTS_CLES: [mot1,mot2,mot3] "
+            "DOMAINE: [domaine] "
+            "Conversation: " + texte_conv
+        )
+
+        response = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=200,
+            messages=[{"role": "user", "content": prompt_resume}]
+        )
+
+        texte     = response.content[0].text.strip()
+        resume    = ""
+        mots_cles = []
+        domaine   = ""
+
+        for ligne in texte.splitlines():
+            if ligne.startswith("RESUME:"):
+                resume = ligne.replace("RESUME:", "").strip()
+            elif ligne.startswith("MOTS_CLES:"):
+                mots_cles = [m.strip() for m in ligne.replace("MOTS_CLES:", "").split(",")]
+            elif ligne.startswith("DOMAINE:"):
+                domaine = ligne.replace("DOMAINE:", "").strip()
+
+        if not resume:
+            resume = texte[:400]
+
+        supabase.table("memoires").insert({
+            "tenant_id":  tenant_id,
+            "session_id": session_id,
+            "resume":     resume,
+            "mots_cles":  mots_cles,
+            "domaine":    domaine,
+        }).execute()
+
+        print("[MEMOIRE] Sauvegardé — " + domaine)
+        return jsonify({"ok": True, "resume": resume})
+
+    except Exception as e:
+        log_erreur("MEMOIRE_SAUVEGARDER", e)
+        return jsonify({"ok": False, "erreur": str(e)}), 500
+
+
+@app.route("/memoire/contexte", methods=["GET"])
+@jwt_required()
+def contexte_memoire():
+    try:
+        tenant_id = get_current_tenant_id()
+        result = supabase.table("memoires").select(
+            "resume, mots_cles, domaine, created_at"
+        ).eq("tenant_id", tenant_id).order(
+            "created_at", desc=True
+        ).limit(3).execute()
+        return jsonify({"memoires": result.data or [], "count": len(result.data or [])})
+    except Exception as e:
+        log_erreur("MEMOIRE_CONTEXTE", e)
+        return jsonify({"memoires": [], "count": 0}), 500
+
 @app.route("/synthese_document", methods=["POST"])
 @jwt_required()
 def synthese_document():
