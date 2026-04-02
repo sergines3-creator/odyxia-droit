@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fr" id="html-root">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Odyxia Droit — Inscription</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#F8FAFC;--surface:#FFFFFF;--border:#E2E8F0;--border2:#DBEAFE;--blue:#2563EB;--blue-lt:#EFF6FF;--blue-md:#BFDBFE;--navy:#0F172A;--text:#0F172A;--text2:#64748B;--text3:#94A3B8;--green:#16A34A;--green-lt:#DCFCE7;--red:#DC2626;--red-lt:#FEE2E2;--r:8px;--font:'DM Sans',system-ui,sans-serif;--serif:'Cormorant Garamond',Georgia,serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.page-wrap{width:100%;max-width:560px;}
+.reg-header{text-align:center;margin-bottom:24px;}
+.reg-logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px;}
+.reg-icon{width:38px;height:38px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:15px;font-weight:600;color:#fff;}
+.reg-name{font-family:var(--serif);font-size:22px;font-weight:500;color:var(--navy);}
+.reg-title{font-size:12px;color:var(--text2);margin-top:4px;}
+.trial-badge{display:inline-flex;align-items:center;gap:6px;background:var(--green-lt);border:0.5px solid #86EFAC;border-radius:20px;padding:4px 14px;font-size:11px;color:var(--green);font-weight:500;margin-top:8px;}
+.reg-card{background:var(--surface);border:0.5px solid var(--border2);border-radius:16px;padding:28px;}
+.steps{display:flex;align-items:center;gap:0;margin-bottom:24px;}
+.step-item{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;}
+.step-circle{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--text3);background:var(--bg);transition:all .3s;}
+.step-circle.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+.step-circle.done{background:var(--green);border-color:var(--green);color:#fff;}
+.step-label{font-size:9px;color:var(--text3);text-align:center;}
+.step-label.active{color:var(--blue);font-weight:500;}
+.step-label.done{color:var(--green);}
+.step-line{flex:1;height:1px;background:var(--border);margin-bottom:12px;transition:all .3s;}
+.step-line.done{background:var(--green);}
+.form-section{display:none;}
+.form-section.active{display:block;}
+.section-title{font-size:13px;font-weight:500;color:var(--navy);margin-bottom:16px;padding-bottom:8px;border-bottom:0.5px solid var(--border2);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{margin-bottom:12px;}
+.form-label{font-size:10px;font-weight:500;color:var(--text2);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:0.4px;}
+.req{color:var(--red);margin-left:2px;}
+.form-input,.form-select{width:100%;border:0.5px solid var(--border2);border-radius:var(--r);padding:9px 12px;font-size:13px;font-family:var(--font);color:var(--text);background:var(--bg);outline:none;transition:all .2s;}
+.form-input:focus,.form-select:focus{border-color:var(--blue);background:var(--surface);}
+.form-input.error{border-color:var(--red);background:var(--red-lt);}
+.form-input.valid{border-color:var(--green);}
+.form-hint{font-size:10px;color:var(--text3);margin-top:3px;}
+.form-err{font-size:10px;color:var(--red);margin-top:3px;display:none;}
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.type-card{padding:14px;border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer;transition:all .2s;background:var(--bg);text-align:center;}
+.type-card:hover{border-color:var(--blue-md);}
+.type-card.selected{border-color:var(--blue);background:var(--blue-lt);}
+.type-icon{font-size:22px;margin-bottom:5px;}
+.type-name{font-size:12px;font-weight:500;color:var(--text);}
+.type-desc{font-size:10px;color:var(--text2);margin-top:2px;}
+.phone-wrap{display:flex;gap:8px;}
+.indicatif{width:85px;flex-shrink:0;border:0.5px solid var(--border2);border-radius:var(--r);padding:9px 10px;font-size:12px;font-family:var(--font);color:var(--text);background:var(--bg);outline:none;}
+.pwd-wrap{position:relative;}
+.pwd-wrap .form-input{padding-right:38px;}
+.pwd-eye{position:absolute;right:11px;top:50%;transform:translateY(-50%);cursor:pointer;background:none;border:none;font-size:13px;color:var(--text3);padding:0;}
+.pwd-bar-wrap{height:3px;border-radius:2px;background:var(--border);margin-top:5px;overflow:hidden;}
+.pwd-bar{height:100%;border-radius:2px;width:0;transition:all .3s;}
+.info-box{background:var(--blue-lt);border:0.5px solid var(--blue-md);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;}
+.info-box-title{font-size:10px;font-weight:500;color:#1D4ED8;margin-bottom:3px;}
+.info-box-text{font-size:10px;color:var(--text2);line-height:1.5;}
+.check-wrap{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.check-wrap input[type=checkbox]{width:16px;height:16px;accent-color:var(--blue);flex-shrink:0;margin-top:2px;}
+.check-label{font-size:11px;color:var(--text2);line-height:1.5;}
+.check-label a{color:var(--blue);}
+.form-nav{display:flex;gap:10px;margin-top:18px;}
+.btn-prev{padding:10px 18px;border:0.5px solid var(--border2);border-radius:var(--r);font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;background:var(--bg);color:var(--text2);}
+.btn-next,.btn-submit{flex:1;background:var(--blue);color:#fff;border:none;border-radius:var(--r);padding:11px;font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;transition:all .2s;}
+.btn-next:hover,.btn-submit:hover{background:#1D4ED8;}
+.btn-next:disabled,.btn-submit:disabled{background:var(--border);color:var(--text3);cursor:not-allowed;}
+.recap-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.recap-item{padding:4px 0;}
+.recap-key{font-size:9px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;}
+.recap-val{font-size:12px;color:var(--text);font-weight:500;}
+.green-box{background:var(--green-lt);border:0.5px solid #86EFAC;border-radius:var(--r);padding:12px 14px;margin-bottom:14px;}
+.green-box-title{font-size:11px;font-weight:500;color:var(--green);margin-bottom:4px;}
+.green-box-text{font-size:11px;color:var(--text2);line-height:1.5;}
+#success-screen{display:none;text-align:center;padding:16px 0;}
+.suc-icon{width:60px;height:60px;background:var(--green-lt);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:26px;}
+.suc-title{font-family:var(--serif);font-size:20px;font-weight:500;color:var(--navy);margin-bottom:8px;}
+.suc-text{font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:18px;}
+.btn-go{display:inline-block;background:var(--blue);color:#fff;border:none;border-radius:var(--r);padding:11px 28px;font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;text-decoration:none;}
+.reg-footer{text-align:center;margin-top:14px;font-size:11px;color:var(--text3);}
+.reg-footer a{color:var(--blue);text-decoration:none;}
+#toast{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 18px;border-radius:20px;font-size:12px;z-index:600;border-left:3px solid var(--red);}
+#toast.show{display:block;}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+<div class="reg-header">
+  <div class="reg-logo">
+    <div class="reg-icon">OD</div>
+    <div class="reg-name">Odyxia Droit</div>
+  </div>
+  <div class="reg-title" id="reg-title">Créez votre espace juridique intelligent</div>
+  <div class="trial-badge">✓ <span id="trial-text">14 jours d'essai gratuit — sans engagement</span></div>
+</div>
+
+<div class="reg-card">
+
+  <div class="steps" id="steps-wrap">
+    <div class="step-item">
+      <div class="step-circle active" id="sc-1">1</div>
+      <div class="step-label active" id="sl-1">Compte</div>
+    </div>
+    <div class="step-line" id="line-1"></div>
+    <div class="step-item">
+      <div class="step-circle" id="sc-2">2</div>
+      <div class="step-label" id="sl-2">Profil</div>
+    </div>
+    <div class="step-line" id="line-2"></div>
+    <div class="step-item">
+      <div class="step-circle" id="sc-3">3</div>
+      <div class="step-label" id="sl-3">Sécurité</div>
+    </div>
+    <div class="step-line" id="line-3"></div>
+    <div class="step-item">
+      <div class="step-circle" id="sc-4">4</div>
+      <div class="step-label" id="sl-4">Confirmation</div>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <div class="form-section active" id="section-1">
+    <div class="section-title" id="st-1">Votre profil professionnel</div>
+    <div class="form-group">
+      <label class="form-label">Type de compte <span class="req">*</span></label>
+      <div class="type-grid">
+        <div class="type-card selected" id="type-avocat" onclick="selectType('avocat')">
+          <div class="type-icon">&#9878;</div>
+          <div class="type-name" id="tn-avocat">Avocat inscrit</div>
+          <div class="type-desc" id="td-avocat">Inscrit au barreau</div>
+        </div>
+        <div class="type-card" id="type-juriste" onclick="selectType('juriste')">
+          <div class="type-icon">&#127970;</div>
+          <div class="type-name" id="tn-juriste">Juriste d'entreprise</div>
+          <div class="type-desc" id="td-juriste">Juridique en entreprise</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Pays <span class="req">*</span></label>
+      <select class="form-select" id="pays" onchange="onPaysChange()">
+        <option value="">Sélectionnez votre pays</option>
+        <option value="CMR" data-ind="+237" data-lang="fr">Cameroun</option>
+        <option value="GAB" data-ind="+241" data-lang="fr">Gabon</option>
+        <option value="CIV" data-ind="+225" data-lang="fr">Côte d'Ivoire</option>
+        <option value="SEN" data-ind="+221" data-lang="fr">Sénégal</option>
+        <option value="NER" data-ind="+227" data-lang="fr">Niger</option>
+        <option value="BFA" data-ind="+226" data-lang="fr">Burkina Faso</option>
+        <option value="TCD" data-ind="+235" data-lang="fr">Tchad</option>
+        <option value="COG" data-ind="+242" data-lang="fr">Congo</option>
+        <option value="GNQ" data-ind="+240" data-lang="es">Guinea Ecuatorial</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Prénom <span class="req">*</span></label>
+        <input class="form-input" type="text" id="prenom" placeholder="Jean"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nom <span class="req">*</span></label>
+        <input class="form-input" type="text" id="nom" placeholder="DUPONT"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email professionnel <span class="req">*</span></label>
+      <input class="form-input" type="email" id="email" placeholder="jean.dupont@cabinet.cm" oninput="validerEmail()"/>
+      <div class="form-err" id="err-email">Format email invalide</div>
+    </div>
+    <div class="form-nav">
+      <button class="btn-next" onclick="etape1()">Continuer</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 2 -->
+  <div class="form-section" id="section-2">
+    <div class="section-title" id="st-2">Informations professionnelles</div>
+    <div id="champs-avocat">
+      <div class="form-group">
+        <label class="form-label">Barreau <span class="req">*</span></label>
+        <input class="form-input" type="text" id="barreau" placeholder="Ex : Barreau du Cameroun"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Numéro d'inscription au barreau <span class="req">*</span></label>
+        <input class="form-input" type="text" id="num-barreau" placeholder="Ex : CMR-2019-0142"/>
+        <div class="form-hint">Tel qu'il figure sur votre carte professionnelle</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Année d'inscription <span class="req">*</span></label>
+        <select class="form-select" id="annee"></select>
+      </div>
+    </div>
+    <div id="champs-juriste" style="display:none;">
+      <div class="form-group">
+        <label class="form-label">Entreprise employeur <span class="req">*</span></label>
+        <input class="form-input" type="text" id="entreprise" placeholder="Ex : Total Energies Cameroun"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Poste occupé <span class="req">*</span></label>
+        <input class="form-input" type="text" id="poste" placeholder="Ex : Directeur juridique"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Numéro d'identification professionnelle <span class="req">*</span></label>
+        <input class="form-input" type="text" id="num-juriste" placeholder="Matricule ou numéro RH"/>
+        <div class="form-hint">Votre numéro d'employé ou matricule RH</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Téléphone <span class="req">*</span></label>
+      <div class="phone-wrap">
+        <input class="indicatif" type="text" id="indicatif" value="+237" readonly/>
+        <input class="form-input" type="tel" id="telephone" placeholder="6XXXXXXXX"/>
+      </div>
+    </div>
+    <div class="form-nav">
+      <button class="btn-prev" onclick="allerEtape(1)">Retour</button>
+      <button class="btn-next" onclick="etape2()">Continuer</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 3 -->
+  <div class="form-section" id="section-3">
+    <div class="section-title" id="st-3">Sécurisez votre accès</div>
+    <div class="form-group">
+      <label class="form-label">Mot de passe <span class="req">*</span></label>
+      <div class="pwd-wrap">
+        <input class="form-input" type="password" id="password" placeholder="Minimum 8 caractères" oninput="evalMdp()"/>
+        <button class="pwd-eye" onclick="togglePwd('password')" type="button">&#128065;</button>
+      </div>
+      <div class="pwd-bar-wrap"><div class="pwd-bar" id="pwd-bar"></div></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:3px;" id="pwd-lbl"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirmer le mot de passe <span class="req">*</span></label>
+      <div class="pwd-wrap">
+        <input class="form-input" type="password" id="password2" placeholder="Répétez votre mot de passe" oninput="verifConf()"/>
+        <button class="pwd-eye" onclick="togglePwd('password2')" type="button">&#128065;</button>
+      </div>
+      <div class="form-err" id="err-pwd">Les mots de passe ne correspondent pas</div>
+    </div>
+    <div class="info-box">
+      <div class="info-box-title">Votre mot de passe est chiffré</div>
+      <div class="info-box-text">Odyxia Droit ne stocke jamais votre mot de passe en clair. Il est chiffré automatiquement par notre système de sécurité avant tout enregistrement.</div>
+    </div>
+    <div class="check-wrap">
+      <input type="checkbox" id="chk-cgu"/>
+      <label class="check-label" for="chk-cgu">J'accepte les <a href="#">conditions générales d'utilisation</a> et la <a href="#">politique de confidentialité</a> d'Odyxia Droit. <span class="req">*</span></label>
+    </div>
+    <div class="check-wrap">
+      <input type="checkbox" id="chk-comm"/>
+      <label class="check-label" for="chk-comm">J'accepte de recevoir les communications relatives à mon abonnement (rappels, factures, mises à jour).</label>
+    </div>
+    <div class="form-nav">
+      <button class="btn-prev" onclick="allerEtape(2)">Retour</button>
+      <button class="btn-next" onclick="etape3()">Continuer</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 4 -->
+  <div class="form-section" id="section-4">
+    <div class="section-title" id="st-4">Récapitulatif de votre inscription</div>
+    <div style="background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r);padding:14px;margin-bottom:14px;">
+      <div class="recap-grid" id="recap"></div>
+    </div>
+    <div class="green-box">
+      <div class="green-box-title">Essai gratuit de 14 jours</div>
+      <div class="green-box-text">Votre abonnement à 55 000 FCFA/mois débutera après votre période d'essai. Vous serez notifié 3 jours avant la fin. Aucun paiement requis aujourd'hui.</div>
+    </div>
+    <div class="form-nav">
+      <button class="btn-prev" onclick="allerEtape(3)">Retour</button>
+      <button class="btn-submit" onclick="soumettre()" id="btn-submit">Créer mon compte</button>
+    </div>
+  </div>
+
+  <!-- Succès -->
+  <div id="success-screen">
+    <div class="suc-icon">&#10003;</div>
+    <div class="suc-title">Compte créé avec succès !</div>
+    <div class="suc-text">Votre essai gratuit de 14 jours a démarré.<br/>Un email de confirmation a été envoyé à <strong id="suc-email"></strong>.<br/><br/>Vous pouvez maintenant accéder à Odyxia Droit.</div>
+    <a href="/" class="btn-go">Accéder à Odyxia Droit</a>
+  </div>
+
+</div>
+
+<div class="reg-footer">
+  Déjà inscrit ? <a href="/">Se connecter</a> &nbsp;·&nbsp; <a href="#">Aide</a>
+</div>
+</div>
+<div id="toast"></div>
+
+<script>
+let langue='fr', typeCompte='avocat';
+
+// Remplir années
+(function(){
+  const s=document.getElementById('annee');
+  s.innerHTML='<option value="">— Sélectionnez —</option>';
+  const y=new Date().getFullYear();
+  for(let i=y;i>=1970;i--){
+    const o=document.createElement('option');
+    o.value=i;o.textContent=i;s.appendChild(o);
+  }
+})();
+
+function selectType(t){
+  typeCompte=t;
+  document.getElementById('type-avocat').classList.toggle('selected',t==='avocat');
+  document.getElementById('type-juriste').classList.toggle('selected',t==='juriste');
+}
+
+function onPaysChange(){
+  const sel=document.getElementById('pays');
+  const opt=sel.options[sel.selectedIndex];
+  document.getElementById('indicatif').value=opt.dataset.ind||'+237';
+  langue=opt.dataset.lang||'fr';
+}
+
+function validerEmail(){
+  const v=document.getElementById('email').value;
+  const ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  document.getElementById('email').classList.toggle('error',v.length>0&&!ok);
+  document.getElementById('email').classList.toggle('valid',ok);
+  document.getElementById('err-email').style.display=(v.length>0&&!ok)?'block':'none';
+  return ok;
+}
+
+function evalMdp(){
+  const pwd=document.getElementById('password').value;
+  let score=0;
+  if(pwd.length>=8)score++;
+  if(/[A-Z]/.test(pwd))score++;
+  if(/[0-9]/.test(pwd))score++;
+  if(/[^A-Za-z0-9]/.test(pwd))score++;
+  const cols=['#EF4444','#F59E0B','#16A34A','#059669'];
+  const lbls=['Faible','Moyen','Fort','Très fort'];
+  document.getElementById('pwd-bar').style.width=((score/4)*100)+'%';
+  document.getElementById('pwd-bar').style.background=cols[score-1]||'#E2E8F0';
+  document.getElementById('pwd-lbl').textContent=pwd.length>0?lbls[score-1]||'':'';
+}
+
+function verifConf(){
+  const p1=document.getElementById('password').value;
+  const p2=document.getElementById('password2').value;
+  const ok=p1===p2&&p2.length>0;
+  document.getElementById('err-pwd').style.display=(p2.length>0&&!ok)?'block':'none';
+  document.getElementById('password2').classList.toggle('error',p2.length>0&&!ok);
+  document.getElementById('password2').classList.toggle('valid',ok);
+}
+
+function togglePwd(id){
+  const i=document.getElementById(id);
+  i.type=i.type==='password'?'text':'password';
+}
+
+function allerEtape(n){
+  document.querySelectorAll('.form-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('section-'+n).classList.add('active');
+  for(let i=1;i<=4;i++){
+    const c=document.getElementById('sc-'+i);
+    const l=document.getElementById('sl-'+i);
+    c.classList.remove('active','done');
+    l.classList.remove('active','done');
+    if(i<n){c.classList.add('done');c.innerHTML='&#10003;';l.classList.add('done');}
+    else if(i===n){c.classList.add('active');c.innerHTML=i;l.classList.add('active');}
+    else{c.innerHTML=i;}
+    if(i<4)document.getElementById('line-'+i).classList.toggle('done',i<n);
+  }
+}
+
+function etape1(){
+  const prenom=document.getElementById('prenom').value.trim();
+  const nom=document.getElementById('nom').value.trim();
+  const pays=document.getElementById('pays').value;
+  if(!prenom||!nom){showToast('Renseignez prénom et nom');return;}
+  if(!pays){showToast('Sélectionnez votre pays');return;}
+  if(!validerEmail()){showToast('Email invalide');return;}
+  document.getElementById('champs-avocat').style.display=typeCompte==='avocat'?'block':'none';
+  document.getElementById('champs-juriste').style.display=typeCompte==='juriste'?'block':'none';
+  allerEtape(2);
+}
+
+function etape2(){
+  const tel=document.getElementById('telephone').value.trim();
+  if(!tel){showToast('Renseignez votre téléphone');return;}
+  if(typeCompte==='avocat'){
+    if(!document.getElementById('barreau').value.trim()){showToast('Renseignez votre barreau');return;}
+    if(!document.getElementById('num-barreau').value.trim()){showToast('Numéro de barreau requis');return;}
+    if(!document.getElementById('annee').value){showToast("Sélectionnez l'année");return;}
+  }else{
+    if(!document.getElementById('entreprise').value.trim()){showToast("Renseignez l'entreprise");return;}
+    if(!document.getElementById('poste').value.trim()){showToast('Renseignez le poste');return;}
+    if(!document.getElementById('num-juriste').value.trim()){showToast("Numéro d'identification requis");return;}
+  }
+  allerEtape(3);
+}
+
+function etape3(){
+  const pwd=document.getElementById('password').value;
+  const pwd2=document.getElementById('password2').value;
+  if(pwd.length<8){showToast('Mot de passe trop court — minimum 8 caractères');return;}
+  if(pwd!==pwd2){showToast('Les mots de passe ne correspondent pas');return;}
+  if(!document.getElementById('chk-cgu').checked){showToast("Acceptez les conditions d'utilisation");return;}
+  const pays=document.getElementById('pays');
+  const paysNom=pays.options[pays.selectedIndex]?.text||'';
+  const items=[
+    ['Nom',document.getElementById('prenom').value+' '+document.getElementById('nom').value],
+    ['Email',document.getElementById('email').value],
+    ['Pays',paysNom],
+    ['Type',typeCompte==='avocat'?'Avocat':'Juriste'],
+  ];
+  if(typeCompte==='avocat'){
+    items.push(['Barreau',document.getElementById('barreau').value]);
+    items.push(['N° Barreau',document.getElementById('num-barreau').value]);
+  }else{
+    items.push(['Entreprise',document.getElementById('entreprise').value]);
+    items.push(['Poste',document.getElementById('poste').value]);
+  }
+  document.getElementById('recap').innerHTML=items.map(([k,v])=>`
+    <div class="recap-item"><div class="recap-key">${k}</div><div class="recap-val">${v}</div></div>`).join('');
+  allerEtape(4);
+}
+
+async function soumettre(){
+  const btn=document.getElementById('btn-submit');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>Création...';
+  const data={
+    email:document.getElementById('email').value.trim(),
+    password:document.getElementById('password').value,
+    prenom:document.getElementById('prenom').value.trim(),
+    nom:document.getElementById('nom').value.trim(),
+    pays:document.getElementById('pays').value,
+    langue:langue,
+    type_compte:typeCompte,
+    telephone:document.getElementById('indicatif').value+document.getElementById('telephone').value.trim(),
+    barreau:typeCompte==='avocat'?document.getElementById('barreau').value.trim():'',
+    num_barreau:typeCompte==='avocat'?document.getElementById('num-barreau').value.trim():'',
+    annee_inscription:typeCompte==='avocat'?document.getElementById('annee').value:'',
+    entreprise:typeCompte==='juriste'?document.getElementById('entreprise').value.trim():'',
+    poste:typeCompte==='juriste'?document.getElementById('poste').value.trim():'',
+    num_juriste:typeCompte==='juriste'?document.getElementById('num-juriste').value.trim():'',
+    accepte_comm:document.getElementById('chk-comm').checked,
+  };
+  try{
+    const r=await fetch('/inscription',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const d=await r.json();
+    if(d.succes){
+      document.getElementById('steps-wrap').style.display='none';
+      document.querySelectorAll('.form-section').forEach(s=>s.style.display='none');
+      document.getElementById('suc-email').textContent=data.email;
+      document.getElementById('success-screen').style.display='block';
+    }else{
+      showToast(d.erreur||'Erreur lors de la création');
+      btn.disabled=false;btn.textContent='Créer mon compte';
+    }
+  }catch(e){
+    showToast('Erreur de connexion');
+    btn.disabled=false;btn.textContent='Créer mon compte';
+  }
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+</script>
+</body>
+</html>
