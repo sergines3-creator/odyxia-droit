@@ -2306,6 +2306,6 @@ PROMPTS_REDACTION.update({
         "description": "Accord rupture amiable · solde tout compte · Code Travail Cameroun",
         "champs":      ["salarie", "employeur", "ancienneté", "salaire",
                         "indemnites_legales", "montant", "faits"],
-        "fn":          prompt_transaction_prudhomale
+        "fn": prompt_transaction_prud_homale
     },
 })
