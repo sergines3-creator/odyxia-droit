@@ -1063,6 +1063,7 @@ def liste_documents():
     try:
         dossier_id = request.args.get("dossier_id", "")
         tenant_id  = get_current_tenant_id()
+        print(f"[LISTE_DOCS] tenant_id={tenant_id} dossier_id={dossier_id}")
 
         query = supabase.table("documents").select(
             "id, nom, filename, original_filename, type, dossier_id, "
@@ -1073,8 +1074,11 @@ def liste_documents():
             query = query.eq("dossier_id", dossier_id)
 
         result = query.execute()
+        print(f"[LISTE_DOCS] OK — {len(result.data)} docs")
         return jsonify(result.data)
     except Exception as e:
+        import traceback
+        print(f"[LISTE_DOCS] ERREUR : {traceback.format_exc()}")
         return jsonify({"erreur": str(e)}), 500
 
 
@@ -1776,3 +1780,4 @@ def health():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
+    
