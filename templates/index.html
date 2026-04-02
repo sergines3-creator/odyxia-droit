@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Themis — Intelligence Juridique</title>
+<title>ODYXIA Droit — Intelligence Juridique</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
@@ -602,7 +602,7 @@ select.pred-inp { cursor: pointer; }
 ══════════════════════════════════════════ -->
 <div id="login-screen">
   <div class="lbox">
-    <div class="l-logo">Themis<span>.</span></div>
+    <div class="l-logo">ODYXIA Droit<span>.</span></div>
     <div class="l-sub">Intelligence Juridique</div>
     <label class="l-lbl">Mot de passe</label>
     <input type="password" class="l-inp" id="l-pwd" placeholder="••••••••••••"
@@ -629,7 +629,7 @@ select.pred-inp { cursor: pointer; }
   <!-- HEADER -->
   <header class="hdr">
     <div class="hdr-logo">
-      <div class="hdr-logo-name">Themis<span>.</span></div>
+      <div class="hdr-logo-name">ODYXIA Droit<span>.</span></div>
       <div class="hdr-logo-sub">Intelligence Juridique · Cameroun</div>
     </div>
     <nav class="hdr-nav">
@@ -672,7 +672,7 @@ select.pred-inp { cursor: pointer; }
       <!-- DOSSIER BAR -->
       <div class="dbar">
         <div>
-          <div class="dbar-title" id="dbar-title">Themis</div>
+          <div class="dbar-title" id="dbar-title">ODYXIA Droit</div>
           <div class="dbar-meta" id="dbar-meta">
             <span>Sélectionnez un dossier</span>
           </div>
@@ -964,7 +964,7 @@ select.pred-inp { cursor: pointer; }
 <div id="modal-enc" class="enc-modal-overlay hidden">
   <div class="enc-modal">
     <div class="enc-modal-title">Document chiffré</div>
-    <div class="enc-modal-sub">Le contenu sera chiffré AES avant stockage dans Supabase.<br>Seul Themis peut le déchiffrer au moment de la recherche.</div>
+    <div class="enc-modal-sub">Le contenu sera chiffré AES avant stockage dans Supabase.<br>Seul ODYXIA peut le déchiffrer au moment de la recherche.</div>
     <input type="password" class="enc-pass" id="enc-pass" placeholder="Mot de passe de chiffrement…"
            onkeydown="if(event.key==='Enter')confirmerChiffrement()"/>
     <div class="enc-hint">
@@ -996,7 +996,7 @@ select.pred-inp { cursor: pointer; }
 /* ═══════════════════════════════════════════
    STATE
 ═══════════════════════════════════════════ */
-let TOKEN = localStorage.getItem('themis_token') || '';
+let TOKEN = localStorage.getItem('odyxia_token') || '';
 let SESSION_ID = 'sess_' + Date.now();
 let DOSSIER_ID = null, DOSSIER_NOM = '';
 let TYPES_DOCS = [], TYPE_ACTIF = null, DERNIER_DOC = '';
@@ -1034,7 +1034,7 @@ async function loginStep() {
     const res = await fetch('/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pwd, code_2fa: code }) });
     const data = await res.json();
     if (data.token) {
-      TOKEN = data.token; localStorage.setItem('themis_token', TOKEN);
+      TOKEN = data.token; localStorage.setItem('odyxia_token', TOKEN);
       $('login-screen').style.display = 'none'; $('app').classList.add('on'); init();
     } else if (data.require_2fa) {
       $('l-2fa-row').classList.add('show'); $('l-code').classList.remove('hidden'); $('l-code').focus();
@@ -1044,7 +1044,7 @@ async function loginStep() {
 }
 
 function logout() {
-  localStorage.removeItem('themis_token'); TOKEN = '';
+  localStorage.removeItem('odyxia_token'); TOKEN = '';
   $('app').classList.remove('on'); $('login-screen').style.display = 'flex';
 }
 
@@ -1294,7 +1294,7 @@ async function synthDoc(docId) {
 ═══════════════════════════════════════════ */
 function afficherBienvenue() {
   $('msgs').innerHTML = `<div class="welcome-card">
-    <div class="wc-lbl">Themis est prêt</div>
+    <div class="wc-lbl">Odyxia est prêt</div>
     <div class="wc-pt">Posez une question juridique ou uploadez un document PDF</div>
     <div class="wc-pt">Sélectionnez un dossier dans la barre latérale pour commencer</div>
     <div class="wc-qs">
@@ -1367,10 +1367,10 @@ async function exportPDF() {
   const contenu = $('msgs').innerText;
   if (!contenu.trim()) { toast('Aucun contenu à exporter'); return; }
   try {
-    const res = await fetch('/export_pdf', { method: 'POST', headers: authH(), body: JSON.stringify({ contenu, nom: DOSSIER_NOM || 'Themis' }) });
+    const res = await fetch('/export_pdf', { method: 'POST', headers: authH(), body: JSON.stringify({ contenu, nom: DOSSIER_NOM || 'Odyxia' }) });
     const blob = await res.blob();
     const url = URL.createObjectURL(blob), a = document.createElement('a');
-    a.href = url; a.download = 'themis_export.pdf'; a.click(); URL.revokeObjectURL(url);
+    a.href = url; a.download = 'odyxia_export.pdf'; a.click(); URL.revokeObjectURL(url);
   } catch(e) { toast('Erreur export PDF'); }
 }
 
@@ -1434,7 +1434,7 @@ async function exporterDocPDF() {
   try {
     const res = await fetch('/export_pdf', { method: 'POST', headers: authH(), body: JSON.stringify({ contenu: DERNIER_DOC, nom: $('rd-result-title').textContent }) });
     const blob = await res.blob(), url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'document_themis.pdf'; a.click(); URL.revokeObjectURL(url);
+    const a = document.createElement('a'); a.href = url; a.download = 'document_odyxia.pdf'; a.click(); URL.revokeObjectURL(url);
   } catch(e) { toast('Erreur PDF'); }
 }
 
