@@ -1067,7 +1067,7 @@ def liste_documents():
 
         query = supabase.table("documents").select(
             "id, nom, filename, original_filename, type, dossier_id, "
-            "manuscrit, metadata, status, storage_tier, created_at"
+            "manuscrit, status, storage_tier, created_at"
         ).eq("tenant_id", tenant_id).eq("status", "ready").order("created_at", desc=True)
 
         if dossier_id:
@@ -1780,4 +1780,3 @@ def health():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
-    
