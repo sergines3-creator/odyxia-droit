@@ -59,7 +59,7 @@ VOYAGE_MODEL   = "voyage-law-2"
 VOYAGE_URL_API = "https://api.voyageai.com/v1/embeddings"
 TOTP_SECRET    = os.environ.get("TOTP_SECRET", "")
 
-CABINET_NOM    = os.environ.get("CABINET_NOM",    "ODYXIA Droit")
+CABINET_NOM    = os.environ.get("CABINET_NOM",    "Odyxia Droit")
 CABINET_AVOCAT = os.environ.get("CABINET_AVOCAT", "Maître")
 CABINET_VILLE  = os.environ.get("CABINET_VILLE",  "Douala, Cameroun")
 
@@ -74,7 +74,7 @@ Talisman(app,
     session_cookie_secure=True,
     content_security_policy=False
 )
-app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "ODYXIA-JWT-2026!")
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "Odyxia-JWT-2026!")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=8)
 jwt_manager = JWTManager(app)
 
@@ -416,7 +416,7 @@ def setup_2fa():
     totp = pyotp.TOTP(secret)
     uri  = totp.provisioning_uri(
         name=CABINET_AVOCAT,
-        issuer_name=f"ODYXIA Droit — {CABINET_NOM}"
+        issuer_name=f"Odyxia Droit — {CABINET_NOM}"
     )
     qr = qrcode.make(uri)
     buffer = BytesIO()
@@ -469,6 +469,182 @@ def login():
     except Exception as e:
         log_erreur("LOGIN", e)
         return jsonify({"erreur": str(e)}), 500
+
+
+# ─── INSCRIPTION ─────────────────────────────────────────────────────────────
+
+@app.route("/inscription")
+def page_inscription():
+    return render_template("inscription.html")
+
+
+@app.route("/inscription", methods=["POST"])
+@limiter.limit("5 per minute")
+def creer_compte():
+    """
+    Création d'un nouveau compte avocat / juriste.
+    - Crée l'utilisateur dans Supabase Auth
+    - Chiffre les données sensibles (nom, téléphone, numéro barreau)
+    - Crée le tenant + utilisateur dans les tables applicatives
+    - Démarre la période d'essai de 14 jours
+    """
+    try:
+        data = request.json
+
+        # ── Validation champs obligatoires ────────────────
+        required = ['email', 'password', 'prenom', 'nom', 'pays', 'type_compte']
+        for field in required:
+            if not data.get(field, '').strip():
+                return jsonify({"erreur": f"Champ requis manquant : {field}"}), 400
+
+        email       = data['email'].strip().lower()
+        password    = data['password']
+        prenom      = data['prenom'].strip()
+        nom         = data['nom'].strip()
+        pays        = data['pays'].strip()
+        langue      = data.get('langue', 'fr')
+        type_compte = data['type_compte']
+        telephone   = data.get('telephone', '').strip()
+
+        # Validation numéro barreau pour avocats
+        if type_compte == 'avocat':
+            num_barreau = data.get('num_barreau', '').strip()
+            if not num_barreau:
+                return jsonify({"erreur": "Numéro de barreau requis pour un avocat"}), 400
+            if not data.get('barreau', '').strip():
+                return jsonify({"erreur": "Nom du barreau requis"}), 400
+
+        if type_compte == 'juriste':
+            if not data.get('entreprise', '').strip():
+                return jsonify({"erreur": "Entreprise employeur requise"}), 400
+            if not data.get('num_juriste', '').strip():
+                return jsonify({"erreur": "Numéro d'identification requis"}), 400
+
+        # ── Vérifier si email déjà utilisé ────────────────
+        existing = supabase.table("tenants").select("id").eq(
+            "slug", email.replace('@', '-').replace('.', '-')
+        ).execute()
+        if existing.data:
+            return jsonify({"erreur": "Un compte existe déjà avec cet email"}), 400
+
+        # ── Créer utilisateur Supabase Auth ───────────────
+        try:
+            auth_response = supabase.auth.sign_up({
+                "email":    email,
+                "password": password,
+            })
+            user_id = auth_response.user.id if auth_response.user else None
+            if not user_id:
+                return jsonify({"erreur": "Erreur lors de la création du compte"}), 500
+        except Exception as e:
+            err_msg = str(e).lower()
+            if 'already' in err_msg or 'exists' in err_msg:
+                return jsonify({"erreur": "Un compte existe déjà avec cet email"}), 400
+            return jsonify({"erreur": "Erreur d'authentification : " + str(e)[:100]}), 500
+
+        # ── Chiffrement données sensibles ─────────────────
+        try:
+            from encryption import chiffrer
+            nom_prenom_enc     = chiffrer(f"{prenom} {nom}")
+            telephone_enc      = chiffrer(telephone) if telephone else None
+            num_barreau_enc    = chiffrer(data.get('num_barreau', '')) if type_compte == 'avocat' else None
+            entreprise_enc     = chiffrer(data.get('entreprise', '')) if type_compte == 'juriste' else None
+            num_juriste_enc    = chiffrer(data.get('num_juriste', '')) if type_compte == 'juriste' else None
+        except Exception:
+            # Fallback sans chiffrement si module non disponible
+            nom_prenom_enc  = f"{prenom} {nom}"
+            telephone_enc   = telephone
+            num_barreau_enc = data.get('num_barreau', '')
+            entreprise_enc  = data.get('entreprise', '')
+            num_juriste_enc = data.get('num_juriste', '')
+
+        # ── Dates essai ───────────────────────────────────
+        from datetime import timezone
+        maintenant  = datetime.now(timezone.utc)
+        fin_essai   = maintenant + timedelta(days=14)
+        tenant_id   = str(uuid.uuid4())
+        slug        = email.replace('@', '-').replace('.', '-')
+
+        # ── Créer le tenant ───────────────────────────────
+        supabase.table("tenants").insert({
+            "id":               tenant_id,
+            "name":             f"{prenom} {nom}",
+            "slug":             slug,
+            "mode":             "solo",
+            "plan":             "trial",
+            "status":           "active",
+            "storage_used_mb":  0,
+            "storage_limit_mb": 2048,
+        }).execute()
+
+        # ── Créer l'utilisateur applicatif ────────────────
+        supabase.table("users").insert({
+            "id":           user_id,
+            "tenant_id":    tenant_id,
+            "email":        email,
+            "full_name":    f"{prenom} {nom}",
+            "role":         "owner",
+            "is_active":    True,
+            "mfa_enabled":  False,
+        }).execute()
+
+        # ── Créer profil avocat/juriste ───────────────────
+        profil = {
+            "id":               str(uuid.uuid4()),
+            "tenant_id":        tenant_id,
+            "user_id":          user_id,
+            "email":            email,
+            "pays":             pays,
+            "langue":           langue,
+            "type_compte":      type_compte,
+            "nom_prenom_enc":   nom_prenom_enc,
+            "telephone_enc":    telephone_enc,
+            "statut":           "essai",
+            "essai_debut":      maintenant.isoformat(),
+            "essai_fin":        fin_essai.isoformat(),
+            "accepte_comm":     data.get('accepte_comm', False),
+        }
+        if type_compte == 'avocat':
+            profil["barreau"]          = data.get('barreau', '').strip()
+            profil["barreau_pays"]     = pays
+            profil["annee_inscription"]= data.get('annee_inscription', '')
+            profil["num_barreau_enc"]  = num_barreau_enc
+        else:
+            profil["entreprise_enc"]   = entreprise_enc
+            profil["poste"]            = data.get('poste', '').strip()
+            profil["num_juriste_enc"]  = num_juriste_enc
+
+        # Insérer le profil (table avocats — créée si absente)
+        try:
+            supabase.table("avocats").insert(profil).execute()
+        except Exception as e:
+            print(f"[INSCRIPTION] Table avocats inexistante — à créer : {e}")
+
+        # ── Log sécurité ──────────────────────────────────
+        log_security_event("login_success", tenant_id, user_id, {
+            "action":      "inscription",
+            "type_compte": type_compte,
+            "pays":        pays,
+        })
+
+        log_audit_event("INSCRIPTION", tenant_id, user_id, {
+            "type_compte": type_compte,
+            "pays":        pays,
+        })
+
+        print(f"[INSCRIPTION] Nouveau compte : {email} | {type_compte} | {pays}")
+
+        return jsonify({
+            "succes":      True,
+            "tenant_id":   tenant_id,
+            "user_id":     user_id,
+            "essai_fin":   fin_essai.isoformat(),
+            "message":     "Compte créé avec succès — essai de 14 jours démarré",
+        })
+
+    except Exception as e:
+        log_erreur("INSCRIPTION", e)
+        return jsonify({"erreur": str(e)[:200]}), 500
 
 
 # ─── CHAT ─────────────────────────────────────────────────────────────────────
@@ -1227,7 +1403,7 @@ def export_pdf():
 
         data      = request.json
         contenu   = data.get("contenu", "")
-        nom       = data.get("nom", "Document ODYXIA Droit")
+        nom       = data.get("nom", "Document Odyxia Droit")
         tenant_id = get_current_tenant_id()
 
         if not contenu:
@@ -1252,7 +1428,7 @@ def export_pdf():
             textColor=DARK, leading=16, alignment=TA_JUSTIFY, spaceAfter=8)
 
         elements = []
-        elements.append(Paragraph(f"ODYXIA Droit · {CABINET_NOM}", s_titre))
+        elements.append(Paragraph(f"Odyxia Droit · {CABINET_NOM}", s_titre))
         elements.append(Paragraph(f"{CABINET_AVOCAT} · {CABINET_VILLE}", s_sub))
         elements.append(Paragraph(
             f"Généré le {datetime.now().strftime('%d/%m/%Y à %H:%M')}", s_sub))
@@ -1274,7 +1450,7 @@ def export_pdf():
         elements.append(Spacer(1, 20))
         elements.append(HRFlowable(width="100%", thickness=0.5, color=OR))
         elements.append(Paragraph(
-            f"ODYXIA Droit · {CABINET_NOM} · Document confidentiel", s_sub))
+            f"Odyxia Droit · {CABINET_NOM} · Document confidentiel", s_sub))
 
         doc.build(elements)
         buffer.seek(0)
@@ -1712,7 +1888,7 @@ def rapport_client():
                                    fontName="Helvetica",     alignment=TA_CENTER)
 
         story = []
-        story.append(Paragraph("ODYXIA Droit.", s_title))
+        story.append(Paragraph("Odyxia Droit.", s_title))
         story.append(Paragraph(
             f"Rapport — {rapport.get('titre', dossier_info['nom'])}", s_sub))
         story.append(HRFlowable(width="100%", thickness=1, color=BLUE, spaceAfter=16))
@@ -1753,7 +1929,7 @@ def rapport_client():
         story.append(HRFlowable(width="100%", thickness=0.5,
                                   color=BLUE, spaceBefore=20, spaceAfter=8))
         story.append(Paragraph(
-            f"ODYXIA Droit · {CABINET_NOM} · {CABINET_VILLE}", s_center))
+            f"Odyxia Droit · {CABINET_NOM} · {CABINET_VILLE}", s_center))
 
         doc.build(story)
         buffer.seek(0)

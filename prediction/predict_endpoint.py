@@ -1,4 +1,4 @@
-"""
+﻿"""
 predict_endpoint.py — Themis
 Blueprint Flask pour l'analyse prédictive juridique
 Sécurité : JWT requis sur toutes les routes + rate limiting + audit logs
@@ -233,7 +233,7 @@ def generer_synthese_claude(query: str, domaine: str, precedents: list,
             f"Résumé : {p.get('contenu', '')[:300]}\n"
         )
 
-    prompt = f"""Tu es ODYXIA Droit, assistant juridique IA expert en droit OHADA, CEMAC et africain.
+    prompt = f"""Tu es Odyxia Droit, assistant juridique IA expert en droit OHADA, CEMAC et africain.
 
 DOSSIER À ANALYSER :
 Domaine : {domaine}
@@ -540,3 +540,4 @@ def stats():
     except Exception as e:
         log_erreur("STATS", e)
         return jsonify({"erreur": str(e)}), 500
+

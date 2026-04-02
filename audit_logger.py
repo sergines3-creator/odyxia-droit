@@ -1,4 +1,4 @@
-"""
+﻿"""
 audit_logger.py — Themis
 Journal d'audit de toutes les actions sensibles
 """

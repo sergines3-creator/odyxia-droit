@@ -1,4 +1,4 @@
-"""
+﻿"""
 encryption.py — Themis
 Chiffrement/déchiffrement Fernet (AES-128)
 + extraction mots-clés pour index de recherche séparé

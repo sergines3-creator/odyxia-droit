@@ -1,4 +1,4 @@
-"""
+﻿"""
 embeddings_voyage.py — Themis
 Pipeline de vectorisation par lots avec Voyage AI (voyage-law-2)
 Chunking intelligent : découpe aux frontières juridiques (articles, alinéas, sections)
@@ -419,7 +419,7 @@ def statut_vectorisation(document_id: str = None) -> dict:
 if __name__ == "__main__":
     import sys
     print("=" * 60)
-    print("Themis — Pipeline de vectorisation Voyage AI")
+    print("Odyxia Droit — Pipeline de vectorisation Voyage AI")
     print("=" * 60)
 
     statut = statut_vectorisation()
@@ -440,3 +440,4 @@ if __name__ == "__main__":
     print(f"  Traités  : {resultat['total']}")
     print(f"  Erreurs  : {resultat['erreurs']}")
     print("=" * 60)
+

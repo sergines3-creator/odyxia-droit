@@ -1,5 +1,5 @@
-"""
-prompts.py — Themis Droit
+﻿"""
+prompts.py — Odyxia Droit
 Bibliothèque centralisée de tous les prompts experts.
 Chaque prompt est rédigé au niveau d'un juriste senior
 spécialisé en droit OHADA, CEMAC et droit camerounais.
@@ -44,7 +44,7 @@ AVERTISSEMENT_NATIONAL = (
     "spécifiques au " + PAYS_CONFIG["pays"] + " et devront être adaptés pour tout autre État OHADA.\n"
 )
 
-IDENTITE_THEMIS = f"""Tu es ODYXIA Droit, assistant juridique IA de niveau expert au service de {CABINET_NOM}.
+IDENTITE_ODYXIA = f"""Tu es Odyxia Droit, assistant juridique IA de niveau expert au service de {CABINET_NOM}.
 
 Ton expertise couvre :
 - Le droit OHADA dans toute sa profondeur (Actes Uniformes, jurisprudence CCJA, doctrine)
@@ -75,7 +75,7 @@ def prompt_chat(question: str, contexte_documents: str) -> str:
     Prompt principal du chat juridique.
     Contextualise la réponse avec les documents indexés du dossier.
     """
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 ━━━ DOCUMENTS DU DOSSIER ━━━
 {contexte_documents if contexte_documents else "Aucun document indexé — répondre sur la base du droit général applicable."}
@@ -117,7 +117,7 @@ def prompt_synthese_document(texte: str, nom_document: str) -> str:
     Génère une synthèse structurée JSON à l'upload d'un document.
     Simule l'analyse d'un juriste qui lit le document pour la première fois.
     """
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu reçois un document juridique à analyser immédiatement après son upload.
 Ton rôle : produire une synthèse de premier niveau, comme si tu lisais
@@ -183,7 +183,7 @@ def prompt_prediction(
             f"Résumé : {p.get('contenu', '')[:400]}\n"
         )
 
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu produis un mémorandum d'analyse prédictive de niveau cabinet international.
 Ce document guidera la stratégie de l'avocat avant audience.
@@ -271,7 +271,7 @@ def prompt_analyse_comparative(
             f"Résumé : {d.get('contenu', '')[:500]}\n"
         )
 
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu produis un profil jurisprudentiel de niveau analyse de cabinet d'avocats d'affaires.
 Ce profil servira à préparer une stratégie de plaidoirie sur mesure.
@@ -325,7 +325,7 @@ Produis un profil jurisprudentiel en JSON strict sans markdown ni backticks :
 # 5. RÉDACTION — 10 DOCUMENTS JURIDIQUES CLÉS
 # ─────────────────────────────────────────────────────────────────────────────
 
-REDACTION_BASE = f"""{IDENTITE_THEMIS}
+REDACTION_BASE = f"""{IDENTITE_ODYXIA}
 
 Tu rédiges un document juridique professionnel destiné à être déposé
 ou transmis à une juridiction ou à une partie adverse.
@@ -628,7 +628,7 @@ def prompt_analyse_veille(texte_document: str, source: str) -> str:
     """
     Analyse un nouveau document de veille et extrait les informations pertinentes.
     """
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu analyses un nouveau texte juridique issu de la veille automatique.
 Ton rôle : extraire les informations utiles pour un avocat en exercice.
@@ -772,7 +772,7 @@ def prompt_carte_mentale(texte: str, nom_document: str) -> str:
     - Maximum 6 branches, maximum 5 feuilles par branche
     - Chaque label doit être court — 1 à 6 mots maximum
     """
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu analyses un document juridique pour en extraire la structure hiérarchique.
 Ton objectif : permettre à un avocat de comprendre l'essentiel du document
@@ -831,7 +831,7 @@ def prompt_timeline_dossier(texte: str, dossier_id: str) -> str:
     Extrait la chronologie des faits et actes juridiques d'un dossier.
     Retourne un JSON structuré avec des événements triés par date.
     """
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu analyses les documents d'un dossier juridique pour en extraire la chronologie complète.
 Ton rôle : reconstituer la ligne du temps avec une précision de juriste.
@@ -887,7 +887,7 @@ def prompt_rapport_client(texte: str, nom_dossier: str, nom_client: str, docs: l
     """
     liste_docs = "\n".join([f"- {d.get('nom','Document')}" for d in docs]) if docs else "Aucun document listé"
 
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu prépares un rapport d'avancement pour le client d'un cabinet d'avocats.
 Ton style : clair, professionnel, rassurant — zéro jargon juridique inutile.
@@ -948,7 +948,7 @@ def prompt_matching_veille(texte_veille: str, dossiers_actifs: list) -> str:
         for d in dossiers_actifs
     ]) if dossiers_actifs else "Aucun dossier actif"
 
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu analyses un nouveau texte juridique (veille) et identifies
 quels dossiers du cabinet sont potentiellement impactés.
@@ -1001,7 +1001,7 @@ Réponds UNIQUEMENT avec ce JSON strict :
 # ─────────────────────────────────────────────────────────────────────────────
 
 def prompt_saisie_conservatoire(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras une requête en autorisation de saisie conservatoire, au niveau d'un avocat
 d'affaires OHADA de 20 ans d'expérience plaidant devant le Président du Tribunal.
@@ -1042,7 +1042,7 @@ dans chaque section. Argumente le fumus et le periculum avec les faits fournis.
 
 
 def prompt_saisie_attribution(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras un acte de saisie-attribution de créances (saisie entre les mains d'un tiers),
 au niveau d'un avocat OHADA expérimenté.
@@ -1076,7 +1076,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_injonction_payer(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras une requête en injonction de payer devant le Président du Tribunal,
 procédure simplifiée de recouvrement OHADA.
@@ -1112,7 +1112,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_opposition_injonction(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras un acte d'opposition à une ordonnance d'injonction de payer OHADA,
 transformant la procédure en procédure contradictoire.
@@ -1150,7 +1150,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_contestation_saisie(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras une requête en contestation de mesure d'exécution forcée devant
 le juge compétent (juge du contentieux de l'exécution).
@@ -1188,7 +1188,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_saisie_immobiliere(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras un commandement valant saisie immobilière et le mémoire introductif
 de la procédure, au niveau d'un avocat OHADA spécialisé en voies d'exécution.
@@ -1228,7 +1228,7 @@ Faits : {donnees.get('faits','')}
 # ─────────────────────────────────────────────────────────────────────────────
 
 def prompt_exception_incompetence(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras un mémoire soulevant une exception d'incompétence (territoriale ou
 matérielle) devant la juridiction saisie, à titre liminaire et in limine litis.
@@ -1262,7 +1262,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_demande_exequatur(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras une requête en exequatur d'une décision judiciaire ou sentence
 arbitrale étrangère devant le Tribunal de Grande Instance camerounais.
@@ -1296,7 +1296,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_opposition_defaut(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras un acte d'opposition à un jugement rendu par défaut (défaut faute
 de comparaître ou défaut faute de conclure), avec argumentation au fond.
@@ -1335,7 +1335,7 @@ Faits : {donnees.get('faits','')}
 # ─────────────────────────────────────────────────────────────────────────────
 
 def prompt_demande_liberte_provisoire(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras une demande de mise en liberté provisoire (liberté sous caution ou
 liberté provisoire simple) devant le juge d'instruction ou la chambre de contrôle
@@ -1377,7 +1377,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_memoire_defense_penale(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras un mémoire de défense pénale complet devant le tribunal correctionnel
 ou la cour d'assises, au niveau d'un avocat pénaliste expérimenté.
@@ -1416,7 +1416,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_constitution_partie_civile(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras une constitution de partie civile devant le juge d'instruction ou
 le tribunal pénal, avec chiffrage détaillé du préjudice.
@@ -1453,7 +1453,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_appel_penal(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras un mémoire d'appel pénal devant la Cour d'appel, contestant
 une décision du tribunal de première instance.
@@ -1495,7 +1495,7 @@ Faits : {donnees.get('faits','')}
 # ─────────────────────────────────────────────────────────────────────────────
 
 def prompt_requete_dissolution(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras une requête en dissolution judiciaire d'une société commerciale
 devant le Tribunal de commerce ou TGI, au niveau OHADA.
@@ -1534,7 +1534,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_action_responsabilite_dirigeant(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras une action en responsabilité civile contre un dirigeant social
 (gérant, DG, administrateur) pour faute de gestion, au niveau OHADA.
@@ -1573,7 +1573,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_procedure_collective(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras une requête en ouverture de procédure collective (redressement judiciaire
 ou liquidation des biens) devant le Tribunal compétent, selon l'AUPC OHADA.
@@ -1613,7 +1613,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_memoire_verification_creances(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras un mémoire de déclaration et vérification de créances dans
 le cadre d'une procédure collective OHADA.
@@ -1651,7 +1651,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_demande_arbitrage_ccja(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras une requête d'arbitrage devant la Cour Commune de Justice et
 d'Arbitrage (CCJA) de l'OHADA, au niveau d'un avocat d'affaires international.
@@ -1693,7 +1693,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_recours_annulation_sentence(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras un recours en annulation d'une sentence arbitrale devant la CCJA
 ou la Cour d'appel nationale compétente.
@@ -1738,7 +1738,7 @@ Faits : {donnees.get('faits','')}
 # ─────────────────────────────────────────────────────────────────────────────
 
 def prompt_contestation_licenciement(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras une requête en contestation de licenciement abusif devant le
 Tribunal du Travail camerounais, avec demandes de réintégration et/ou indemnités.
@@ -1781,7 +1781,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_recours_exces_pouvoir(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras un recours pour excès de pouvoir (REP) devant le Tribunal
 Administratif camerounais contre un acte administratif illégal.
@@ -1821,7 +1821,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_contestation_fonciere(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras une requête en contestation de titre foncier ou d'immatriculation
 foncière devant le Tribunal de Grande Instance au Cameroun.
@@ -1865,7 +1865,7 @@ Faits : {donnees.get('faits','')}
 # ─────────────────────────────────────────────────────────────────────────────
 
 def prompt_mise_en_demeure(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras une mise en demeure formelle à valeur probatoire maximale,
 pouvant servir de préalable à toute action judiciaire ou voie d'exécution.
@@ -1902,7 +1902,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_protocole_transactionnel(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras un protocole transactionnel (accord amiable) entre les parties,
 mettant fin à un litige par concessions réciproques.
@@ -1944,7 +1944,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_recours_fiscal(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras un recours fiscal gracieux (réclamation préalable) puis contentieux
 devant la DGI ou le Tribunal Administratif camerounais.
@@ -1984,7 +1984,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_avis_juridique(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras un avis juridique structuré (legal opinion) sur une question de droit,
 au niveau d'un cabinet d'avocats d'affaires international.
@@ -2019,7 +2019,7 @@ Domaine de droit : {donnees.get('domaine','Droit des affaires OHADA')}
 
 
 def prompt_demande_sursis_execution(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras une demande de sursis à exécution d'une décision judiciaire
 ou administrative, à titre d'urgence.
@@ -2056,7 +2056,7 @@ Faits : {donnees.get('faits','')}
 
 
 def prompt_transaction_prud_homale(donnees: dict, contexte: str) -> str:
-    return f"""{IDENTITE_THEMIS}
+    return f"""{IDENTITE_ODYXIA}
 
 Tu rédigeras une transaction prud'homale (accord de rupture amiable du contrat
 de travail) avec protocole de solde de tout compte sécurisé juridiquement.
@@ -2309,3 +2309,4 @@ PROMPTS_REDACTION.update({
         "fn": prompt_transaction_prud_homale
     },
 })
+
