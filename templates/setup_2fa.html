@@ -3,329 +3,158 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ODYXIA Droit — Configuration 2FA</title>
+<title>Odyxia Droit — Configuration 2FA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  --bg:       #F2F1EE;
-  --surface:  #FFFFFF;
-  --border:   #E0D8C8;
-  --gold:     #C6A75E;
-  --gold-h:   #D4B873;
-  --text:     #2A2A2A;
-  --muted:    #888888;
-  --light:    #F8F7F4;
-  --success:  #22c55e;
-  --danger:   #ef4444;
-  --warning:  #f59e0b;
+  --bg:      #F8FAFC;
+  --surface: #FFFFFF;
+  --border:  #E2E8F0;
+  --border2: #DBEAFE;
+  --blue:    #2563EB;
+  --blue-lt: #EFF6FF;
+  --blue-md: #BFDBFE;
+  --navy:    #0F172A;
+  --text:    #0F172A;
+  --text2:   #64748B;
+  --text3:   #94A3B8;
+  --green:   #16A34A;
+  --green-lt:#DCFCE7;
+  --red:     #DC2626;
+  --red-lt:  #FEE2E2;
+  --radius:  8px;
+  --font:    'DM Sans', system-ui, sans-serif;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:var(--font);background:var(--bg);color:var(--text);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
 }
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 40px;
-  width: 100%;
-  max-width: 480px;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.06);
+.card{
+  background:var(--surface);border:0.5px solid var(--border2);
+  border-radius:16px;padding:36px;width:100%;max-width:460px;
 }
-.header {
-  text-align: center;
-  margin-bottom: 32px;
+.header{text-align:center;margin-bottom:28px;}
+.logo{
+  display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;
 }
-.logo {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 28px;
-  color: var(--text);
-  margin-bottom: 6px;
+.logo-icon{
+  width:36px;height:36px;background:var(--blue);border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:600;color:#fff;letter-spacing:-0.3px;
 }
-.logo span { color: var(--gold); }
-.subtitle {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.5;
+.logo-name{font-size:20px;font-weight:600;color:var(--navy);}
+.subtitle{font-size:12px;color:var(--text2);line-height:1.6;}
+
+.section-label{
+  font-size:9px;font-weight:600;text-transform:uppercase;
+  letter-spacing:0.8px;color:var(--text3);margin-bottom:12px;
 }
-.section-title {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: var(--gold);
-  margin-bottom: 16px;
+.step{
+  background:var(--bg);border:0.5px solid var(--border2);
+  border-radius:var(--radius);padding:16px;margin-bottom:12px;
 }
-.step {
-  background: var(--light);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 16px;
+.step-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.step-num{
+  width:24px;height:24px;border-radius:50%;background:var(--blue);
+  color:#fff;font-size:11px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
-.step-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+.step-title{font-size:13px;font-weight:500;color:var(--text);}
+.step-desc{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px;}
+
+.app-badges{display:flex;gap:6px;flex-wrap:wrap;}
+.badge{
+  padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;
+  border:0.5px solid var(--border);background:var(--surface);color:var(--text2);
 }
-.step-num {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--gold);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+.badge.recommended{
+  background:var(--blue-lt);border-color:var(--blue-md);color:#1D4ED8;
 }
-.step-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text);
+
+.qr-container{text-align:center;padding:12px 0;}
+.qr-box{
+  display:inline-block;padding:14px;background:#fff;
+  border:0.5px solid var(--border2);border-radius:var(--radius);margin-bottom:10px;
 }
-.step-desc {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.6;
-  margin-bottom: 10px;
+.qr-box img{width:160px;height:160px;display:block;}
+.qr-loading{
+  width:160px;height:160px;display:flex;align-items:center;
+  justify-content:center;color:var(--text3);font-size:12px;
 }
-.app-badges {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+.secret-box{
+  background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius);
+  padding:9px 14px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);
+  text-align:center;letter-spacing:2px;word-break:break-all;margin-top:8px;
+  cursor:pointer;transition:.2s;
 }
-.badge {
-  padding: 5px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--muted);
+.secret-box:hover{border-color:var(--blue);background:var(--blue-lt);}
+.secret-label{font-size:10px;color:var(--text3);text-align:center;margin-top:4px;}
+
+.code-input{
+  width:100%;padding:12px;border:0.5px solid var(--border2);border-radius:var(--radius);
+  font-size:20px;font-family:'DM Mono',monospace;font-weight:600;text-align:center;
+  letter-spacing:8px;color:var(--text);background:var(--surface);outline:none;
+  transition:.2s;margin-bottom:10px;
 }
-.badge.recommended {
-  background: rgba(198,167,94,0.1);
-  border-color: rgba(198,167,94,0.3);
-  color: var(--gold);
+.code-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-lt);}
+.code-input::placeholder{color:var(--border);letter-spacing:4px;font-size:16px;}
+
+.btn{
+  width:100%;padding:11px;border-radius:var(--radius);border:none;
+  font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;transition:.2s;
 }
-.qr-container {
-  text-align: center;
-  padding: 16px 0;
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-blue:hover{background:#1D4ED8;}
+.btn-blue:disabled{background:var(--border);color:var(--text3);cursor:not-allowed;}
+
+.feedback{
+  display:none;padding:10px 14px;border-radius:var(--radius);
+  font-size:12px;line-height:1.5;margin-top:10px;
 }
-.qr-box {
-  display: inline-block;
-  padding: 16px;
-  background: #fff;
-  border: 2px solid var(--border);
-  border-radius: 12px;
-  margin-bottom: 12px;
+.feedback.success{
+  display:flex;align-items:flex-start;gap:8px;
+  background:var(--green-lt);border:0.5px solid #86EFAC;color:#166534;
 }
-.qr-box img {
-  width: 180px;
-  height: 180px;
-  display: block;
+.feedback.error{
+  display:flex;align-items:flex-start;gap:8px;
+  background:var(--red-lt);border:0.5px solid #FCA5A5;color:#991B1B;
 }
-.qr-loading {
-  width: 180px;
-  height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--muted);
-  font-size: 13px;
+.feedback-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+
+.divider{height:0.5px;background:var(--border2);margin:20px 0;}
+
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.info-card{
+  background:var(--bg);border:0.5px solid var(--border2);
+  border-radius:var(--radius);padding:10px 12px;
 }
-.secret-box {
-  background: var(--light);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-family: 'Courier New', monospace;
-  font-size: 13px;
-  color: var(--text);
-  text-align: center;
-  letter-spacing: 2px;
-  word-break: break-all;
-  margin-top: 8px;
-  cursor: pointer;
-  transition: 0.2s;
-  position: relative;
+.info-card-title{font-size:10px;font-weight:600;color:var(--blue);margin-bottom:4px;}
+.info-card-text {font-size:11px;color:var(--text2);line-height:1.5;}
+
+.back-link{
+  display:block;text-align:center;margin-top:20px;
+  font-size:12px;color:var(--text3);text-decoration:none;transition:.2s;
 }
-.secret-box:hover {
-  border-color: var(--gold);
-  background: rgba(198,167,94,0.04);
+.back-link:hover{color:var(--blue);}
+
+.spinner{
+  display:inline-block;width:14px;height:14px;
+  border:2px solid rgba(255,255,255,.3);border-top-color:#fff;
+  border-radius:50%;animation:spin .7s linear infinite;
+  vertical-align:middle;margin-right:6px;
 }
-.secret-label {
-  font-size: 10px;
-  color: var(--muted);
-  text-align: center;
-  margin-top: 6px;
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.copy-toast{
+  position:fixed;bottom:20px;left:50%;
+  transform:translateX(-50%) translateY(40px);
+  background:var(--navy);color:#fff;padding:8px 18px;
+  border-radius:20px;font-size:12px;font-weight:500;
+  opacity:0;transition:.3s;pointer-events:none;z-index:999;
 }
-.verify-section {
-  margin-top: 8px;
-}
-.input-wrap {
-  position: relative;
-  margin-bottom: 12px;
-}
-.code-input {
-  width: 100%;
-  padding: 14px 16px;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  font-size: 22px;
-  font-family: 'Courier New', monospace;
-  font-weight: 600;
-  text-align: center;
-  letter-spacing: 8px;
-  color: var(--text);
-  background: var(--surface);
-  outline: none;
-  transition: 0.2s;
-}
-.code-input:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(198,167,94,0.12);
-}
-.code-input::placeholder {
-  color: #DDD;
-  letter-spacing: 4px;
-  font-size: 18px;
-}
-.btn {
-  width: 100%;
-  padding: 13px;
-  border-radius: 10px;
-  border: none;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.btn-gold {
-  background: var(--gold);
-  color: #fff;
-}
-.btn-gold:hover {
-  background: var(--gold-h);
-  box-shadow: 0 4px 16px rgba(198,167,94,0.35);
-  transform: translateY(-1px);
-}
-.btn-gold:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-.feedback {
-  display: none;
-  padding: 12px 16px;
-  border-radius: 10px;
-  font-size: 13px;
-  line-height: 1.5;
-  margin-top: 12px;
-}
-.feedback.success {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  background: rgba(34,197,94,0.08);
-  border: 1px solid rgba(34,197,94,0.25);
-  color: #166534;
-}
-.feedback.error {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  background: rgba(239,68,68,0.08);
-  border: 1px solid rgba(239,68,68,0.25);
-  color: #991b1b;
-}
-.feedback-icon {
-  font-size: 16px;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-.divider {
-  height: 1px;
-  background: var(--border);
-  margin: 24px 0;
-}
-.info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 12px;
-}
-.info-card {
-  background: var(--light);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px 14px;
-}
-.info-card-title {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--gold);
-  margin-bottom: 5px;
-}
-.info-card-text {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.5;
-}
-.back-link {
-  display: block;
-  text-align: center;
-  margin-top: 20px;
-  font-size: 13px;
-  color: var(--muted);
-  text-decoration: none;
-  transition: 0.2s;
-}
-.back-link:hover { color: var(--gold); }
-.spinner {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  vertical-align: middle;
-  margin-right: 6px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.copy-toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%) translateY(60px);
-  background: var(--text);
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
-  opacity: 0;
-  transition: 0.3s;
-  pointer-events: none;
-  z-index: 999;
-}
-.copy-toast.visible {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
+.copy-toast.visible{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
@@ -333,12 +162,14 @@ body {
 <div class="card">
 
   <div class="header">
-    <div class="logo">ODYXIA Droit<span>.</span></div>
+    <div class="logo">
+      <div class="logo-icon">OD</div>
+      <div class="logo-name">Odyxia</div>
+    </div>
     <div class="subtitle">Configuration de la double authentification<br>Protégez votre accès avec un code à usage unique</div>
   </div>
 
-  <!-- ÉTAPE 1 — Installer l'app -->
-  <div class="section-title">Configuration</div>
+  <div class="section-label">Configuration</div>
 
   <div class="step">
     <div class="step-header">
@@ -355,7 +186,6 @@ body {
     </div>
   </div>
 
-  <!-- ÉTAPE 2 — Scanner le QR -->
   <div class="step">
     <div class="step-header">
       <div class="step-num">2</div>
@@ -364,15 +194,12 @@ body {
     <div class="step-desc">
       Ouvrez votre application, appuyez sur "Ajouter un compte" puis scannez ce QR code.
     </div>
-
     <div class="qr-container">
       <div class="qr-box" id="qrBox">
         <div class="qr-loading" id="qrLoading">Chargement...</div>
         <img id="qrImg" src="" alt="QR Code 2FA" style="display:none;"/>
       </div>
-      <div class="step-desc" style="margin-top:8px;margin-bottom:4px;">
-        Ou entrez manuellement la clé secrète :
-      </div>
+      <div class="step-desc" style="margin-bottom:4px;">Ou entrez manuellement la clé secrète :</div>
       <div class="secret-box" id="secretBox" onclick="copierSecret()" title="Cliquer pour copier">
         <span id="secretText">Chargement...</span>
       </div>
@@ -380,7 +207,6 @@ body {
     </div>
   </div>
 
-  <!-- ÉTAPE 3 — Vérifier le code -->
   <div class="step">
     <div class="step-header">
       <div class="step-num">3</div>
@@ -389,60 +215,49 @@ body {
     <div class="step-desc">
       Entrez le code à 6 chiffres affiché dans votre application pour confirmer que tout fonctionne.
     </div>
-
-    <div class="verify-section">
-      <div class="input-wrap">
-        <input
-          type="text"
-          class="code-input"
-          id="codeInput"
-          placeholder="000000"
-          maxlength="6"
-          inputmode="numeric"
-          autocomplete="one-time-code"
-          oninput="this.value=this.value.replace(/[^0-9]/g,''); checkLength()"
-          onkeydown="if(event.key==='Enter') verifierCode()"
-        />
+    <input
+      type="text" class="code-input" id="codeInput"
+      placeholder="000000" maxlength="6" inputmode="numeric"
+      autocomplete="one-time-code"
+      oninput="this.value=this.value.replace(/[^0-9]/g,'');checkLength()"
+      onkeydown="if(event.key==='Enter')verifierCode()"
+    />
+    <button class="btn btn-blue" id="verifyBtn" onclick="verifierCode()" disabled>
+      Vérifier le code
+    </button>
+    <div class="feedback" id="feedbackSuccess">
+      <span class="feedback-icon">✓</span>
+      <div>
+        <strong>Double authentification activée.</strong><br>
+        À chaque connexion, entrez votre mot de passe puis ce code à 6 chiffres.
+        En cas de perte de votre téléphone, contactez votre administrateur.
       </div>
-      <button class="btn btn-gold" id="verifyBtn" onclick="verifierCode()" disabled>
-        Vérifier le code
-      </button>
-      <div class="feedback" id="feedbackSuccess">
-        <span class="feedback-icon">✓</span>
-        <div>
-          <strong>Double authentification activée !</strong><br>
-          À chaque connexion, vous devrez entrer votre mot de passe puis ce code à 6 chiffres.
-          <br><br>
-          <strong>Important :</strong> Gardez votre smartphone accessible. En cas de perte, contactez votre administrateur ODYXIA Droit.
-        </div>
-      </div>
-      <div class="feedback" id="feedbackError">
-        <span class="feedback-icon">✗</span>
-        <div id="feedbackErrorText">Code incorrect. Vérifiez que l'heure de votre téléphone est synchronisée et réessayez.</div>
-      </div>
+    </div>
+    <div class="feedback" id="feedbackError">
+      <span class="feedback-icon">✗</span>
+      <div id="feedbackErrorText">Code incorrect. Vérifiez que l'heure de votre téléphone est synchronisée.</div>
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <!-- INFORMATIONS -->
-  <div class="section-title">À savoir</div>
+  <div class="section-label">À savoir</div>
   <div class="info-grid">
     <div class="info-card">
       <div class="info-card-title">Renouvellement</div>
-      <div class="info-card-text">Le code change toutes les 30 secondes. Entrez-le rapidement après l'avoir vu.</div>
+      <div class="info-card-text">Le code change toutes les 30 secondes. Entrez-le rapidement.</div>
     </div>
     <div class="info-card">
       <div class="info-card-title">Sauvegarde</div>
-      <div class="info-card-text">Notez la clé secrète dans un endroit sûr en cas de perte de votre téléphone.</div>
+      <div class="info-card-text">Notez la clé secrète dans un endroit sûr en cas de perte du téléphone.</div>
     </div>
     <div class="info-card">
       <div class="info-card-title">Sécurité</div>
-      <div class="info-card-text">Même si votre mot de passe est compromis, l'accès reste protégé par ce code.</div>
+      <div class="info-card-text">Même si votre mot de passe est compromis, l'accès reste protégé.</div>
     </div>
     <div class="info-card">
       <div class="info-card-title">Support</div>
-      <div class="info-card-text">En cas de problème, contactez votre administrateur ODYXIA Droit pour réinitialiser.</div>
+      <div class="info-card-text">En cas de problème, contactez votre administrateur pour réinitialiser.</div>
     </div>
   </div>
 
@@ -457,28 +272,22 @@ let secretKey = "";
 
 async function chargerQRCode() {
   try {
-    const res = await fetch("/setup-2fa");
+    const res  = await fetch("/setup-2fa");
     const data = await res.json();
-
     if (data.erreur) {
       document.getElementById("qrLoading").textContent = "Erreur : " + data.erreur;
       document.getElementById("secretText").textContent = "Non disponible";
       return;
     }
-
-    // Afficher le QR code
     const img = document.getElementById("qrImg");
     img.src = data.qr_code;
     img.onload = () => {
       document.getElementById("qrLoading").style.display = "none";
       img.style.display = "block";
     };
-
-    // Afficher la clé secrète formatée
     secretKey = data.secret || "";
     const formatted = secretKey.match(/.{1,4}/g)?.join(" ") || secretKey;
     document.getElementById("secretText").textContent = formatted;
-
   } catch(e) {
     document.getElementById("qrLoading").textContent = "Impossible de charger le QR code.";
     document.getElementById("secretText").textContent = "Erreur de connexion";
@@ -488,53 +297,38 @@ async function chargerQRCode() {
 function checkLength() {
   const val = document.getElementById("codeInput").value;
   document.getElementById("verifyBtn").disabled = val.length !== 6;
-
-  // Cacher les feedbacks si l'utilisateur retape
-  if (val.length > 0) {
-    document.getElementById("feedbackError").style.display = "none";
-  }
+  if (val.length > 0) document.getElementById("feedbackError").style.display = "none";
 }
 
 async function verifierCode() {
   const code = document.getElementById("codeInput").value.trim();
   if (code.length !== 6) return;
-
   const btn = document.getElementById("verifyBtn");
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Vérification...';
-
   document.getElementById("feedbackSuccess").style.display = "none";
-  document.getElementById("feedbackError").style.display = "none";
-
+  document.getElementById("feedbackError").style.display   = "none";
   try {
-    const res = await fetch("/login", {
+    const res  = await fetch("/login", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password: "__test_2fa__", code_2fa: code })
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({password:"__test_2fa__", code_2fa: code})
     });
     const data = await res.json();
-
-    if (data.token || data.require_2fa === false) {
-      // Code valide
+    if (data.token ||
+        (data.erreur && !data.erreur.toLowerCase().includes("2fa") &&
+                        !data.erreur.toLowerCase().includes("code") &&
+                        !data.erreur.toLowerCase().includes("authy"))) {
       document.getElementById("feedbackSuccess").style.display = "flex";
       btn.innerHTML = "✓ Code vérifié";
-      btn.style.background = "#22c55e";
-      document.getElementById("codeInput").style.borderColor = "#22c55e";
-    } else if (data.erreur && data.erreur.toLowerCase().includes("2fa") ||
-               data.erreur && data.erreur.toLowerCase().includes("authy") ||
-               data.erreur && data.erreur.toLowerCase().includes("code")) {
-      // Code invalide
+      btn.style.background = "#16A34A";
+      document.getElementById("codeInput").style.borderColor = "#16A34A";
+    } else {
       document.getElementById("feedbackError").style.display = "flex";
       btn.disabled = false;
       btn.innerHTML = "Vérifier le code";
       document.getElementById("codeInput").value = "";
       document.getElementById("codeInput").focus();
-    } else {
-      // Mot de passe incorrect mais code 2FA valide (comportement attendu en test)
-      document.getElementById("feedbackSuccess").style.display = "flex";
-      btn.innerHTML = "✓ Code vérifié";
-      btn.style.background = "#22c55e";
-      document.getElementById("codeInput").style.borderColor = "#22c55e";
     }
   } catch(e) {
     document.getElementById("feedbackErrorText").textContent = "Erreur de connexion — réessayez.";
@@ -546,25 +340,23 @@ async function verifierCode() {
 
 function copierSecret() {
   if (!secretKey) return;
-  navigator.clipboard.writeText(secretKey).then(() => {
-    const toast = document.getElementById("copyToast");
-    toast.classList.add("visible");
-    setTimeout(() => toast.classList.remove("visible"), 2000);
-  }).catch(() => {
-    // Fallback
+  navigator.clipboard.writeText(secretKey).then(() => showToast()).catch(() => {
     const el = document.createElement("textarea");
     el.value = secretKey;
     document.body.appendChild(el);
     el.select();
     document.execCommand("copy");
     document.body.removeChild(el);
-    const toast = document.getElementById("copyToast");
-    toast.classList.add("visible");
-    setTimeout(() => toast.classList.remove("visible"), 2000);
+    showToast();
   });
 }
 
-// Charger le QR code au démarrage
+function showToast() {
+  const t = document.getElementById("copyToast");
+  t.classList.add("visible");
+  setTimeout(() => t.classList.remove("visible"), 2000);
+}
+
 window.addEventListener("DOMContentLoaded", chargerQRCode);
 </script>
 </body>
