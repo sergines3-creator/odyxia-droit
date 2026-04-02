@@ -84,10 +84,14 @@ def prompt_chat(question: str, contexte_documents: str) -> str:
 {question}
 
 ━━━ INSTRUCTIONS DE RÉPONSE ━━━
-Structure ta réponse ainsi :
-
-**Réponse directe**
-Réponds à la question en 2-3 phrases claires et précises.
+Réponds comme un confrère juriste senior qui explique à un avocat.
+Ton style :
+- Réponse en prose fluide et conversationnelle — pas de titres, pas de tirets mécaniques
+- Développe ton raisonnement juridique de façon naturelle et argumentée
+- Minimum 3 paragraphes pour les questions substantielles
+- Cite les textes applicables et la jurisprudence de façon intégrée dans le texte
+- Termine par une recommandation stratégique concrète si pertinent
+- N'utilise jamais les sous-titres "Réponse directe", "Fondement juridique", "Analyse"
 
 **Fondement juridique**
 Cite les textes applicables avec leur référence exacte [Source · Page X].
@@ -2309,4 +2313,5 @@ PROMPTS_REDACTION.update({
         "fn": prompt_transaction_prud_homale
     },
 })
+
 
