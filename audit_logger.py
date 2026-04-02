@@ -1,5 +1,5 @@
 ﻿"""
-audit_logger.py — Themis
+audit_logger.py — Odyxia Droit
 Journal d'audit de toutes les actions sensibles
 """
 
@@ -49,3 +49,4 @@ def log_audit(action: str, details: dict = None, succes: bool = True):
 
     except Exception as e:
         print(f"[AUDIT] Erreur log ({action}) : {str(e)[:100]}")
+

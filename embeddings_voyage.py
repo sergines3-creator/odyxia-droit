@@ -1,5 +1,5 @@
 ﻿"""
-embeddings_voyage.py — Themis
+embeddings_voyage.py — Odyxia Droit
 Pipeline de vectorisation par lots avec Voyage AI (voyage-law-2)
 Chunking intelligent : découpe aux frontières juridiques (articles, alinéas, sections)
 Sécurité : clés via variables d'environnement uniquement
@@ -440,4 +440,5 @@ if __name__ == "__main__":
     print(f"  Traités  : {resultat['total']}")
     print(f"  Erreurs  : {resultat['erreurs']}")
     print("=" * 60)
+
 

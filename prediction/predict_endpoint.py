@@ -1,5 +1,5 @@
 ﻿"""
-predict_endpoint.py — Themis
+predict_endpoint.py — Odyxia Droit
 Blueprint Flask pour l'analyse prédictive juridique
 Sécurité : JWT requis sur toutes les routes + rate limiting + audit logs
 """
@@ -540,4 +540,5 @@ def stats():
     except Exception as e:
         log_erreur("STATS", e)
         return jsonify({"erreur": str(e)}), 500
+
 

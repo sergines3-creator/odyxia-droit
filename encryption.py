@@ -1,5 +1,5 @@
 ﻿"""
-encryption.py — Themis
+encryption.py — Odyxia Droit
 Chiffrement/déchiffrement Fernet (AES-128)
 + extraction mots-clés pour index de recherche séparé
 """
@@ -93,3 +93,4 @@ def generer_cle() -> str:
 if __name__ == "__main__":
     print("Nouvelle clé ENCRYPTION_KEY :")
     print(generer_cle())
+
