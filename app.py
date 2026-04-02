@@ -973,18 +973,18 @@ def upload_document():
             "uploaded_by":      user_id if user_id else None,
             "filename":         fichier.filename,
             "original_filename": fichier.filename,
-            "nom":              fichier.filename,          # compatibilité
-            "type":             "juridique",               # compatibilité
+            "nom":              fichier.filename,
+            "type":             "juridique",
             "mime_type":        "application/pdf",
             "file_size_bytes":  taille,
             "file_hash_sha256": file_hash,
             "dossier_id":       dossier_id if dossier_id else None,
-            "manuscrit":        est_manuscrit,             # compatibilité
+            "manuscrit":        est_manuscrit,
             "ocr_status":       "done",
             "scan_status":      "clean",
             "status":           "ready",
             "storage_tier":     "hot",
-            "metadata": {
+            "metadata":         {
                 "sensible":  est_sensible,
                 "chiffre":   est_chiffre_d,
                 "manuscrit": est_manuscrit
@@ -1067,7 +1067,7 @@ def liste_documents():
 
         query = supabase.table("documents").select(
             "id, nom, filename, original_filename, type, dossier_id, "
-            "manuscrit, status, storage_tier, created_at"
+            "manuscrit, status, storage_tier, created_at, metadata"
         ).eq("tenant_id", tenant_id).eq("status", "ready").order("created_at", desc=True)
 
         if dossier_id:
