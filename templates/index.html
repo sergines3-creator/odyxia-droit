@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ODYXIA Droit — Intelligence Juridique</title>
+<title>Odyxia Droit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 :root {
   --bg:       #FFFFFF;
@@ -26,799 +26,1045 @@
   --amber-lt: #FEF3C7;
   --red:      #DC2626;
   --red-lt:   #FEE2E2;
-  --radius:   8px;
-  --radius-lg:12px;
+  --r:        8px;
+  --r-lg:     12px;
   --font:     'DM Sans', system-ui, sans-serif;
+  --serif:    'Cormorant Garamond', Georgia, serif;
   --mono:     'DM Mono', monospace;
-  --sidebar-w:220px;
-  --header-h: 48px;
+  --sidebar:  220px;
+  --header:   48px;
   --trans:    all .18s ease;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:14px;line-height:1.6;height:100vh;overflow:hidden;}
 
-/* ── LOGIN ─────────────────────────────────────────── */
-#login-screen {
-  position:fixed;inset:0;background:var(--navy);
-  display:flex;align-items:center;justify-content:center;z-index:1000;
+/* ══ SPLASH ══════════════════════════════════════════ */
+#splash {
+  position:fixed;inset:0;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:2000;
 }
-.login-card {
-  background:var(--bg);border-radius:16px;padding:40px;width:360px;
-  border:0.5px solid var(--border2);
+.splash-logo {
+  display:flex;align-items:center;gap:14px;margin-bottom:16px;
 }
-.login-logo {
-  display:flex;align-items:center;gap:12px;margin-bottom:32px;
-}
-.login-icon {
-  width:40px;height:40px;background:var(--blue);border-radius:10px;
+.splash-icon {
+  width:48px;height:48px;background:var(--blue);border-radius:12px;
   display:flex;align-items:center;justify-content:center;
-  font-size:16px;font-weight:600;color:#fff;letter-spacing:-0.5px;
+  font-family:var(--serif);font-size:18px;font-weight:600;color:#fff;
+  opacity:0;transform:scale(0.8);
+  animation:iconReveal .8s cubic-bezier(.34,1.56,.64,1) .4s forwards;
 }
-.login-title {font-size:20px;font-weight:600;color:var(--navy);}
-.login-sub {font-size:12px;color:var(--text2);margin-top:2px;}
+@keyframes iconReveal {
+  to{opacity:1;transform:scale(1);}
+}
+.splash-name {
+  display:flex;align-items:baseline;gap:6px;overflow:hidden;
+}
+.splash-odyxia {
+  font-family:var(--serif);font-size:36px;font-weight:500;color:var(--navy);
+  opacity:0;filter:blur(8px);
+  animation:nameReveal 1s ease 1s forwards;
+  letter-spacing:0.5px;
+}
+@keyframes nameReveal {
+  to{opacity:1;filter:blur(0);}
+}
+.splash-droit {
+  font-family:var(--font);font-size:18px;font-weight:300;color:var(--blue);
+  opacity:0;transform:translateX(20px);
+  animation:droitReveal .8s ease 1.8s forwards;
+  letter-spacing:2px;text-transform:uppercase;
+}
+@keyframes droitReveal {
+  to{opacity:1;transform:translateX(0);}
+}
+.splash-sub {
+  font-size:12px;color:var(--text3);letter-spacing:0.5px;
+  opacity:0;transform:translateY(8px);
+  animation:subReveal .6s ease 2.4s forwards;
+}
+@keyframes subReveal {
+  to{opacity:1;transform:translateY(0);}
+}
+.splash-line {
+  width:0;height:1px;background:var(--blue);margin:14px auto 0;
+  animation:lineReveal .8s ease 2.8s forwards;
+}
+@keyframes lineReveal {
+  to{width:120px;}
+}
+#splash.hide {
+  animation:splashFade .4s ease forwards;
+}
+@keyframes splashFade {
+  to{opacity:0;pointer-events:none;}
+}
+
+/* ══ LOGIN ════════════════════════════════════════════ */
+#login-screen {
+  position:fixed;inset:0;background:var(--bg2);
+  display:none;align-items:center;justify-content:center;z-index:1000;
+}
+#login-screen.show {display:flex;}
+.login-card {
+  background:var(--bg);border:0.5px solid var(--border2);
+  border-radius:16px;padding:40px;width:360px;
+}
+.login-logo {display:flex;align-items:center;gap:12px;margin-bottom:28px;}
+.login-icon {
+  width:38px;height:38px;background:var(--blue);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:15px;font-weight:600;color:#fff;
+}
+.login-name {font-family:var(--serif);font-size:22px;font-weight:500;color:var(--navy);}
 .login-label {font-size:11px;font-weight:500;color:var(--text2);margin-bottom:6px;display:block;}
 .login-input {
-  width:100%;border:0.5px solid var(--border2);border-radius:var(--radius);
+  width:100%;border:0.5px solid var(--border2);border-radius:var(--r);
   padding:10px 14px;font-size:13px;font-family:var(--font);
-  color:var(--text);background:var(--bg2);outline:none;margin-bottom:14px;
-  transition:var(--trans);
+  color:var(--text);background:var(--bg2);outline:none;margin-bottom:12px;transition:var(--trans);
 }
-.login-input:focus {border-color:var(--blue);background:var(--bg);}
+.login-input:focus{border-color:var(--blue);background:var(--bg);}
 .login-btn {
-  width:100%;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);
-  padding:11px;font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;
-  transition:var(--trans);
+  width:100%;background:var(--blue);color:#fff;border:none;border-radius:var(--r);
+  padding:11px;font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;transition:var(--trans);
 }
-.login-btn:hover {background:#1D4ED8;}
-.login-err {font-size:11px;color:var(--red);margin-top:8px;display:none;}
-.login-2fa {display:none;margin-top:12px;}
+.login-btn:hover{background:#1D4ED8;}
+.login-err{font-size:11px;color:var(--red);margin-top:8px;display:none;}
+.login-2fa{display:none;margin-top:10px;}
+.login-setup{text-align:center;margin-top:14px;}
+.login-setup a{font-size:11px;color:var(--text3);text-decoration:underline;cursor:pointer;}
 
-/* ── APP LAYOUT ────────────────────────────────────── */
-#app {display:none;height:100vh;display:none;grid-template-columns:var(--sidebar-w) 1fr;grid-template-rows:var(--header-h) 1fr;}
-#app.visible {display:grid;}
+/* ══ APP ══════════════════════════════════════════════ */
+#app{display:none;height:100vh;grid-template-columns:var(--sidebar) 1fr;grid-template-rows:var(--header) 1fr;}
+#app.show{display:grid;}
 
-/* ── HEADER ────────────────────────────────────────── */
-.header {
+/* ══ HEADER ═══════════════════════════════════════════ */
+.hdr{
   grid-column:1/-1;background:var(--navy);
   display:flex;align-items:center;padding:0 16px;gap:12px;
   border-bottom:0.5px solid #1E293B;
 }
-.header-logo {display:flex;align-items:center;gap:10px;}
-.header-icon {
+.hdr-logo{display:flex;align-items:center;gap:10px;}
+.hdr-icon{
   width:28px;height:28px;background:var(--blue);border-radius:7px;
   display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:600;color:#fff;letter-spacing:-0.3px;flex-shrink:0;
+  font-family:var(--serif);font-size:12px;font-weight:600;color:#fff;flex-shrink:0;
 }
-.header-name {font-size:14px;font-weight:600;color:#FFFFFF;letter-spacing:0.2px;}
-.header-sub  {font-size:9px;color:#64748B;line-height:1;}
-.header-sep  {width:0.5px;height:18px;background:#1E293B;}
-.header-badge{font-size:9px;padding:2px 9px;border-radius:20px;background:#1E3A5F;color:#93C5FD;font-weight:500;}
-.header-dossier{margin-left:8px;display:flex;align-items:center;gap:8px;}
-.header-dossier-label{font-size:10px;color:#64748B;}
-.header-dossier-name {font-size:11px;font-weight:500;color:#FFFFFF;}
-.header-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
-.header-status{font-size:9px;padding:2px 9px;border-radius:20px;background:#14532D;color:#86EFAC;}
-.header-avatar{width:26px;height:26px;background:#1E293B;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:#94A3B8;font-weight:500;cursor:pointer;}
+.hdr-avocat{font-size:13px;font-weight:500;color:#FFFFFF;}
+.hdr-cabinet{font-size:9px;color:#64748B;line-height:1;}
+.hdr-sep{width:0.5px;height:18px;background:#1E293B;}
+.hdr-pays{
+  font-size:9px;padding:2px 9px;border-radius:20px;
+  background:#1E3A5F;color:#93C5FD;font-weight:500;
+}
+.hdr-dossier{display:none;align-items:center;gap:6px;margin-left:4px;}
+.hdr-dossier-label{font-size:10px;color:#64748B;}
+.hdr-dossier-name{font-size:11px;font-weight:500;color:#FFFFFF;}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.hdr-status{font-size:9px;padding:2px 9px;border-radius:20px;background:#14532D;color:#86EFAC;}
+.hdr-avatar{
+  width:26px;height:26px;background:#1E293B;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;color:#94A3B8;cursor:pointer;font-weight:500;
+}
 
-/* ── SIDEBAR ────────────────────────────────────────── */
-.sidebar {
+/* ══ SIDEBAR ══════════════════════════════════════════ */
+.sidebar{
   background:var(--bg);border-right:0.5px solid var(--border2);
   display:flex;flex-direction:column;overflow-y:auto;
 }
-.sidebar-section {padding:12px 0 4px;}
-.sidebar-label {
-  font-size:9px;font-weight:600;color:var(--text3);
+.sb-section{padding:10px 0 4px;}
+.sb-label{
+  font-size:9px;font-weight:500;color:var(--text3);
   padding:0 14px 4px;letter-spacing:0.8px;text-transform:uppercase;
 }
-.nav-item {
-  display:flex;align-items:center;gap:9px;padding:8px 14px;
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:8px 14px;
   font-size:12px;color:var(--text2);cursor:pointer;
-  transition:var(--trans);border-left:2px solid transparent;
-  user-select:none;
+  transition:var(--trans);border-left:2px solid transparent;user-select:none;
 }
-.nav-item:hover {background:var(--bg2);color:var(--text);}
-.nav-item.active {
-  background:var(--bg3);color:var(--blue);font-weight:500;
-  border-left-color:var(--blue);
-}
-.nav-icon {
-  width:18px;height:18px;border-radius:4px;display:flex;align-items:center;
-  justify-content:center;flex-shrink:0;font-size:10px;
-}
-.nav-item.active .nav-icon {background:var(--blue-lt);}
-.nav-count {
+.nav-item:hover{background:var(--bg2);color:var(--text);}
+.nav-item.active{background:var(--bg3);color:var(--blue);font-weight:500;border-left-color:var(--blue);}
+.nav-icon{width:16px;height:16px;flex-shrink:0;opacity:0.6;}
+.nav-item.active .nav-icon{opacity:1;}
+.nav-count{
   margin-left:auto;font-size:9px;background:var(--blue-lt);
   color:#1D4ED8;padding:1px 6px;border-radius:10px;
 }
-.sidebar-sep {height:0.5px;background:var(--border);margin:8px 14px;}
-.dossier-item {
+.sb-sep{height:0.5px;background:var(--border);margin:6px 14px;}
+.sb-affaire{
   display:flex;align-items:center;gap:8px;padding:6px 14px;
   font-size:11px;color:var(--text2);cursor:pointer;transition:var(--trans);
-  border-radius:0;
 }
-.dossier-item:hover {background:var(--bg2);color:var(--text);}
-.dossier-item.active {color:var(--blue);font-weight:500;}
-.dossier-dot {width:5px;height:5px;border-radius:50%;background:var(--border2);flex-shrink:0;}
-.dossier-item.active .dossier-dot {background:var(--blue);}
-.btn-new-dossier {
-  margin:8px 14px;padding:7px 12px;border:0.5px dashed var(--blue-md);
-  border-radius:var(--radius);font-size:11px;color:var(--blue);
+.sb-affaire:hover{background:var(--bg2);color:var(--text);}
+.sb-affaire.active{color:var(--blue);font-weight:500;}
+.sb-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);flex-shrink:0;}
+.sb-affaire.active .sb-dot{background:var(--blue);}
+.btn-new-affaire{
+  margin:6px 14px;padding:7px 12px;border:0.5px dashed var(--blue-md);
+  border-radius:var(--r);font-size:11px;color:var(--blue);
   cursor:pointer;text-align:center;transition:var(--trans);background:transparent;
   font-family:var(--font);
 }
-.btn-new-dossier:hover {background:var(--bg3);}
+.btn-new-affaire:hover{background:var(--bg3);}
 
-/* ── MAIN ───────────────────────────────────────────── */
-.main {display:flex;flex-direction:column;overflow:hidden;}
+/* ══ MAIN ═════════════════════════════════════════════ */
+.main{display:flex;flex-direction:column;overflow:hidden;}
 
-/* ── DOSSIER BAR ────────────────────────────────────── */
-.dossier-bar {
-  background:var(--bg);border-bottom:0.5px solid var(--border2);
-  padding:8px 16px;display:flex;align-items:center;gap:12px;
-  min-height:38px;flex-shrink:0;
-}
-.dossier-bar-label {font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;}
-.dossier-bar-name  {font-size:12px;font-weight:500;color:var(--text);}
-.proc-steps {margin-left:auto;display:flex;align-items:center;gap:0;}
-.proc-step  {display:flex;flex-direction:column;align-items:center;gap:2px;}
-.proc-dot   {width:7px;height:7px;border-radius:50%;background:var(--border2);}
-.proc-dot.done   {background:var(--blue);}
-.proc-dot.active {background:var(--bg);border:2px solid var(--blue);box-shadow:0 0 0 3px var(--blue-lt);}
-.proc-name  {font-size:8px;color:var(--text3);}
-.proc-name.done {color:var(--blue);}
-.proc-line  {width:36px;height:1px;background:var(--border2);margin-bottom:10px;}
-.proc-line.done {background:var(--blue);}
+/* ══ PAGES ════════════════════════════════════════════ */
+.page{display:none;flex:1;overflow:hidden;}
+.page.active{display:flex;}
 
-/* ── PAGES ──────────────────────────────────────────── */
-.page {display:none;flex:1;overflow:hidden;}
-.page.active {display:flex;}
-
-/* ── PAGE CHAT ──────────────────────────────────────── */
-.chat-layout {display:grid;grid-template-columns:1fr 240px;flex:1;overflow:hidden;}
-.chat-col {display:flex;flex-direction:column;overflow:hidden;border-right:0.5px solid var(--border2);}
-.chat-messages {
-  flex:1;overflow-y:auto;padding:14px 16px;
-  display:flex;flex-direction:column;gap:10px;
-  background:var(--bg);
+/* ══ TABLEAU DE BORD ══════════════════════════════════ */
+.dash-layout{flex:1;overflow-y:auto;padding:20px;}
+.dash-welcome{margin-bottom:20px;}
+.dash-welcome h1{font-family:var(--serif);font-size:24px;font-weight:500;color:var(--navy);margin-bottom:4px;}
+.dash-welcome p{font-size:12px;color:var(--text2);}
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.stat-card{
+  background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r-lg);
+  padding:16px;display:flex;flex-direction:column;gap:6px;
 }
-.chat-messages::-webkit-scrollbar {width:4px;}
-.chat-messages::-webkit-scrollbar-thumb {background:var(--border2);border-radius:4px;}
-.msg-user {
-  align-self:flex-end;background:var(--bg3);border-radius:10px 0 10px 10px;
-  padding:9px 13px;font-size:12px;color:#1D4ED8;max-width:75%;
-}
-.msg-ai {
-  align-self:flex-start;background:var(--bg2);border:0.5px solid var(--border2);
-  border-radius:0 10px 10px 10px;padding:10px 13px;font-size:12px;
-  color:var(--text);max-width:88%;line-height:1.6;
-}
-.msg-ai strong {color:var(--navy);}
-.msg-ai .sources {margin-top:8px;display:flex;flex-wrap:wrap;gap:3px;}
-.source-chip {
-  display:inline-flex;align-items:center;background:var(--bg3);
-  border:0.5px solid var(--blue-md);border-radius:4px;
-  padding:2px 7px;font-size:9px;color:#1D4ED8;
-}
-.typing {display:flex;gap:4px;padding:4px 0;}
-.typing span {
-  width:6px;height:6px;border-radius:50%;background:var(--blue-md);
-  animation:bounce .8s infinite;
-}
-.typing span:nth-child(2) {animation-delay:.15s;}
-.typing span:nth-child(3) {animation-delay:.3s;}
-@keyframes bounce {0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
-
-/* Carte mentale */
-.mind-map-panel {
-  border-top:0.5px solid var(--border2);background:var(--bg);
-  transition:var(--trans);overflow:hidden;
-}
-.mind-map-header {
-  padding:6px 14px;display:flex;align-items:center;justify-content:space-between;
-  border-bottom:0.5px solid var(--border2);cursor:pointer;
-}
-.mind-map-header:hover {background:var(--bg2);}
-.mind-map-label {font-size:10px;font-weight:500;color:var(--text2);}
-.mind-map-body {padding:10px 14px;}
-.mind-map-body svg {width:100%;height:140px;}
-
-/* Barre de saisie */
-.chat-input-bar {
-  padding:10px 14px;border-top:0.5px solid var(--border2);
-  background:var(--bg);display:flex;gap:8px;align-items:center;
-}
-.chat-input-wrap {
-  flex:1;display:flex;align-items:center;gap:8px;
-  border:0.5px solid var(--border2);border-radius:var(--radius);
-  padding:0 12px;background:var(--bg2);transition:var(--trans);
-}
-.chat-input-wrap:focus-within {border-color:var(--blue);background:var(--bg);}
-#chat-input {
-  flex:1;border:none;outline:none;background:transparent;
-  font-size:12px;font-family:var(--font);color:var(--text);padding:9px 0;
-}
-.btn-send {
-  background:var(--blue);color:#fff;border:none;border-radius:var(--radius);
-  padding:8px 14px;font-size:12px;font-weight:500;font-family:var(--font);
-  cursor:pointer;transition:var(--trans);flex-shrink:0;
-}
-.btn-send:hover {background:#1D4ED8;}
-.btn-icon {
-  background:transparent;border:0.5px solid var(--border);border-radius:6px;
-  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:14px;color:var(--text2);transition:var(--trans);
-  flex-shrink:0;
-}
-.btn-icon:hover {background:var(--bg2);color:var(--text);}
-
-/* Historique sidebar */
-.hist-col {
-  display:flex;flex-direction:column;overflow:hidden;background:var(--bg);
-}
-.hist-header {
-  padding:10px 14px;border-bottom:0.5px solid var(--border2);
+.stat-icon{width:32px;height:32px;background:var(--bg3);border-radius:var(--r);display:flex;align-items:center;justify-content:center;}
+.stat-val{font-size:24px;font-weight:500;color:var(--navy);}
+.stat-label{font-size:11px;color:var(--text2);}
+.dash-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.dash-card{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;}
+.dash-card-hdr{
+  padding:10px 14px;border-bottom:0.5px solid var(--border2);background:var(--bg2);
   display:flex;align-items:center;justify-content:space-between;
 }
-.hist-title {font-size:11px;font-weight:600;color:var(--text);}
-.btn-new-conv {
-  font-size:10px;background:var(--bg3);color:var(--blue);
-  border:0.5px solid var(--blue-md);border-radius:6px;
-  padding:3px 9px;cursor:pointer;font-family:var(--font);transition:var(--trans);
+.dash-card-title{font-size:11px;font-weight:500;color:var(--text);}
+.dash-card-body{padding:10px 14px;}
+.affaire-row{
+  display:flex;align-items:center;gap:10px;padding:7px 0;
+  border-bottom:0.5px solid var(--border);cursor:pointer;transition:var(--trans);
 }
-.btn-new-conv:hover {background:var(--blue-lt);}
-.hist-list {flex:1;overflow-y:auto;padding:6px 0;}
-.hist-item {
-  padding:8px 14px;cursor:pointer;transition:var(--trans);
-  border-left:2px solid transparent;
+.affaire-row:last-child{border:none;}
+.affaire-row:hover{opacity:.8;}
+.affaire-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0;}
+.affaire-dot.orange{background:var(--amber);}
+.affaire-dot.green{background:var(--green);}
+.affaire-name{font-size:11px;color:var(--text);flex:1;}
+.affaire-status{font-size:9px;padding:2px 7px;border-radius:20px;}
+.s-blue{background:var(--blue-lt);color:#1D4ED8;}
+.s-amber{background:var(--amber-lt);color:var(--amber);}
+.s-green{background:var(--green-lt);color:var(--green);}
+.doc-row-dash{
+  display:flex;align-items:center;gap:8px;padding:6px 0;
+  border-bottom:0.5px solid var(--border);
 }
-.hist-item:hover {background:var(--bg2);}
-.hist-item.active {background:var(--bg3);border-left-color:var(--blue);}
-.hist-item-title {font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.hist-item-date  {font-size:9px;color:var(--text3);margin-top:2px;}
-.hist-sep {height:0.5px;background:var(--border);margin:4px 14px;}
+.doc-row-dash:last-child{border:none;}
+.doc-icon-sm{
+  width:24px;height:24px;background:var(--bg3);border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;font-weight:600;color:var(--blue);flex-shrink:0;
+}
+.doc-name-sm{font-size:11px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.doc-date-sm{font-size:9px;color:var(--text3);}
 
-/* ── PAGE DOCUMENTS ─────────────────────────────────── */
-.docs-layout {display:grid;grid-template-columns:260px 1fr;flex:1;overflow:hidden;}
-.docs-sidebar {
+/* ══ BIBLIOTHEQUE ═════════════════════════════════════ */
+.bib-layout{flex:1;display:grid;grid-template-columns:280px 1fr;overflow:hidden;}
+.bib-sidebar{
   border-right:0.5px solid var(--border2);background:var(--bg);
   display:flex;flex-direction:column;overflow:hidden;
 }
-.docs-sidebar-header {
+.bib-sidebar-hdr{
   padding:10px 14px;border-bottom:0.5px solid var(--border2);
   display:flex;align-items:center;justify-content:space-between;
 }
-.docs-sidebar-title {font-size:11px;font-weight:600;color:var(--text);}
-.upload-zone {
-  margin:10px 14px;border:1.5px dashed var(--blue-md);border-radius:var(--radius);
+.bib-sidebar-title{font-size:11px;font-weight:500;color:var(--text);}
+.upload-zone{
+  margin:10px 14px;border:1.5px dashed var(--blue-md);border-radius:var(--r);
   padding:16px;text-align:center;cursor:pointer;transition:var(--trans);background:var(--bg2);
 }
-.upload-zone:hover {border-color:var(--blue);background:var(--bg3);}
-.upload-zone.dragover {border-color:var(--blue);background:var(--bg3);}
-.upload-icon {font-size:22px;margin-bottom:6px;}
-.upload-text {font-size:11px;color:var(--blue);font-weight:500;}
-.upload-sub  {font-size:9px;color:var(--text3);margin-top:2px;}
-.upload-options {
-  padding:0 14px 10px;display:flex;gap:6px;flex-wrap:wrap;
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--blue);background:var(--bg3);}
+.upload-text{font-size:11px;color:var(--blue);font-weight:500;margin-top:6px;}
+.upload-sub{font-size:9px;color:var(--text3);margin-top:2px;}
+.upload-opts{padding:0 14px 8px;display:flex;gap:6px;flex-wrap:wrap;}
+.opt-tag{
+  display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);
+  cursor:pointer;padding:4px 9px;border:0.5px solid var(--border);
+  border-radius:6px;background:var(--bg);transition:var(--trans);user-select:none;
 }
-.opt-toggle {
-  display:flex;align-items:center;gap:5px;font-size:10px;
-  color:var(--text2);cursor:pointer;padding:4px 8px;
-  border:0.5px solid var(--border);border-radius:6px;
-  background:var(--bg);transition:var(--trans);user-select:none;
-}
-.opt-toggle:hover {background:var(--bg2);}
-.opt-toggle.active {background:var(--bg3);border-color:var(--blue-md);color:var(--blue);}
-.opt-toggle input {display:none;}
-.upload-hint {
-  padding:0 14px 8px;font-size:9px;color:var(--text3);line-height:1.5;
-}
-.docs-list {flex:1;overflow-y:auto;padding:0;}
-.docs-group-label {
-  font-size:9px;font-weight:600;color:var(--text3);
-  padding:8px 14px 4px;letter-spacing:0.5px;text-transform:uppercase;
-}
-.doc-item {
+.opt-tag:hover{background:var(--bg2);}
+.opt-tag.active{background:var(--bg3);border-color:var(--blue-md);color:var(--blue);}
+.opt-tag input{display:none;}
+.upload-hint{padding:0 14px 8px;font-size:9px;color:var(--text3);line-height:1.5;}
+.docs-group{font-size:9px;font-weight:500;color:var(--text3);padding:6px 14px 3px;letter-spacing:0.5px;text-transform:uppercase;}
+.doc-item{
   display:flex;align-items:center;gap:9px;padding:7px 14px;
   cursor:pointer;transition:var(--trans);border-left:2px solid transparent;
 }
-.doc-item:hover {background:var(--bg2);}
-.doc-item.active {background:var(--bg3);border-left-color:var(--blue);}
-.doc-icon {
+.doc-item:hover{background:var(--bg2);}
+.doc-item.active{background:var(--bg3);border-left-color:var(--blue);}
+.doc-icon{
   width:28px;height:28px;background:var(--bg3);border-radius:6px;
   display:flex;align-items:center;justify-content:center;
   font-size:9px;font-weight:600;color:var(--blue);flex-shrink:0;
 }
-.doc-name {font-size:11px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.doc-badge {font-size:8px;padding:1px 5px;border-radius:4px;flex-shrink:0;}
-.badge-ok    {background:var(--green-lt);color:var(--green);}
-.badge-wait  {background:var(--amber-lt);color:var(--amber);}
-.badge-lock  {background:var(--blue-lt);color:#1D4ED8;}
+.doc-name{font-size:11px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.doc-badge{font-size:8px;padding:1px 5px;border-radius:4px;flex-shrink:0;}
+.b-ok{background:var(--green-lt);color:var(--green);}
+.b-wait{background:var(--amber-lt);color:var(--amber);}
+.b-lock{background:var(--blue-lt);color:#1D4ED8;}
 
-.docs-main {display:flex;flex-direction:column;overflow:hidden;}
-.docs-toolbar {
+.bib-main{display:flex;flex-direction:column;overflow:hidden;}
+.bib-toolbar{
   padding:10px 16px;border-bottom:0.5px solid var(--border2);background:var(--bg);
   display:flex;align-items:center;gap:8px;
 }
-.docs-toolbar-title {font-size:12px;font-weight:600;color:var(--text);flex:1;}
-.btn-action {
+.bib-toolbar-title{font-size:12px;font-weight:500;color:var(--text);flex:1;}
+.btn-sm{
   font-size:11px;padding:5px 12px;border-radius:6px;cursor:pointer;
   font-family:var(--font);transition:var(--trans);border:0.5px solid var(--border2);
   background:var(--bg);color:var(--text2);
 }
-.btn-action:hover {background:var(--bg2);}
-.btn-action.primary {background:var(--blue);color:#fff;border-color:var(--blue);}
-.btn-action.primary:hover {background:#1D4ED8;}
-.btn-action.danger  {color:var(--red);border-color:#FECACA;}
-.btn-action.danger:hover {background:var(--red-lt);}
-
-.doc-viewer {
-  flex:1;overflow-y:auto;padding:16px;background:var(--bg2);
+.btn-sm:hover{background:var(--bg2);}
+.btn-sm.primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-sm.primary:hover{background:#1D4ED8;}
+.btn-sm.danger{color:var(--red);border-color:#FECACA;}
+.btn-sm.danger:hover{background:var(--red-lt);}
+.doc-viewer{flex:1;overflow-y:auto;padding:16px;background:var(--bg2);}
+.doc-viewer-empty{
+  height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;color:var(--text3);gap:10px;
 }
-.doc-viewer-empty {
-  height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  color:var(--text3);gap:8px;
+.viewer-content{
+  background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r-lg);
+  padding:24px;max-width:720px;margin:0 auto;
 }
-.doc-viewer-empty .big-icon {font-size:40px;opacity:0.3;}
-.doc-viewer-content {
-  background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius-lg);
-  padding:24px;max-width:740px;margin:0 auto;
-}
-.doc-viewer-content h1,h2,h3 {color:var(--navy);margin:16px 0 8px;font-weight:500;}
-.doc-viewer-content h1 {font-size:16px;border-bottom:0.5px solid var(--border2);padding-bottom:8px;}
-.doc-viewer-content h2 {font-size:14px;}
-.doc-viewer-content h3 {font-size:13px;}
-.doc-viewer-content p  {font-size:13px;color:var(--text);margin-bottom:10px;line-height:1.7;}
-.doc-viewer-content strong {color:var(--navy);}
-.doc-viewer-content hr {border:none;border-top:0.5px solid var(--border2);margin:16px 0;}
-.doc-viewer-meta {
+.viewer-meta{
   display:flex;align-items:center;gap:8px;padding:10px 14px;
   background:var(--bg2);border-bottom:0.5px solid var(--border2);
-  border-radius:var(--radius-lg) var(--radius-lg) 0 0;margin:-24px -24px 20px;
+  border-radius:var(--r-lg) var(--r-lg) 0 0;margin:-24px -24px 20px;
 }
-.doc-viewer-meta-name {font-size:12px;font-weight:500;color:var(--text);}
-.doc-viewer-meta-date {font-size:10px;color:var(--text3);}
+.viewer-meta-name{font-size:12px;font-weight:500;color:var(--text);}
+.viewer-meta-date{font-size:10px;color:var(--text3);}
+.viewer-content p{font-size:13px;color:var(--text);margin-bottom:10px;line-height:1.7;}
+.viewer-content h1,.viewer-content h2,.viewer-content h3{color:var(--navy);margin:16px 0 8px;font-weight:500;}
+.viewer-content h1{font-size:16px;border-bottom:0.5px solid var(--border2);padding-bottom:8px;}
+.viewer-content h2{font-size:14px;}
+.viewer-content strong{color:var(--navy);}
+.viewer-content hr{border:none;border-top:0.5px solid var(--border2);margin:16px 0;}
 
-/* ── PAGE ANALYSE ───────────────────────────────────── */
-.analyse-layout {flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.analyse-body   {flex:1;display:grid;grid-template-columns:320px 1fr;overflow:hidden;}
-.analyse-form   {
+/* Carte mentale dans viewer */
+.mind-map-section{
+  margin-top:16px;border-top:0.5px solid var(--border2);padding-top:12px;
+}
+.mind-map-toggle{
+  display:flex;align-items:center;gap:8px;cursor:pointer;
+  font-size:11px;font-weight:500;color:var(--blue);padding:6px 0;
+  transition:var(--trans);
+}
+.mind-map-toggle:hover{opacity:.8;}
+.mind-map-body{margin-top:10px;}
+
+/* ══ AFFAIRES ═════════════════════════════════════════ */
+.aff-layout{flex:1;display:grid;grid-template-columns:260px 1fr;overflow:hidden;}
+.aff-sidebar{
+  border-right:0.5px solid var(--border2);background:var(--bg);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.aff-sidebar-hdr{
+  padding:10px 14px;border-bottom:0.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.aff-list{flex:1;overflow-y:auto;}
+.aff-item{
+  padding:10px 14px;cursor:pointer;transition:var(--trans);
+  border-left:2px solid transparent;border-bottom:0.5px solid var(--border);
+}
+.aff-item:hover{background:var(--bg2);}
+.aff-item.active{background:var(--bg3);border-left-color:var(--blue);}
+.aff-item-name{font-size:12px;font-weight:500;color:var(--text);}
+.aff-item-meta{font-size:10px;color:var(--text3);margin-top:2px;}
+.aff-item-status{
+  display:inline-block;font-size:9px;padding:1px 6px;border-radius:4px;margin-top:4px;
+}
+.aff-main{display:flex;flex-direction:column;overflow:hidden;}
+.aff-main-hdr{
+  padding:12px 16px;border-bottom:0.5px solid var(--border2);background:var(--bg);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.aff-main-title{font-size:13px;font-weight:500;color:var(--text);}
+.aff-body{flex:1;overflow-y:auto;padding:16px;background:var(--bg2);display:flex;flex-direction:column;gap:12px;}
+.aff-section{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;}
+.aff-section-hdr{
+  padding:9px 14px;border-bottom:0.5px solid var(--border2);background:var(--bg2);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.aff-section-title{font-size:11px;font-weight:500;color:var(--text);}
+.aff-section-body{padding:12px 14px;}
+
+/* Suivi procédural */
+.proc-track{display:flex;align-items:center;gap:0;padding:8px 0;}
+.proc-step{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.proc-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);}
+.proc-dot.done{background:var(--blue);}
+.proc-dot.active{background:var(--bg);border:2px solid var(--blue);box-shadow:0 0 0 3px var(--blue-lt);}
+.proc-name{font-size:9px;color:var(--text3);}
+.proc-name.done{color:var(--blue);}
+.proc-line{width:40px;height:1px;background:var(--border2);margin-bottom:12px;}
+.proc-line.done{background:var(--blue);}
+
+/* Rédaction acte */
+.redac-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.redac-btn{
+  padding:10px;border:0.5px solid var(--border2);border-radius:var(--r);
+  cursor:pointer;text-align:center;transition:var(--trans);background:var(--bg2);
+}
+.redac-btn:hover{border-color:var(--blue);background:var(--bg3);}
+.redac-btn-icon{font-size:18px;margin-bottom:4px;}
+.redac-btn-name{font-size:10px;font-weight:500;color:var(--text);}
+.redac-btn-desc{font-size:9px;color:var(--text3);}
+
+/* ══ ANALYSE ══════════════════════════════════════════ */
+.analyse-layout{flex:1;display:grid;grid-template-columns:340px 1fr;overflow:hidden;}
+.analyse-form{
   border-right:0.5px solid var(--border2);background:var(--bg);
   padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;
 }
-.form-section {margin-bottom:4px;}
-.form-label  {font-size:10px;font-weight:600;color:var(--text2);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:0.4px;}
-.form-input,
-.form-select,
-.form-textarea {
-  width:100%;border:0.5px solid var(--border2);border-radius:var(--radius);
+.form-step-indicator{
+  display:flex;gap:4px;margin-bottom:6px;
+}
+.fsi-dot{
+  flex:1;height:3px;border-radius:2px;background:var(--border);transition:var(--trans);
+}
+.fsi-dot.active{background:var(--blue);}
+.form-section{margin-bottom:4px;}
+.form-label{font-size:10px;font-weight:500;color:var(--text2);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:0.4px;}
+.form-input,.form-select,.form-textarea{
+  width:100%;border:0.5px solid var(--border2);border-radius:var(--r);
   padding:8px 12px;font-size:12px;font-family:var(--font);
   color:var(--text);background:var(--bg2);outline:none;transition:var(--trans);
 }
-.form-input:focus,
-.form-select:focus,
-.form-textarea:focus {border-color:var(--blue);background:var(--bg);}
-.form-textarea {min-height:80px;resize:vertical;}
-.form-step {
-  display:flex;align-items:center;gap:8px;padding:8px 12px;
-  background:var(--bg3);border-radius:var(--radius);
-  border:0.5px solid var(--blue-md);margin-bottom:8px;
-}
-.form-step-num {
-  width:20px;height:20px;background:var(--blue);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:600;color:#fff;flex-shrink:0;
-}
-.form-step-text {font-size:11px;color:var(--blue);font-weight:500;}
-.domains-grid {display:grid;grid-template-columns:1fr 1fr;gap:5px;}
-.domain-chip {
-  padding:5px 8px;border:0.5px solid var(--border);border-radius:6px;
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--blue);background:var(--bg);}
+.form-textarea{min-height:80px;resize:vertical;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.domains-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.domain-chip{
+  padding:6px 8px;border:0.5px solid var(--border);border-radius:6px;
   font-size:10px;color:var(--text2);cursor:pointer;transition:var(--trans);
   text-align:center;background:var(--bg);
 }
-.domain-chip:hover  {border-color:var(--blue-md);color:var(--blue);background:var(--bg3);}
-.domain-chip.active {border-color:var(--blue);background:var(--bg3);color:var(--blue);font-weight:500;}
-.btn-analyse {
-  width:100%;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);
+.domain-chip:hover{border-color:var(--blue-md);color:var(--blue);background:var(--bg3);}
+.domain-chip.active{border-color:var(--blue);background:var(--bg3);color:var(--blue);font-weight:500;}
+.btn-full{
+  width:100%;background:var(--blue);color:#fff;border:none;border-radius:var(--r);
   padding:10px;font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;transition:var(--trans);
 }
-.btn-analyse:hover {background:#1D4ED8;}
-.btn-analyse:disabled {background:var(--border);color:var(--text3);cursor:not-allowed;}
-
-.analyse-result {
+.btn-full:hover{background:#1D4ED8;}
+.btn-full:disabled{background:var(--border);color:var(--text3);cursor:not-allowed;}
+.analyse-result{
   flex:1;overflow-y:auto;padding:16px;background:var(--bg2);
   display:flex;flex-direction:column;gap:12px;
 }
-.result-card {
-  background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius-lg);
-  overflow:hidden;
-}
-.result-card-header {
+.result-card{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;}
+.result-card-hdr{
   padding:10px 14px;border-bottom:0.5px solid var(--border2);
   display:flex;align-items:center;justify-content:space-between;background:var(--bg2);
 }
-.result-card-title {font-size:12px;font-weight:600;color:var(--text);}
-.result-card-body  {padding:12px 14px;font-size:12px;color:var(--text);line-height:1.7;}
-.score-ring {
-  display:flex;align-items:center;gap:12px;padding:12px 14px;
-}
-.ring-num  {font-size:28px;font-weight:600;color:var(--blue);}
-.ring-label{font-size:11px;color:var(--text2);}
-.ring-bar  {flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;}
-.ring-fill {height:100%;border-radius:3px;background:var(--blue);}
-.result-empty {
-  height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  color:var(--text3);gap:8px;text-align:center;
+.result-card-title{font-size:12px;font-weight:500;color:var(--text);}
+.result-card-body{padding:14px;font-size:12px;color:var(--text);line-height:1.8;}
+.result-empty{
+  height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;color:var(--text3);gap:10px;text-align:center;
 }
 
-/* ── PAGE COMPARAISON ───────────────────────────────── */
-.comp-layout  {flex:1;display:grid;grid-template-columns:320px 1fr;overflow:hidden;}
-.comp-form    {
+/* ══ COMPARAISON ══════════════════════════════════════ */
+.comp-layout{flex:1;display:grid;grid-template-columns:340px 1fr;overflow:hidden;}
+.comp-form{
   border-right:0.5px solid var(--border2);background:var(--bg);
   padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;
 }
-.comp-result  {
+.comp-result{
   flex:1;overflow-y:auto;padding:16px;background:var(--bg2);
   display:flex;flex-direction:column;gap:12px;
 }
-.dec-item {
-  background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius);
+.juge-profile-card{
+  background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r-lg);
+  overflow:hidden;
+}
+.juge-profile-hdr{
+  padding:14px;background:var(--navy);display:flex;align-items:center;gap:12px;
+}
+.juge-avatar{
+  width:40px;height:40px;background:var(--blue);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:16px;font-weight:600;color:#fff;flex-shrink:0;
+}
+.juge-name{font-size:14px;font-weight:500;color:#FFFFFF;}
+.juge-meta{font-size:10px;color:#94A3B8;margin-top:2px;}
+.juge-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:0.5px solid var(--border2);}
+.juge-stat{padding:12px 14px;text-align:center;border-right:0.5px solid var(--border2);}
+.juge-stat:last-child{border-right:none;}
+.juge-stat-val{font-size:20px;font-weight:500;color:var(--navy);}
+.juge-stat-label{font-size:10px;color:var(--text3);margin-top:2px;}
+.prog-bar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:6px;}
+.prog-fill{height:100%;border-radius:3px;background:var(--blue);}
+.dec-item{
+  background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r);
   padding:10px 14px;display:flex;align-items:flex-start;gap:10px;
 }
-.dec-issue {
-  width:60px;text-align:center;padding:3px 6px;border-radius:5px;
+.dec-issue{
+  width:64px;text-align:center;padding:3px 6px;border-radius:5px;
   font-size:9px;font-weight:600;flex-shrink:0;
 }
-.dec-issue.fav    {background:var(--green-lt);color:var(--green);}
-.dec-issue.defav  {background:var(--red-lt);color:var(--red);}
-.dec-issue.partiel{background:var(--amber-lt);color:var(--amber);}
-.dec-title  {font-size:11px;font-weight:500;color:var(--text);margin-bottom:3px;}
-.dec-meta   {font-size:10px;color:var(--text3);}
-.save-hint  {
+.i-fav{background:var(--green-lt);color:var(--green);}
+.i-def{background:var(--red-lt);color:var(--red);}
+.i-par{background:var(--amber-lt);color:var(--amber);}
+.dec-title{font-size:11px;font-weight:500;color:var(--text);margin-bottom:3px;}
+.dec-meta{font-size:10px;color:var(--text3);}
+.save-confirm{
   font-size:10px;color:var(--green);background:var(--green-lt);
-  padding:6px 12px;border-radius:6px;text-align:center;
-  border:0.5px solid #86EFAC;
+  padding:6px 12px;border-radius:6px;text-align:center;border:0.5px solid #86EFAC;
+  display:none;
 }
 
-/* ── UTILITAIRES ────────────────────────────────────── */
-.card {
+/* ══ CHAT FLOTTANT ════════════════════════════════════ */
+#chat-fab{
+  position:fixed;bottom:24px;right:24px;
+  width:48px;height:48px;background:var(--blue);border-radius:50%;
+  display:none;align-items:center;justify-content:center;
+  cursor:pointer;z-index:400;transition:var(--trans);
+  box-shadow:0 4px 16px rgba(37,99,235,.35);
+}
+#chat-fab.show{display:flex;}
+#chat-fab:hover{background:#1D4ED8;transform:scale(1.05);}
+#chat-fab svg{width:20px;height:20px;}
+
+#chat-panel{
+  position:fixed;bottom:80px;right:24px;
+  width:420px;height:560px;
   background:var(--bg);border:0.5px solid var(--border2);
-  border-radius:var(--radius-lg);overflow:hidden;
+  border-radius:var(--r-lg);display:none;flex-direction:column;
+  z-index:400;overflow:hidden;
+  box-shadow:0 8px 32px rgba(15,23,42,.12);
 }
-.card-header {
-  padding:9px 14px;border-bottom:0.5px solid var(--border2);
-  background:var(--bg2);display:flex;align-items:center;justify-content:space-between;
+#chat-panel.show{display:flex;}
+.chat-panel-hdr{
+  padding:10px 14px;background:var(--navy);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
 }
-.card-title {font-size:11px;font-weight:600;color:var(--text);}
-.card-body  {padding:12px 14px;}
-.badge {font-size:9px;padding:2px 7px;border-radius:20px;font-weight:500;}
-.badge-blue  {background:var(--blue-lt);color:#1D4ED8;}
-.badge-green {background:var(--green-lt);color:var(--green);}
-.badge-amber {background:var(--amber-lt);color:var(--amber);}
+.chat-panel-title{font-size:12px;font-weight:500;color:#FFFFFF;}
+.chat-panel-actions{display:flex;gap:6px;align-items:center;}
+.chat-panel-btn{
+  font-size:10px;background:rgba(255,255,255,.1);color:#FFFFFF;
+  border:none;border-radius:5px;padding:3px 9px;cursor:pointer;
+  font-family:var(--font);transition:var(--trans);
+}
+.chat-panel-btn:hover{background:rgba(255,255,255,.2);}
+.chat-close{
+  width:22px;height:22px;background:rgba(255,255,255,.1);border:none;
+  border-radius:50%;color:#FFFFFF;cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;transition:var(--trans);
+}
+.chat-close:hover{background:rgba(255,255,255,.2);}
+.chat-messages{
+  flex:1;overflow-y:auto;padding:12px;
+  display:flex;flex-direction:column;gap:8px;background:var(--bg);
+}
+.chat-messages::-webkit-scrollbar{width:3px;}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.msg-user{
+  align-self:flex-end;background:var(--bg3);border-radius:10px 0 10px 10px;
+  padding:8px 12px;font-size:12px;color:#1D4ED8;max-width:78%;
+}
+.msg-ai{
+  align-self:flex-start;background:var(--bg2);border:0.5px solid var(--border2);
+  border-radius:0 10px 10px 10px;padding:10px 12px;font-size:12px;
+  color:var(--text);max-width:88%;line-height:1.7;
+}
+.msg-ai strong{color:var(--navy);font-weight:500;}
+.sources-row{margin-top:6px;display:flex;flex-wrap:wrap;gap:3px;}
+.source-chip{
+  display:inline-flex;background:var(--bg3);border:0.5px solid var(--blue-md);
+  border-radius:4px;padding:2px 6px;font-size:9px;color:#1D4ED8;
+}
+.typing{display:flex;gap:4px;padding:2px 0;}
+.typing span{
+  width:6px;height:6px;border-radius:50%;background:var(--blue-md);
+  animation:bounce .8s infinite;
+}
+.typing span:nth-child(2){animation-delay:.15s;}
+.typing span:nth-child(3){animation-delay:.3s;}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
 
-/* Loading overlay */
-#loading {
-  display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);
+/* Carte mentale dans chat panel */
+.mind-panel{
+  border-top:0.5px solid var(--border2);background:var(--bg);
+  flex-shrink:0;overflow:hidden;max-height:0;transition:max-height .3s ease;
+}
+.mind-panel.open{max-height:180px;}
+.mind-panel-hdr{
+  padding:5px 12px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:0.5px solid var(--border2);cursor:pointer;
+}
+.mind-panel-hdr:hover{background:var(--bg2);}
+.mind-panel-label{font-size:9px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;}
+.mind-panel-body{padding:6px 10px;}
+
+.chat-input-bar{
+  padding:8px 12px;border-top:0.5px solid var(--border2);
+  background:var(--bg);display:flex;gap:6px;align-items:center;flex-shrink:0;
+}
+.chat-input-wrap{
+  flex:1;display:flex;align-items:center;
+  border:0.5px solid var(--border2);border-radius:var(--r);
+  padding:0 10px;background:var(--bg2);transition:var(--trans);
+}
+.chat-input-wrap:focus-within{border-color:var(--blue);background:var(--bg);}
+#chat-input{
+  flex:1;border:none;outline:none;background:transparent;
+  font-size:12px;font-family:var(--font);color:var(--text);padding:8px 0;
+}
+.btn-send{
+  background:var(--blue);color:#fff;border:none;border-radius:var(--r);
+  padding:7px 12px;font-size:12px;font-weight:500;font-family:var(--font);
+  cursor:pointer;transition:var(--trans);flex-shrink:0;
+}
+.btn-send:hover{background:#1D4ED8;}
+
+/* Historique dans chat panel */
+.chat-hist{
+  border-top:0.5px solid var(--border2);background:var(--bg2);
+  max-height:0;overflow:hidden;transition:max-height .3s ease;flex-shrink:0;
+}
+.chat-hist.open{max-height:160px;overflow-y:auto;}
+.hist-item{
+  padding:7px 12px;cursor:pointer;transition:var(--trans);
+  border-bottom:0.5px solid var(--border);
+}
+.hist-item:hover{background:var(--bg);}
+.hist-item.active{background:var(--bg3);}
+.hist-title{font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hist-date{font-size:9px;color:var(--text3);}
+
+/* ══ UTILITAIRES ══════════════════════════════════════ */
+.badge{font-size:9px;padding:2px 7px;border-radius:20px;font-weight:500;}
+.badge-blue{background:var(--blue-lt);color:#1D4ED8;}
+.badge-green{background:var(--green-lt);color:var(--green);}
+.badge-amber{background:var(--amber-lt);color:var(--amber);}
+
+#loading{
+  display:none;position:fixed;inset:0;background:rgba(15,23,42,.3);
   z-index:500;align-items:center;justify-content:center;
 }
-#loading.show {display:flex;}
-.spinner {
-  width:36px;height:36px;border:3px solid var(--blue-lt);
+#loading.show{display:flex;}
+.spinner{
+  width:32px;height:32px;border:2.5px solid var(--blue-lt);
   border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;
 }
-@keyframes spin {to{transform:rotate(360deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-/* Toast */
-#toast {
-  display:none;position:fixed;bottom:20px;right:20px;
-  background:var(--navy);color:#fff;padding:10px 16px;
-  border-radius:var(--radius);font-size:12px;z-index:600;
-  border-left:3px solid var(--blue);
+#toast{
+  display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:var(--navy);color:#fff;padding:9px 18px;
+  border-radius:20px;font-size:12px;z-index:600;
+  border-left:3px solid var(--blue);white-space:nowrap;
 }
-#toast.show {display:block;animation:fadeIn .2s ease;}
-@keyframes fadeIn {from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+#toast.show{display:block;animation:fadeUp .2s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
-/* Scrollbars */
-::-webkit-scrollbar {width:4px;height:4px;}
-::-webkit-scrollbar-track {background:transparent;}
-::-webkit-scrollbar-thumb {background:var(--border);border-radius:4px;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
 </style>
 </head>
 <body>
 
-<!-- ══ LOGIN ══════════════════════════════════════════ -->
+<!-- ══ SPLASH ══════════════════════════════════════════ -->
+<div id="splash">
+  <div class="splash-logo">
+    <div class="splash-icon">OD</div>
+    <div class="splash-name">
+      <span class="splash-odyxia">Odyxia</span>
+      <span class="splash-droit">Droit</span>
+    </div>
+  </div>
+  <div class="splash-sub">Intelligence juridique · OHADA · CEMAC</div>
+  <div class="splash-line"></div>
+</div>
+
+<!-- ══ LOGIN ═══════════════════════════════════════════ -->
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">
       <div class="login-icon">OD</div>
-      <div>
-        <div class="login-title">Odyxia</div>
-      </div>
+      <div class="login-name">Odyxia</div>
     </div>
     <label class="login-label">Mot de passe</label>
     <input class="login-input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
     <div class="login-2fa" id="login-2fa-wrap">
-      <label class="login-label">Code d'authentification (6 chiffres)</label>
+      <label class="login-label">Code d'authentification</label>
       <input class="login-input" type="text" id="login-2fa" placeholder="000000" maxlength="6" inputmode="numeric"/>
     </div>
     <button class="login-btn" onclick="doLogin()">Accéder</button>
     <div class="login-err" id="login-err">Identifiants incorrects</div>
-    <div class="login-2fa" id="login-2fa-wrap">
-      <label class="login-label">Code d'authentification (6 chiffres)</label>
-      <input class="login-input" type="text" id="login-2fa" placeholder="000000" maxlength="6" inputmode="numeric"/>
-    </div>
-    <div style="text-align:center;margin-top:14px;">
-      <a href="/setup-2fa-page" style="font-size:11px;color:var(--text3);text-decoration:underline;cursor:pointer;">
-        Première connexion — configurer l'authentification
-      </a>
+    <div class="login-setup">
+      <a href="/setup-2fa-page">Première connexion — configurer l'authentification</a>
     </div>
   </div>
 </div>
 
-<!-- ══ APP ════════════════════════════════════════════ -->
+<!-- ══ APP ═════════════════════════════════════════════ -->
 <div id="app">
 
   <!-- Header -->
-  <div class="header">
-    <div class="header-logo">
-      <div class="header-icon">OD</div>
+  <div class="hdr">
+    <div class="hdr-logo">
+      <div class="hdr-icon">OD</div>
       <div>
-        <div class="header-name" id="header-avocat-nom">{{ cabinet_avocat }}</div>
-        <div class="header-sub" id="header-cabinet-nom">{{ cabinet_nom }}</div>
+        <div class="hdr-avocat" id="hdr-avocat">{{ cabinet_avocat }}</div>
+        <div class="hdr-cabinet" id="hdr-cabinet">{{ cabinet_nom }}</div>
       </div>
     </div>
-    <div class="header-sep"></div>
-    <div class="header-dossier" id="header-dossier" style="display:none;">
-      <span class="header-dossier-label">Dossier :</span>
-      <span class="header-dossier-name" id="header-dossier-name">—</span>
+    <div class="hdr-sep"></div>
+    <span class="hdr-pays" id="hdr-pays">OHADA · CMR</span>
+    <div class="hdr-dossier" id="hdr-dossier">
+      <span class="hdr-dossier-label">Affaire :</span>
+      <span class="hdr-dossier-name" id="hdr-dossier-name">—</span>
     </div>
-    <div class="header-right">
-      <span class="header-status">En ligne</span>
-      <div class="header-avatar" title="Déconnexion" onclick="doLogout()">Me</div>
+    <div class="hdr-right">
+      <span class="hdr-status">En ligne</span>
+      <div class="hdr-avatar" onclick="doLogout()" title="Déconnexion">Me</div>
     </div>
   </div>
 
   <!-- Sidebar -->
   <div class="sidebar">
-    <div class="sidebar-section">
-      <div class="sidebar-label">Navigation</div>
-      <div class="nav-item active" onclick="showPage('chat')" id="nav-chat">
-        <div class="nav-icon">💬</div>
-        Chat juridique
-        <span class="nav-count" id="nav-chat-count">0</span>
+    <div class="sb-section">
+      <div class="sb-label">Navigation</div>
+
+      <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/>
+          <rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/>
+        </svg>
+        Tableau de bord
       </div>
-      <div class="nav-item" onclick="showPage('documents')" id="nav-documents">
-        <div class="nav-icon">📄</div>
-        Documents
-        <span class="nav-count" id="nav-docs-count">0</span>
+
+      <div class="nav-item" onclick="showPage('bibliotheque')" id="nav-bibliotheque">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 2h4v12H2zM6 2h4v12H6zM10 2l4 1v11l-4-1z"/>
+        </svg>
+        Bibliothèque
+        <span class="nav-count" id="nav-bib-count">0</span>
       </div>
+
+      <div class="nav-item" onclick="showPage('affaires')" id="nav-affaires">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 4h12v10H2zM5 4V2h6v2"/><line x1="2" y1="8" x2="14" y2="8"/>
+        </svg>
+        Affaires
+        <span class="nav-count" id="nav-aff-count">0</span>
+      </div>
+
       <div class="nav-item" onclick="showPage('analyse')" id="nav-analyse">
-        <div class="nav-icon">🔍</div>
-        Analyse dossier
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="6.5" cy="6.5" r="4.5"/><line x1="10" y1="10" x2="14" y2="14"/>
+          <line x1="4.5" y1="6.5" x2="8.5" y2="6.5"/><line x1="6.5" y1="4.5" x2="6.5" y2="8.5"/>
+        </svg>
+        Analyse juridique
       </div>
+
       <div class="nav-item" onclick="showPage('comparaison')" id="nav-comparaison">
-        <div class="nav-icon">⚖️</div>
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M8 2v12M3 5l5-3 5 3"/><path d="M2 10h5M9 10h5"/><path d="M2 13h5M9 13h5"/>
+        </svg>
         Comparaison
       </div>
     </div>
-    <div class="sidebar-sep"></div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">Dossiers</div>
-      <div id="dossiers-list"></div>
-      <button class="btn-new-dossier" onclick="creerDossier()">+ Nouveau dossier</button>
+
+    <div class="sb-sep"></div>
+
+    <div class="sb-section">
+      <div class="sb-label">Affaires récentes</div>
+      <div id="affaires-sidebar"></div>
+      <button class="btn-new-affaire" onclick="creerAffaire()">+ Nouvelle affaire</button>
     </div>
   </div>
 
   <!-- Main -->
   <div class="main">
 
-    <!-- Barre dossier actif -->
-    <div class="dossier-bar" id="dossier-bar" style="display:none;">
-      <span class="dossier-bar-label">Dossier actif</span>
-      <span class="dossier-bar-name" id="dossier-bar-name">—</span>
-      <div class="proc-steps" id="proc-steps">
-        <div class="proc-step">
-          <div class="proc-dot done"></div>
-          <div class="proc-name done">Assignation</div>
+    <!-- ── TABLEAU DE BORD ──────────────────────────── -->
+    <div class="page active" id="page-dashboard">
+      <div class="dash-layout">
+        <div class="dash-welcome">
+          <h1 id="dash-greeting">Bonjour, Maître</h1>
+          <p id="dash-date">Chargement...</p>
         </div>
-        <div class="proc-line done"></div>
-        <div class="proc-step">
-          <div class="proc-dot active"></div>
-          <div class="proc-name done">Mise en état</div>
+        <div class="dash-grid">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2563EB" stroke-width="1.5">
+                <path d="M2 4h12v10H2zM5 4V2h6v2"/>
+              </svg>
+            </div>
+            <div class="stat-val" id="stat-affaires">0</div>
+            <div class="stat-label">Affaires actives</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2563EB" stroke-width="1.5">
+                <path d="M2 2h4v12H2zM6 2h4v12H6z"/>
+              </svg>
+            </div>
+            <div class="stat-val" id="stat-docs">0</div>
+            <div class="stat-label">Documents indexés</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2563EB" stroke-width="1.5">
+                <path d="M3 12L6 6l3 4 2-3 2 5"/>
+              </svg>
+            </div>
+            <div class="stat-val" id="stat-actes">0</div>
+            <div class="stat-label">Actes générés</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2563EB" stroke-width="1.5">
+                <circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/>
+              </svg>
+            </div>
+            <div class="stat-val" id="stat-convs">0</div>
+            <div class="stat-label">Conversations</div>
+          </div>
         </div>
-        <div class="proc-line"></div>
-        <div class="proc-step">
-          <div class="proc-dot"></div>
-          <div class="proc-name">Plaidoirie</div>
+        <div class="dash-row">
+          <div class="dash-card">
+            <div class="dash-card-hdr">
+              <span class="dash-card-title">Affaires en cours</span>
+              <span class="badge badge-blue" id="dash-aff-count">0</span>
+            </div>
+            <div class="dash-card-body" id="dash-affaires-list">
+              <div style="font-size:11px;color:var(--text3);padding:8px 0;">Aucune affaire — créez-en une</div>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-hdr">
+              <span class="dash-card-title">Documents récents</span>
+            </div>
+            <div class="dash-card-body" id="dash-docs-list">
+              <div style="font-size:11px;color:var(--text3);padding:8px 0;">Aucun document</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ── PAGE CHAT ────────────────────────────────── -->
-    <div class="page active" id="page-chat">
-      <div class="chat-layout" style="flex:1;">
-
-        <div class="chat-col">
-          <div class="chat-messages" id="chat-messages">
-            <div class="msg-ai">
-              Bonjour Maître. Je suis ODYXIA Droit, votre assistant juridique IA spécialisé en droit OHADA, CEMAC et camerounais. Comment puis-je vous aider ?
-            </div>
+    <!-- ── BIBLIOTHEQUE ─────────────────────────────── -->
+    <div class="page" id="page-bibliotheque">
+      <div class="bib-layout" style="flex:1;">
+        <div class="bib-sidebar">
+          <div class="bib-sidebar-hdr">
+            <span class="bib-sidebar-title">Bibliothèque</span>
           </div>
 
-          <!-- Carte mentale -->
-          <div class="mind-map-panel" id="mind-map-panel" style="display:none;">
-            <div class="mind-map-header" onclick="toggleMindMap()">
-              <span class="mind-map-label">Carte mentale — synthèse</span>
-              <span style="font-size:10px;color:var(--blue);" id="mm-toggle-label">Réduire ▴</span>
-            </div>
-            <div class="mind-map-body" id="mind-map-body"></div>
-          </div>
-
-          <div class="chat-input-bar">
-            <div class="btn-icon" onclick="toggleMindMap(true)" title="Carte mentale">🗺</div>
-            <div class="chat-input-wrap">
-              <input id="chat-input" placeholder="Posez votre question juridique..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();envoyerMessage();}"/>
-            </div>
-            <button class="btn-send" onclick="envoyerMessage()">Envoyer</button>
-          </div>
-        </div>
-
-        <!-- Historique -->
-        <div class="hist-col">
-          <div class="hist-header">
-            <span class="hist-title">Conversations</span>
-            <button class="btn-new-conv" onclick="nouvelleConversation()">+ Nouvelle</button>
-          </div>
-          <div class="hist-list" id="hist-list">
-            <div style="padding:20px 14px;text-align:center;font-size:11px;color:var(--text3);">Aucune conversation</div>
-          </div>
-          <div style="padding:10px 14px;border-top:0.5px solid var(--border2);">
-            <div class="card">
-              <div class="card-header"><span class="card-title">Documents du dossier</span></div>
-              <div class="card-body" id="chat-docs-list" style="font-size:11px;color:var(--text3);">
-                Sélectionnez un dossier
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ── PAGE DOCUMENTS ───────────────────────────── -->
-    <div class="page" id="page-documents">
-      <div class="docs-layout" style="flex:1;">
-
-        <div class="docs-sidebar">
-          <div class="docs-sidebar-header">
-            <span class="docs-sidebar-title">Mes documents</span>
-          </div>
-
-          <!-- Zone upload -->
-          <div class="upload-zone" id="upload-zone"
-            onclick="document.getElementById('file-input').click()"
+          <div class="upload-zone" id="upload-zone-bib"
+            onclick="document.getElementById('file-input-bib').click()"
             ondragover="event.preventDefault();this.classList.add('dragover')"
             ondragleave="this.classList.remove('dragover')"
-            ondrop="handleDrop(event)">
-            <div class="upload-icon">📎</div>
+            ondrop="handleDrop(event,'bib')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.5" style="margin:0 auto;display:block;">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+            </svg>
             <div class="upload-text">Cliquez ou glissez un PDF</div>
             <div class="upload-sub">Jusqu'à 50 Mo · Format PDF uniquement</div>
           </div>
-          <input type="file" id="file-input" accept=".pdf" style="display:none" onchange="uploadFichier(this.files[0])"/>
+          <input type="file" id="file-input-bib" accept=".pdf" style="display:none" onchange="uploadFichier(this.files[0],null)"/>
 
-          <div class="upload-options">
-            <label class="opt-toggle" id="opt-sensible">
-              <input type="checkbox" id="chk-sensible" onchange="toggleOpt('opt-sensible')"/>
-              🔒 Confidentiel
+          <div class="upload-opts">
+            <label class="opt-tag" id="opt-sensible-bib">
+              <input type="checkbox" id="chk-sensible-bib" onchange="toggleOpt('opt-sensible-bib')"/>
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="10" height="8" rx="1"/><path d="M5 7V5a3 3 0 016 0v2"/></svg>
+              Chiffré AES
             </label>
-            <label class="opt-toggle" id="opt-manuscrit">
-              <input type="checkbox" id="chk-manuscrit" onchange="toggleOpt('opt-manuscrit')"/>
-              ✍️ Manuscrit
+            <label class="opt-tag" id="opt-manuscrit-bib">
+              <input type="checkbox" id="chk-manuscrit-bib" onchange="toggleOpt('opt-manuscrit-bib')"/>
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-9 2 2-9 9H3v-2z"/></svg>
+              Manuscrit
             </label>
           </div>
           <div class="upload-hint">
-            <strong>Confidentiel</strong> : chiffrement AES du document.<br/>
+            <strong>Chiffré AES</strong> : document confidentiel, accès restreint.<br/>
             <strong>Manuscrit</strong> : OCR pour documents écrits à la main.
           </div>
 
-          <div class="docs-group-label">Documents du dossier</div>
-          <div id="docs-list-dossier"></div>
+          <div class="docs-group">Fichiers du dossier</div>
+          <div id="bib-docs-list"></div>
 
-          <div class="docs-group-label" style="margin-top:8px;">Documents générés</div>
-          <div id="docs-list-generes"></div>
+          <div class="docs-group" style="margin-top:6px;">Documents générés</div>
+          <div id="bib-generes-list"></div>
         </div>
 
-        <div class="docs-main">
-          <div class="docs-toolbar">
-            <span class="docs-toolbar-title" id="doc-viewer-title">Sélectionnez un document</span>
-            <button class="btn-action" id="btn-rediger" onclick="showRedaction()" style="display:none;">Rédiger un acte</button>
-            <button class="btn-action primary" id="btn-export-pdf" onclick="exporterPDF()" style="display:none;">Exporter PDF</button>
-            <button class="btn-action danger" id="btn-del-doc" onclick="supprimerDocActif()" style="display:none;">Supprimer</button>
+        <div class="bib-main">
+          <div class="bib-toolbar">
+            <span class="bib-toolbar-title" id="bib-doc-title">Sélectionnez un document</span>
+            <button class="btn-sm" id="btn-carte-mentale" onclick="afficherCarteMentale()" style="display:none;">
+              🗺 Carte mentale
+            </button>
+            <button class="btn-sm" id="btn-rediger-bib" onclick="showRedaction(null)" style="display:none;">Rédiger un acte</button>
+            <button class="btn-sm primary" id="btn-export-bib" onclick="exporterPDF()" style="display:none;">Exporter PDF</button>
+            <button class="btn-sm danger" id="btn-del-bib" onclick="supprimerDocActif()" style="display:none;">Supprimer</button>
           </div>
-
-          <div class="doc-viewer" id="doc-viewer">
+          <div class="doc-viewer" id="bib-viewer">
             <div class="doc-viewer-empty">
-              <div class="big-icon">📋</div>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+              </svg>
               <div style="font-size:13px;font-weight:500;">Aucun document sélectionné</div>
-              <div style="font-size:11px;">Uploadez un PDF ou sélectionnez un document dans la liste</div>
+              <div style="font-size:11px;">Uploadez un PDF ou sélectionnez un document</div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- ── PAGE ANALYSE ─────────────────────────────── -->
-    <div class="page" id="page-analyse">
-      <div class="analyse-layout">
-        <div class="analyse-body">
-
-          <div class="analyse-form">
-            <div class="form-step">
-              <div class="form-step-num">1</div>
-              <div class="form-step-text">Uploadez d'abord vos documents dans l'onglet Documents</div>
-            </div>
-            <div class="form-step" style="background:var(--bg2);border-color:var(--border);">
-              <div class="form-step-num" style="background:var(--text2);">2</div>
-              <div class="form-step-text" style="color:var(--text2);">Renseignez le dossier puis lancez l'analyse</div>
-            </div>
-
-            <div class="form-section">
-              <label class="form-label">Domaine juridique (OHADA/CEMAC)</label>
-              <div class="domains-grid" id="domains-grid">
-                <div class="domain-chip" onclick="selectDomain(this,'commercial')">Commercial OHADA</div>
-                <div class="domain-chip" onclick="selectDomain(this,'societaire')">Sociétaire OHADA</div>
-                <div class="domain-chip" onclick="selectDomain(this,'recouvrement')">Recouvrement OHADA</div>
-                <div class="domain-chip" onclick="selectDomain(this,'surete')">Sûretés OHADA</div>
-                <div class="domain-chip" onclick="selectDomain(this,'arbitrage')">Arbitrage OHADA</div>
-                <div class="domain-chip" onclick="selectDomain(this,'bancaire')">Bancaire COBAC</div>
-                <div class="domain-chip" onclick="selectDomain(this,'assurance')">Assurance CIMA</div>
-                <div class="domain-chip" onclick="selectDomain(this,'travail')">Droit du travail</div>
-                <div class="domain-chip" onclick="selectDomain(this,'foncier')">Foncier CMR</div>
-                <div class="domain-chip" onclick="selectDomain(this,'penal')">Pénal CMR</div>
-              </div>
-            </div>
-
-            <div class="form-section">
-              <label class="form-label">Description du dossier</label>
-              <textarea class="form-textarea" id="analyse-description" placeholder="Décrivez les faits, les parties, l'enjeu juridique..."></textarea>
-            </div>
-
-            <div class="form-section">
-              <label class="form-label">Question juridique principale</label>
-              <input class="form-input" id="analyse-question" placeholder="Ex: La clause de résiliation est-elle valide ?"/>
-            </div>
-
-            <button class="btn-analyse" id="btn-analyse" onclick="lancerAnalyse()">Analyser le dossier</button>
+    <!-- ── AFFAIRES ─────────────────────────────────── -->
+    <div class="page" id="page-affaires">
+      <div class="aff-layout" style="flex:1;">
+        <div class="aff-sidebar">
+          <div class="aff-sidebar-hdr">
+            <span style="font-size:11px;font-weight:500;color:var(--text);">Mes affaires</span>
+            <button class="btn-sm" onclick="creerAffaire()">+ Nouvelle</button>
           </div>
+          <div class="aff-list" id="aff-list">
+            <div style="padding:16px 14px;font-size:11px;color:var(--text3);">Aucune affaire</div>
+          </div>
+        </div>
 
-          <div class="analyse-result" id="analyse-result">
+        <div class="aff-main">
+          <div class="aff-main-hdr">
+            <span class="aff-main-title" id="aff-main-title">Sélectionnez une affaire</span>
+            <div style="display:flex;gap:6px;">
+              <button class="btn-sm primary" id="btn-aff-upload" onclick="document.getElementById('file-input-aff').click()" style="display:none;">Ajouter une pièce</button>
+              <button class="btn-sm primary" id="btn-aff-export" onclick="exporterPDF()" style="display:none;">Exporter PDF</button>
+            </div>
+          </div>
+          <input type="file" id="file-input-aff" accept=".pdf" style="display:none" onchange="uploadFichier(this.files[0], AFFAIRE_ACTIVE?.id)"/>
+
+          <div class="aff-body" id="aff-body">
             <div class="result-empty">
-              <div style="font-size:36px;opacity:.2;">🔍</div>
-              <div style="font-size:13px;font-weight:500;">Aucune analyse en cours</div>
-              <div style="font-size:11px;">Renseignez le formulaire et lancez l'analyse</div>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1">
+                <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
+              </svg>
+              <div style="font-size:13px;font-weight:500;">Sélectionnez ou créez une affaire</div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
 
-    <!-- ── PAGE COMPARAISON ─────────────────────────── -->
+    <!-- ── ANALYSE ──────────────────────────────────── -->
+    <div class="page" id="page-analyse">
+      <div class="analyse-layout" style="flex:1;">
+        <div class="analyse-form">
+          <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;">Analyse juridique</div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">
+            Décrivez votre situation juridique. L'analyse s'appuie sur la base documentaire et la jurisprudence OHADA/CEMAC.
+          </div>
+
+          <div class="form-step-indicator" id="fsi">
+            <div class="fsi-dot active"></div>
+            <div class="fsi-dot"></div>
+            <div class="fsi-dot"></div>
+            <div class="fsi-dot"></div>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label">Domaine juridique</label>
+            <div class="domains-grid">
+              <div class="domain-chip" onclick="selectDomain(this,'commercial')">Commercial OHADA</div>
+              <div class="domain-chip" onclick="selectDomain(this,'societaire')">Sociétaire OHADA</div>
+              <div class="domain-chip" onclick="selectDomain(this,'recouvrement')">Recouvrement OHADA</div>
+              <div class="domain-chip" onclick="selectDomain(this,'surete')">Sûretés OHADA</div>
+              <div class="domain-chip" onclick="selectDomain(this,'arbitrage')">Arbitrage OHADA</div>
+              <div class="domain-chip" onclick="selectDomain(this,'bancaire')">Bancaire COBAC</div>
+              <div class="domain-chip" onclick="selectDomain(this,'assurance')">Assurance CIMA</div>
+              <div class="domain-chip" onclick="selectDomain(this,'travail')">Droit du travail</div>
+              <div class="domain-chip" onclick="selectDomain(this,'foncier')">Foncier CMR</div>
+              <div class="domain-chip" onclick="selectDomain(this,'penal')">Pénal CMR</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-section">
+              <label class="form-label">Partie demanderesse</label>
+              <input class="form-input" id="an-demandeur" placeholder="Nom ou dénomination"/>
+            </div>
+            <div class="form-section">
+              <label class="form-label">Partie défenderesse</label>
+              <input class="form-input" id="an-defendeur" placeholder="Nom ou dénomination"/>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label">Exposé des faits</label>
+            <textarea class="form-textarea" id="an-faits" placeholder="Décrivez les faits de manière chronologique et précise..."></textarea>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label">Question juridique principale</label>
+            <input class="form-input" id="an-question" placeholder="Ex : La clause de résiliation anticipée est-elle valide ?"/>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label">Textes invoqués (optionnel)</label>
+            <input class="form-input" id="an-textes" placeholder="Ex : AU OHADA Art. 134, Code civil CMR Art. 1134..."/>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label">Enjeu et demandes</label>
+            <textarea class="form-textarea" id="an-enjeu" style="min-height:60px;" placeholder="Quel est l'enjeu financier ou juridique ? Que demandez-vous ?"></textarea>
+          </div>
+
+          <button class="btn-full" id="btn-analyser" onclick="lancerAnalyse()">Lancer l'analyse</button>
+        </div>
+
+        <div class="analyse-result" id="analyse-result">
+          <div class="result-empty">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <div style="font-size:13px;font-weight:500;">Aucune analyse</div>
+            <div style="font-size:11px;">Renseignez le formulaire et lancez l'analyse</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COMPARAISON ──────────────────────────────── -->
     <div class="page" id="page-comparaison">
       <div class="comp-layout" style="flex:1;">
-
         <div class="comp-form">
+          <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;">Profil juge & stratégie</div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">
+            Renseignez le juge et votre affaire. L'outil analyse le profil décisionnel et vous prépare une stratégie d'audience.
+          </div>
+
           <div class="form-section">
             <label class="form-label">Nom du juge</label>
-            <input class="form-input" id="comp-juge" placeholder="Ex: MBARGA Paul"/>
+            <input class="form-input" id="cmp-juge" placeholder="Ex : MBARGA Paul"/>
           </div>
-          <div class="form-section">
-            <label class="form-label">Juridiction</label>
-            <input class="form-input" id="comp-juridiction" placeholder="Ex: TPI Douala"/>
+          <div class="form-row">
+            <div class="form-section">
+              <label class="form-label">Juridiction</label>
+              <input class="form-input" id="cmp-juridiction" placeholder="Ex : TPI Douala"/>
+            </div>
+            <div class="form-section">
+              <label class="form-label">Chambre</label>
+              <input class="form-input" id="cmp-chambre" placeholder="Ex : Civile"/>
+            </div>
           </div>
+
           <div class="form-section">
-            <label class="form-label">Domaine</label>
-            <select class="form-select" id="comp-domaine">
+            <label class="form-label">Domaine de l'affaire</label>
+            <select class="form-select" id="cmp-domaine">
               <option value="">Tous les domaines</option>
               <option value="commercial">Commercial OHADA</option>
               <option value="societaire">Sociétaire OHADA</option>
@@ -831,27 +1077,77 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
               <option value="penal">Pénal CMR</option>
             </select>
           </div>
+
           <div class="form-section">
-            <label class="form-label">Informations du dossier à enregistrer</label>
-            <textarea class="form-textarea" id="comp-infos" placeholder="Résumé de votre dossier — sera enregistré automatiquement dans la base documentaire pour usage futur..."></textarea>
+            <label class="form-label">Résumé de votre affaire</label>
+            <textarea class="form-textarea" id="cmp-affaire" placeholder="Décrivez brièvement les faits, les parties, l'enjeu et votre position..."></textarea>
           </div>
-          <button class="btn-analyse" onclick="lancerComparaison()">Analyser le juge</button>
-          <div class="save-hint" id="comp-save-hint" style="display:none;">
-            ✓ Dossier enregistré dans la base documentaire
+
+          <div class="form-section">
+            <label class="form-label">Arguments principaux</label>
+            <textarea class="form-textarea" id="cmp-arguments" style="min-height:60px;" placeholder="Quels sont vos arguments de fond ?"></textarea>
           </div>
+
+          <div class="form-section">
+            <label class="form-label">Antécédents connus du juge (optionnel)</label>
+            <textarea class="form-textarea" id="cmp-antecedents" style="min-height:60px;" placeholder="Avez-vous déjà plaider devant ce juge ? Tendances observées..."></textarea>
+          </div>
+
+          <button class="btn-full" onclick="lancerComparaison()">Analyser le profil juge</button>
+          <div class="save-confirm" id="cmp-save-confirm">✓ Dossier enregistré dans la base documentaire</div>
         </div>
 
         <div class="comp-result" id="comp-result">
           <div class="result-empty">
-            <div style="font-size:36px;opacity:.2;">⚖️</div>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1">
+              <path d="M12 2L3 7v6c0 5 4 9.3 9 10 5-.7 9-5 9-10V7L12 2z"/>
+            </svg>
             <div style="font-size:13px;font-weight:500;">Aucune analyse comparative</div>
-            <div style="font-size:11px;">Renseignez le juge et lancez l'analyse</div>
+            <div style="font-size:11px;">Renseignez le formulaire pour obtenir le profil du juge</div>
           </div>
         </div>
-
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- ══ CHAT FLOTTANT ═══════════════════════════════════ -->
+<div id="chat-fab" onclick="toggleChat()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5">
+    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+  </svg>
+</div>
+
+<div id="chat-panel">
+  <div class="chat-panel-hdr">
+    <span class="chat-panel-title">Assistant juridique</span>
+    <div class="chat-panel-actions">
+      <button class="chat-panel-btn" onclick="toggleHist()">Historique</button>
+      <button class="chat-panel-btn" onclick="nouvelleConversation()">+ Nouveau</button>
+      <button class="chat-close" onclick="toggleChat()">×</button>
+    </div>
+  </div>
+
+  <div class="chat-hist" id="chat-hist"></div>
+
+  <div class="chat-messages" id="chat-messages">
+    <div class="msg-ai">Bonjour Maître. Je suis votre assistant juridique ODYXIA, spécialisé en droit OHADA, CEMAC et camerounais. Posez-moi vos questions — je puise mes réponses directement dans votre base documentaire.</div>
+  </div>
+
+  <div class="mind-panel" id="mind-panel">
+    <div class="mind-panel-hdr" onclick="toggleMindPanel()">
+      <span class="mind-panel-label">Carte mentale</span>
+      <span id="mind-toggle-lbl" style="font-size:9px;color:var(--blue);">Réduire ▴</span>
+    </div>
+    <div class="mind-panel-body" id="mind-panel-body"></div>
+  </div>
+
+  <div class="chat-input-bar">
+    <div class="chat-input-wrap">
+      <input id="chat-input" placeholder="Votre question juridique..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();envoyerMessage();}"/>
+    </div>
+    <button class="btn-send" onclick="envoyerMessage()">→</button>
   </div>
 </div>
 
@@ -860,149 +1156,719 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
 <script>
 const API = '';
-let TOKEN = localStorage.getItem('odyxia_token') || '';
+let TOKEN = localStorage.getItem('od_token') || '';
 let SESSION_ID = 'sess_' + Math.random().toString(36).slice(2);
-let DOSSIER_ACTIF = null;
-let DOC_ACTIF = null;
+let TENANT_ID  = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+let DOC_ACTIF  = null;
+let AFFAIRE_ACTIVE = null;
 let SELECTED_DOMAIN = '';
-let mmVisible = false;
-let mmOpen = true;
-let conversations = JSON.parse(localStorage.getItem('odyxia_convs') || '[]');
+let conversations = JSON.parse(localStorage.getItem('od_convs') || '[]');
 let convActuelle = null;
+let chatOpen = false;
+let histOpen = false;
+let mindOpen = false;
+
+// ── SPLASH ───────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('hide');
+    setTimeout(() => {
+      document.getElementById('splash').style.display = 'none';
+      if (TOKEN) {
+        document.getElementById('app').classList.add('show');
+        document.getElementById('chat-fab').classList.add('show');
+        init();
+      } else {
+        document.getElementById('login-screen').classList.add('show');
+      }
+    }, 400);
+  }, 4500);
+});
 
 // ── AUTH ─────────────────────────────────────────────
 async function doLogin() {
   const pass = document.getElementById('login-pass').value;
   const code = document.getElementById('login-2fa').value;
-  const body = { password: pass };
+  const body = {password: pass};
   if (code) body.code_2fa = code;
   try {
-    const r = await fetch(API + '/login', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(body)
-    });
+    const r = await fetch('/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const d = await r.json();
-    if (d.require_2fa) {
-      document.getElementById('login-2fa-wrap').style.display = 'block';
-      document.getElementById('login-err').style.display = 'none';
-      return;
-    }
+    if (d.require_2fa) { document.getElementById('login-2fa-wrap').style.display='block'; return; }
     if (d.token) {
       TOKEN = d.token;
-      localStorage.setItem('odyxia_token', TOKEN);
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('app').classList.add('visible');
+      localStorage.setItem('od_token', TOKEN);
+      document.getElementById('login-screen').classList.remove('show');
+      document.getElementById('app').classList.add('show');
+      document.getElementById('chat-fab').classList.add('show');
       init();
     } else {
       document.getElementById('login-err').style.display = 'block';
-      document.getElementById('login-err').textContent = d.erreur || 'Erreur';
+      document.getElementById('login-err').textContent = d.erreur || 'Identifiants incorrects';
     }
   } catch(e) {
     document.getElementById('login-err').style.display = 'block';
     document.getElementById('login-err').textContent = 'Connexion impossible';
   }
 }
+document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 
 function doLogout() {
-  localStorage.removeItem('odyxia_token');
-  TOKEN = '';
+  localStorage.removeItem('od_token');
   location.reload();
 }
 
-document.getElementById('login-pass').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
-
 // ── INIT ─────────────────────────────────────────────
 async function init() {
-  if (TOKEN) {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').classList.add('visible');
-    await chargerDossiers();
-    chargerHistorique();
-  }
+  const now = new Date();
+  const h = now.getHours();
+  const greeting = h < 12 ? 'Bonjour' : h < 18 ? 'Bon après-midi' : 'Bonsoir';
+  document.getElementById('dash-greeting').textContent = greeting + ', Maître';
+  document.getElementById('dash-date').textContent = now.toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  chargerHistorique();
+  await chargerAffaires();
+  await chargerStats();
+  await chargerDocsBib();
 }
 
 // ── NAVIGATION ───────────────────────────────────────
-function showPage(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  document.getElementById('nav-' + page).classList.add('active');
-  if (page === 'documents') chargerDocuments();
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  document.getElementById('nav-' + p).classList.add('active');
+  if (p === 'bibliotheque') chargerDocsBib();
+  if (p === 'affaires') chargerAffaires();
+  if (p === 'dashboard') chargerStats();
 }
 
-// ── DOSSIERS ─────────────────────────────────────────
-async function chargerDossiers() {
+// ── STATS DASHBOARD ──────────────────────────────────
+async function chargerStats() {
   try {
-    const r = await apiFetch('/dossiers');
-    const list = document.getElementById('dossiers-list');
-    list.innerHTML = '';
-    if (!r || !r.length) {
-      list.innerHTML = '<div style="padding:6px 14px;font-size:11px;color:var(--text3);">Aucun dossier</div>';
-      return;
-    }
-    document.getElementById('nav-chat-count').textContent = r.length;
-    r.forEach(d => {
-      const el = document.createElement('div');
-      el.className = 'dossier-item' + (DOSSIER_ACTIF?.id === d.id ? ' active' : '');
-      el.innerHTML = `<div class="dossier-dot"></div><span>${d.nom}</span>`;
-      el.onclick = () => selectionnerDossier(d);
-      list.appendChild(el);
-    });
+    const r = await apiFetch('/stats');
+    if (!r) return;
+    document.getElementById('stat-affaires').textContent = r.dossiers || 0;
+    document.getElementById('stat-docs').textContent = r.documents || 0;
+    document.getElementById('stat-actes').textContent = 0;
+    document.getElementById('stat-convs').textContent = conversations.length;
+    document.getElementById('dash-aff-count').textContent = r.dossiers || 0;
   } catch(e) {}
 }
 
-function selectionnerDossier(d) {
-  DOSSIER_ACTIF = d;
-  document.querySelectorAll('.dossier-item').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.dossier-item').forEach(el => {
-    if (el.querySelector('span')?.textContent === d.nom) el.classList.add('active');
-  });
-  document.getElementById('header-dossier').style.display = 'flex';
-  document.getElementById('header-dossier-name').textContent = d.nom;
-  document.getElementById('dossier-bar').style.display = 'flex';
-  document.getElementById('dossier-bar-name').textContent = d.nom;
-  chargerDocumentsDossier(d.id);
-  afficherDocsChatSidebar(d.id);
+// ── AFFAIRES ─────────────────────────────────────────
+async function chargerAffaires() {
+  try {
+    const r = await apiFetch('/dossiers');
+    if (!r) return;
+    document.getElementById('nav-aff-count').textContent = r.length;
+
+    // Sidebar affaires
+    const sb = document.getElementById('affaires-sidebar');
+    sb.innerHTML = '';
+    r.slice(0,5).forEach(a => {
+      const el = document.createElement('div');
+      el.className = 'sb-affaire' + (AFFAIRE_ACTIVE?.id === a.id ? ' active' : '');
+      el.innerHTML = `<div class="sb-dot"></div><span>${a.nom}</span>`;
+      el.onclick = () => selectionnerAffaire(a);
+      sb.appendChild(el);
+    });
+
+    // Liste page affaires
+    const list = document.getElementById('aff-list');
+    list.innerHTML = '';
+    if (!r.length) {
+      list.innerHTML = '<div style="padding:16px 14px;font-size:11px;color:var(--text3);">Aucune affaire — créez-en une</div>';
+      return;
+    }
+    r.forEach(a => {
+      const el = document.createElement('div');
+      el.className = 'aff-item' + (AFFAIRE_ACTIVE?.id === a.id ? ' active' : '');
+      el.innerHTML = `
+        <div class="aff-item-name">${a.nom}</div>
+        <div class="aff-item-meta">${a.description || 'Aucune description'}</div>
+        <span class="aff-item-status s-blue">En cours</span>`;
+      el.onclick = () => selectionnerAffaire(a);
+      list.appendChild(el);
+    });
+
+    // Dashboard
+    const dashList = document.getElementById('dash-affaires-list');
+    dashList.innerHTML = r.slice(0,4).map(a => `
+      <div class="affaire-row" onclick="selectionnerAffaire(${JSON.stringify(a).replace(/"/g,'&quot;')})">
+        <div class="affaire-dot"></div>
+        <div class="affaire-name">${a.nom}</div>
+        <span class="affaire-status s-blue">En cours</span>
+      </div>`).join('');
+  } catch(e) {}
 }
 
-async function creerDossier() {
-  const nom = prompt('Nom du nouveau dossier :');
+async function selectionnerAffaire(a) {
+  AFFAIRE_ACTIVE = a;
+  document.getElementById('hdr-dossier').style.display = 'flex';
+  document.getElementById('hdr-dossier-name').textContent = a.nom;
+  document.getElementById('aff-main-title').textContent = a.nom;
+  document.getElementById('btn-aff-upload').style.display = 'inline-flex';
+  document.querySelectorAll('.aff-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.sb-affaire').forEach(el => el.classList.remove('active'));
+  showPage('affaires');
+  await chargerCorpsAffaire(a);
+}
+
+async function chargerCorpsAffaire(a) {
+  const body = document.getElementById('aff-body');
+  body.innerHTML = '<div style="text-align:center;padding:20px;"><div class="spinner" style="margin:0 auto;"></div></div>';
+
+  let docs = [];
+  try { docs = await apiFetch('/liste_documents?dossier_id=' + a.id) || []; } catch(e) {}
+
+  body.innerHTML = `
+    <div class="aff-section">
+      <div class="aff-section-hdr">
+        <span class="aff-section-title">Suivi procédural</span>
+        <span class="badge badge-blue">En cours</span>
+      </div>
+      <div class="aff-section-body">
+        <div class="proc-track">
+          <div class="proc-step"><div class="proc-dot done"></div><div class="proc-name done">Saisine</div></div>
+          <div class="proc-line done"></div>
+          <div class="proc-step"><div class="proc-dot active"></div><div class="proc-name done">Instruction</div></div>
+          <div class="proc-line"></div>
+          <div class="proc-step"><div class="proc-dot"></div><div class="proc-name">Audience</div></div>
+          <div class="proc-line"></div>
+          <div class="proc-step"><div class="proc-dot"></div><div class="proc-name">Délibéré</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="aff-section">
+      <div class="aff-section-hdr">
+        <span class="aff-section-title">Pièces du dossier</span>
+        <span class="badge badge-blue">${docs.length} fichier(s)</span>
+      </div>
+      <div class="aff-section-body" id="aff-docs-body">
+        ${docs.length ? docs.map(d => `
+          <div class="doc-row-dash">
+            <div class="doc-icon-sm">PDF</div>
+            <div class="doc-name-sm">${d.nom || d.filename}</div>
+            <span class="doc-date-sm">${new Date(d.created_at).toLocaleDateString('fr')}</span>
+          </div>`).join('') : '<div style="font-size:11px;color:var(--text3);">Aucune pièce — ajoutez des documents</div>'}
+      </div>
+    </div>
+
+    <div class="aff-section">
+      <div class="aff-section-hdr">
+        <span class="aff-section-title">Rédiger un acte</span>
+      </div>
+      <div class="aff-section-body">
+        <div class="redac-grid">
+          ${[
+            {key:'requete',icon:'📋',name:'Requête introductive',desc:'Saisine du tribunal'},
+            {key:'conclusions',icon:'📝',name:'Conclusions',desc:'Mémoire en défense/demande'},
+            {key:'assignation',icon:'📨',name:'Assignation',desc:'Citation à comparaître'},
+            {key:'mise_en_demeure',icon:'⚠️',name:'Mise en demeure',desc:'Sommation préalable'},
+            {key:'contrat',icon:'✍️',name:'Contrat',desc:'Rédaction contractuelle'},
+            {key:'rapport',icon:'📊',name:'Rapport client',desc:'Compte rendu d\'avancement'},
+          ].map(t => `
+            <div class="redac-btn" onclick="showRedaction('${t.key}')">
+              <div class="redac-btn-icon">${t.icon}</div>
+              <div class="redac-btn-name">${t.name}</div>
+              <div class="redac-btn-desc">${t.desc}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+async function creerAffaire() {
+  const nom = prompt('Nom de l\'affaire :');
   if (!nom?.trim()) return;
+  const desc = prompt('Description (optionnel) :') || '';
   try {
-    await apiFetch('/dossiers', 'POST', {nom: nom.trim()});
-    showToast('Dossier créé');
-    await chargerDossiers();
+    await apiFetch('/dossiers', 'POST', {nom: nom.trim(), description: desc});
+    showToast('Affaire créée');
+    await chargerAffaires();
   } catch(e) { showToast('Erreur : ' + e.message, true); }
 }
 
-// ── CHAT ─────────────────────────────────────────────
+// ── BIBLIOTHEQUE ─────────────────────────────────────
+async function chargerDocsBib() {
+  try {
+    const r = await apiFetch('/liste_documents') || [];
+    document.getElementById('nav-bib-count').textContent = r.length;
+
+    const list = document.getElementById('bib-docs-list');
+    list.innerHTML = '';
+    if (!r.length) {
+      list.innerHTML = '<div style="padding:8px 14px;font-size:11px;color:var(--text3);">Aucun document</div>';
+    } else {
+      r.forEach(d => {
+        const el = document.createElement('div');
+        el.className = 'doc-item';
+        const locked = d.metadata?.sensible;
+        el.innerHTML = `
+          <div class="doc-icon">PDF</div>
+          <div class="doc-name">${d.nom || d.filename}</div>
+          <span class="doc-badge ${locked ? 'b-lock' : 'b-ok'}">${locked ? '🔒' : 'OK'}</span>`;
+        el.onclick = () => afficherDocViewer(d);
+        list.appendChild(el);
+      });
+    }
+
+    // Dashboard docs récents
+    const dashDocs = document.getElementById('dash-docs-list');
+    dashDocs.innerHTML = r.slice(0,4).map(d => `
+      <div class="doc-row-dash">
+        <div class="doc-icon-sm">PDF</div>
+        <div class="doc-name-sm">${d.nom || d.filename}</div>
+        <div class="doc-date-sm">${new Date(d.created_at).toLocaleDateString('fr')}</div>
+      </div>`).join('') || '<div style="font-size:11px;color:var(--text3);">Aucun document</div>';
+  } catch(e) {}
+}
+
+function afficherDocViewer(doc) {
+  DOC_ACTIF = doc;
+  document.querySelectorAll('.doc-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll(`[data-doc-id="${doc.id}"]`).forEach(el => el.classList.add('active'));
+
+  document.getElementById('bib-doc-title').textContent = doc.nom || doc.filename;
+  document.getElementById('btn-carte-mentale').style.display = 'inline-flex';
+  document.getElementById('btn-rediger-bib').style.display   = 'inline-flex';
+  document.getElementById('btn-export-bib').style.display    = 'inline-flex';
+  document.getElementById('btn-del-bib').style.display       = 'inline-flex';
+
+  document.getElementById('bib-viewer').innerHTML = `
+    <div class="viewer-content">
+      <div class="viewer-meta">
+        <div>
+          <div class="viewer-meta-name">${doc.nom || doc.filename}</div>
+          <div class="viewer-meta-date">${doc.storage_tier || 'hot'} · ${new Date(doc.created_at).toLocaleDateString('fr')}</div>
+        </div>
+        <span class="badge badge-${doc.status === 'ready' ? 'green' : 'amber'}" style="margin-left:auto;">${doc.status === 'ready' ? 'Indexé' : 'En cours'}</span>
+      </div>
+      <p>Document chargé. Utilisez le <strong>chat flottant</strong> pour l'interroger, ou générez un acte depuis l'onglet Affaires.</p>
+      <div class="mind-map-section" id="mind-map-section" style="display:none;">
+        <div class="mind-map-toggle" onclick="toggleCarteMentaleViewer()">
+          🗺 <span id="mm-viewer-lbl">Afficher la carte mentale</span>
+        </div>
+        <div class="mind-map-body" id="mm-viewer-body" style="display:none;"></div>
+      </div>
+    </div>`;
+}
+
+async function afficherCarteMentale() {
+  if (!DOC_ACTIF) return;
+  showLoading(true);
+  try {
+    const r = await apiFetch('/carte_mentale', 'POST', {document_id: DOC_ACTIF.id});
+    showLoading(false);
+    if (!r?.carte) { showToast('Impossible de générer la carte', true); return; }
+    const section = document.getElementById('mind-map-section');
+    const body    = document.getElementById('mm-viewer-body');
+    if (!section) return;
+    section.style.display = 'block';
+    body.style.display = 'block';
+    body.innerHTML = buildMindMapSVG(r.carte);
+    document.getElementById('mm-viewer-lbl').textContent = 'Masquer la carte mentale';
+  } catch(e) {
+    showLoading(false);
+    showToast('Erreur carte mentale', true);
+  }
+}
+
+function toggleCarteMentaleViewer() {
+  const body = document.getElementById('mm-viewer-body');
+  const lbl  = document.getElementById('mm-viewer-lbl');
+  if (!body) return;
+  const visible = body.style.display !== 'none';
+  body.style.display = visible ? 'none' : 'block';
+  lbl.textContent = visible ? 'Afficher la carte mentale' : 'Masquer la carte mentale';
+}
+
+function buildMindMapSVG(carte) {
+  const branches = carte.branches || [];
+  const cx = 290, cy = 55;
+  const bw = 110, bh = 26;
+  let svg = `<svg viewBox="0 0 580 150" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:140px;">
+    <rect x="${cx-75}" y="${cy-13}" width="150" height="26" rx="6" fill="#2563EB"/>
+    <text x="${cx}" y="${cy+3}" text-anchor="middle" font-size="11" font-weight="600" fill="#FFFFFF" font-family="DM Sans,system-ui">${(carte.racine||'').slice(0,20)}</text>`;
+  const cols = ['#FEF3C7','#DCFCE7','#EFF6FF','#FEE2E2','#F3E8FF','#FFF7ED'];
+  const tcols = ['#92400E','#15803D','#1D4ED8','#991B1B','#6B21A8','#9A3412'];
+  const n = branches.length;
+  branches.forEach((b, i) => {
+    const side = i < Math.ceil(n/2) ? -1 : 1;
+    const idx  = side === -1 ? i : i - Math.ceil(n/2);
+    const total= side === -1 ? Math.ceil(n/2) : Math.floor(n/2);
+    const by   = 16 + idx * (Math.max(120/(Math.max(total,1)), 28));
+    const bx   = side === -1 ? 30 : 580 - 30 - bw;
+    const lx1  = side === -1 ? cx - 75 : cx + 75;
+    const lx2  = side === -1 ? bx + bw : bx;
+    const ci   = i % cols.length;
+    svg += `<line x1="${lx1}" y1="${cy}" x2="${lx2}" y2="${by+bh/2}" stroke="#BFDBFE" stroke-width="1"/>
+    <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="5" fill="${cols[ci]}" stroke="#E2E8F0" stroke-width="0.5"/>
+    <text x="${bx+bw/2}" y="${by+bh/2+1}" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="500" fill="${tcols[ci]}" font-family="DM Sans,system-ui">${(b.label||'').slice(0,16)}</text>`;
+  });
+  svg += '</svg>';
+  return svg;
+}
+
+// ── UPLOAD ────────────────────────────────────────────
+async function uploadFichier(file, dossierId) {
+  if (!file) return;
+  showLoading(true);
+  const formData = new FormData();
+  formData.append('fichier', file);
+  if (dossierId) formData.append('dossier_id', dossierId);
+  const sensible  = dossierId ? false : document.getElementById('chk-sensible-bib')?.checked;
+  const manuscrit = dossierId ? false : document.getElementById('chk-manuscrit-bib')?.checked;
+  formData.append('sensible',  sensible  ? 'true' : 'false');
+  formData.append('manuscrit', manuscrit ? 'true' : 'false');
+  try {
+    const r = await fetch('/upload_document', {
+      method:'POST',
+      headers:{'Authorization':'Bearer '+TOKEN},
+      body: formData
+    });
+    const d = await r.json();
+    showLoading(false);
+    if (d.succes) {
+      showToast(`"${file.name}" indexé — ${d.chunks} passages`);
+      await chargerDocsBib();
+      if (dossierId && AFFAIRE_ACTIVE) await chargerCorpsAffaire(AFFAIRE_ACTIVE);
+    } else {
+      showToast('Erreur : ' + (d.erreur || 'Upload échoué'), true);
+    }
+  } catch(e) {
+    showLoading(false);
+    showToast('Erreur upload', true);
+  }
+  document.getElementById('file-input-bib').value = '';
+  document.getElementById('file-input-aff').value = '';
+}
+
+function handleDrop(e, ctx) {
+  e.preventDefault();
+  document.getElementById('upload-zone-' + ctx).classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file?.type === 'application/pdf') uploadFichier(file, null);
+  else showToast('Format PDF uniquement', true);
+}
+
+function toggleOpt(id) {
+  document.getElementById(id).classList.toggle('active');
+}
+
+async function supprimerDocActif() {
+  if (!DOC_ACTIF || !confirm('Supprimer ce document ?')) return;
+  try {
+    await apiFetch('/supprimer_document', 'DELETE', {id: DOC_ACTIF.id});
+    showToast('Document supprimé');
+    DOC_ACTIF = null;
+    document.getElementById('bib-viewer').innerHTML = '<div class="doc-viewer-empty"><div style="font-size:13px;">Document supprimé</div></div>';
+    ['btn-carte-mentale','btn-rediger-bib','btn-export-bib','btn-del-bib'].forEach(id => document.getElementById(id).style.display='none');
+    await chargerDocsBib();
+  } catch(e) { showToast('Erreur', true); }
+}
+
+// ── REDACTION ─────────────────────────────────────────
+function showRedaction(type) {
+  const t = type || prompt('Type d\'acte :\nrequete, conclusions, mise_en_demeure, assignation, contrat, rapport');
+  if (!t) return;
+  const faits = prompt('Décrivez brièvement les faits :');
+  if (!faits) return;
+  redigerActe(t.trim(), faits);
+}
+
+async function redigerActe(type, faits) {
+  showLoading(true);
+  try {
+    const r = await apiFetch('/rediger', 'POST', {
+      type,
+      donnees: {faits, dossier: AFFAIRE_ACTIVE?.nom || ''},
+      session_id: SESSION_ID
+    });
+    showLoading(false);
+    if (!r?.document) { showToast('Erreur rédaction', true); return; }
+
+    const html = r.document
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^## (.+)$/gm,  '<h2>$1</h2>')
+      .replace(/^# (.+)$/gm,   '<h1>$1</h1>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g,    '<em>$1</em>')
+      .replace(/^---+$/gm,      '<hr/>')
+      .replace(/\n\n/g,         '</p><p>')
+      .replace(/\n/g,           '<br/>');
+
+    document.getElementById('bib-viewer').innerHTML = `
+      <div class="viewer-content">
+        <div class="viewer-meta">
+          <div>
+            <div class="viewer-meta-name">${r.nom || type}</div>
+            <div class="viewer-meta-date">Généré le ${new Date().toLocaleDateString('fr')}</div>
+          </div>
+          <span class="badge badge-blue" style="margin-left:auto;">Généré</span>
+        </div>
+        <p>${html}</p>
+      </div>`;
+    document.getElementById('bib-doc-title').textContent = r.nom || type;
+    document.getElementById('btn-export-bib').style.display = 'inline-flex';
+
+    const genEl = document.getElementById('bib-generes-list');
+    const docEl = document.createElement('div');
+    docEl.className = 'doc-item active';
+    docEl.innerHTML = `<div class="doc-icon">GEN</div><div class="doc-name">${r.nom||type}</div><span class="doc-badge badge-blue">Généré</span>`;
+    genEl.appendChild(docEl);
+    showToast('Acte rédigé');
+  } catch(e) {
+    showLoading(false);
+    showToast('Erreur : ' + e.message, true);
+  }
+}
+
+async function exporterPDF() {
+  const viewer = document.getElementById('bib-viewer');
+  const contenu = viewer?.innerText || '';
+  if (!contenu.trim()) { showToast('Aucun contenu', true); return; }
+  try {
+    const r = await fetch('/export_pdf', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},
+      body: JSON.stringify({contenu, nom: DOC_ACTIF?.nom || 'Document'})
+    });
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (DOC_ACTIF?.nom || 'document') + '.pdf';
+    a.click();
+    showToast('PDF exporté');
+  } catch(e) { showToast('Erreur export', true); }
+}
+
+// ── ANALYSE ───────────────────────────────────────────
+function selectDomain(el, domain) {
+  document.querySelectorAll('.domain-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  SELECTED_DOMAIN = domain;
+  // Mise à jour indicateur étapes
+  const dots = document.querySelectorAll('.fsi-dot');
+  dots.forEach((d,i) => d.classList.toggle('active', i === 0));
+  if (domain) dots[1]?.classList.add('active');
+}
+
+async function lancerAnalyse() {
+  if (!SELECTED_DOMAIN) { showToast('Sélectionnez un domaine', true); return; }
+  const faits = document.getElementById('an-faits').value.trim();
+  const q     = document.getElementById('an-question').value.trim();
+  const dem   = document.getElementById('an-demandeur').value.trim();
+  const def   = document.getElementById('an-defendeur').value.trim();
+  const textes= document.getElementById('an-textes').value.trim();
+  const enjeu = document.getElementById('an-enjeu').value.trim();
+  if (!faits)  { showToast('Décrivez les faits', true); return; }
+  if (!q)      { showToast('Posez la question juridique', true); return; }
+
+  showLoading(true);
+  const result = document.getElementById('analyse-result');
+  result.innerHTML = '<div class="result-empty"><div class="spinner"></div></div>';
+
+  // Mise à jour indicateur
+  document.querySelectorAll('.fsi-dot').forEach(d => d.classList.add('active'));
+
+  const prompt_complet = `[Analyse ${SELECTED_DOMAIN}]
+Parties : ${dem || 'Non précisé'} c/ ${def || 'Non précisé'}
+Faits : ${faits}
+Textes invoqués : ${textes || 'Non précisés'}
+Enjeu : ${enjeu || 'Non précisé'}
+Question : ${q}
+
+Répondez de façon détaillée et conversationnelle, en développant l'analyse juridique, la qualification des faits, les risques et la stratégie recommandée. Citez les textes applicables et la jurisprudence OHADA/CEMAC pertinente.`;
+
+  try {
+    const r = await apiFetch('/question', 'POST', {
+      question: prompt_complet,
+      session_id: 'analyse_' + Date.now()
+    });
+    showLoading(false);
+    const reponse = r.reponse || '';
+    const sources = r.sources || [];
+
+    result.innerHTML = `
+      <div class="result-card">
+        <div class="result-card-hdr">
+          <span class="result-card-title">Analyse — ${SELECTED_DOMAIN}</span>
+          <div style="display:flex;gap:6px;">
+            <span class="badge badge-blue">${SELECTED_DOMAIN.toUpperCase()}</span>
+            <button class="btn-sm" onclick="exporterAnalyse()">Exporter PDF</button>
+          </div>
+        </div>
+        <div class="result-card-body" id="analyse-result-text">
+          ${reponse.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br/>')}
+          ${sources.length ? '<div class="sources-row">' + sources.map(s=>`<span class="source-chip">${s}</span>`).join('') + '</div>' : ''}
+        </div>
+      </div>`;
+  } catch(e) {
+    showLoading(false);
+    result.innerHTML = `<div class="result-empty"><div>Erreur : ${e.message}</div></div>`;
+  }
+}
+
+async function exporterAnalyse() {
+  const el = document.getElementById('analyse-result-text');
+  if (!el) return;
+  try {
+    const r = await fetch('/export_pdf', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},
+      body: JSON.stringify({contenu: el.innerText, nom: 'Analyse_' + SELECTED_DOMAIN})
+    });
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'Analyse_' + SELECTED_DOMAIN + '.pdf'; a.click();
+    showToast('Analyse exportée');
+  } catch(e) { showToast('Erreur export', true); }
+}
+
+// ── COMPARAISON ───────────────────────────────────────
+async function lancerComparaison() {
+  const juge    = document.getElementById('cmp-juge').value.trim();
+  const jurid   = document.getElementById('cmp-juridiction').value.trim();
+  const chambre = document.getElementById('cmp-chambre').value.trim();
+  const domaine = document.getElementById('cmp-domaine').value;
+  const affaire = document.getElementById('cmp-affaire').value.trim();
+  const args    = document.getElementById('cmp-arguments').value.trim();
+  const ant     = document.getElementById('cmp-antecedents').value.trim();
+
+  if (!juge && !jurid) { showToast('Renseignez un juge ou une juridiction', true); return; }
+  if (!affaire)        { showToast('Décrivez votre affaire', true); return; }
+
+  showLoading(true);
+  try {
+    const r = await apiFetch('/comparaison/analyser', 'POST', {
+      juge, juridiction: jurid, domaine, periode: 'Toutes'
+    });
+    showLoading(false);
+
+    const result = document.getElementById('comp-result');
+    const analyse = r.analyse || {};
+    const decisions = r.decisions || [];
+    const initiales = (juge || jurid).split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+
+    if (!r.succes && !decisions.length) {
+      result.innerHTML = `
+        <div class="result-card">
+          <div class="result-card-hdr"><span class="result-card-title">Analyse basée sur votre dossier</span></div>
+          <div class="result-card-body">
+            <p>Aucune décision antérieure trouvée pour <strong>${juge || jurid}</strong>. L'analyse se base sur votre description et les tendances jurisprudentielles OHADA/CEMAC.</p>
+            <p style="margin-top:10px;"><strong>Votre affaire :</strong> ${affaire}</p>
+            ${args ? `<p><strong>Arguments :</strong> ${args}</p>` : ''}
+            ${ant ? `<p><strong>Antécédents :</strong> ${ant}</p>` : ''}
+          </div>
+        </div>`;
+    } else {
+      const taux = analyse.taux_favorabilite || Math.round((decisions.filter(d=>d.issue==='favorable').length / Math.max(decisions.length,1)) * 100);
+      result.innerHTML = `
+        <div class="juge-profile-card">
+          <div class="juge-profile-hdr">
+            <div class="juge-avatar">${initiales}</div>
+            <div>
+              <div class="juge-name">${juge || jurid}</div>
+              <div class="juge-meta">${jurid || ''}${chambre ? ' · ' + chambre : ''}${domaine ? ' · ' + domaine : ''}</div>
+            </div>
+          </div>
+          <div class="juge-stats">
+            <div class="juge-stat">
+              <div class="juge-stat-val">${decisions.length}</div>
+              <div class="juge-stat-label">Décisions</div>
+            </div>
+            <div class="juge-stat">
+              <div class="juge-stat-val" style="color:var(--blue);">${taux}%</div>
+              <div class="juge-stat-label">Taux favorable</div>
+              <div class="prog-bar"><div class="prog-fill" style="width:${taux}%"></div></div>
+            </div>
+            <div class="juge-stat">
+              <div class="juge-stat-val">${decisions.filter(d=>d.issue==='defavorable').length}</div>
+              <div class="juge-stat-label">Défavorables</div>
+            </div>
+          </div>
+          ${analyse.synthese ? `<div style="padding:12px 14px;font-size:12px;color:var(--text);line-height:1.7;border-bottom:0.5px solid var(--border2);">${analyse.synthese}</div>` : ''}
+          <div style="padding:10px 14px;">
+            <div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">Stratégie recommandée pour votre affaire</div>
+            <div style="font-size:12px;color:var(--text);line-height:1.7;">
+              ${affaire ? `Compte tenu du profil décisionnel et de votre affaire (<em>${affaire.slice(0,100)}...</em>), privilégiez une argumentation axée sur les textes OHADA et la jurisprudence CCJA. ${taux > 60 ? 'Ce juge tend à être favorable dans ce domaine.' : 'Préparez des arguments solides — ce juge est exigeant.'}` : ''}
+            </div>
+          </div>
+        </div>
+
+        ${decisions.length ? `
+        <div class="result-card">
+          <div class="result-card-hdr"><span class="result-card-title">Décisions antérieures</span><span class="badge badge-blue">${decisions.length}</span></div>
+          <div class="result-card-body" style="display:flex;flex-direction:column;gap:8px;">
+            ${decisions.slice(0,5).map(d => `
+              <div class="dec-item">
+                <div class="dec-issue ${d.issue==='favorable'?'i-fav':d.issue==='defavorable'?'i-def':'i-par'}">${d.issue||'—'}</div>
+                <div>
+                  <div class="dec-title">${d.titre||'Décision'}</div>
+                  <div class="dec-meta">${d.juridiction||''} · ${d.date_dec||''} · ${d.reference||''}</div>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>` : ''}`;
+    }
+
+    if (affaire) {
+      document.getElementById('cmp-save-confirm').style.display = 'block';
+      setTimeout(() => document.getElementById('cmp-save-confirm').style.display='none', 4000);
+    }
+  } catch(e) {
+    showLoading(false);
+    showToast('Erreur : ' + e.message, true);
+  }
+}
+
+// ── CHAT FLOTTANT ─────────────────────────────────────
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById('chat-panel').classList.toggle('show', chatOpen);
+}
+
+function toggleHist() {
+  histOpen = !histOpen;
+  document.getElementById('chat-hist').classList.toggle('open', histOpen);
+}
+
+function toggleMindPanel() {
+  mindOpen = !mindOpen;
+  document.getElementById('mind-panel').classList.toggle('open', mindOpen);
+  document.getElementById('mind-toggle-lbl').textContent = mindOpen ? 'Réduire ▴' : 'Agrandir ▾';
+}
+
 async function envoyerMessage() {
   const input = document.getElementById('chat-input');
   const q = input.value.trim();
   if (!q) return;
   input.value = '';
 
-  ajouterMessage('user', q);
+  ajouterMsg('user', q);
   const typing = ajouterTyping();
   showLoading(true);
 
   if (!convActuelle) {
-    convActuelle = {id: SESSION_ID, titre: q.slice(0,40), date: new Date().toLocaleString('fr'), messages: []};
+    convActuelle = {id: SESSION_ID, titre: q.slice(0,40), date: new Date().toLocaleString('fr'), messages:[]};
     conversations.unshift(convActuelle);
-    sauvegarderHistorique();
+    sauvegarderHist();
   }
-  convActuelle.messages.push({role:'user', content: q});
+  convActuelle.messages.push({role:'user', content:q});
 
   try {
-    const body = {question: q, session_id: SESSION_ID};
-    if (DOSSIER_ACTIF) body.dossier_id = DOSSIER_ACTIF.id;
+    const body = {question:q, session_id:SESSION_ID};
+    if (AFFAIRE_ACTIVE) body.dossier_id = AFFAIRE_ACTIVE.id;
 
-    const r = await apiFetch('/question_stream', 'POST', body, true);
-    if (!r.ok) throw new Error('Erreur serveur');
-
+    const r = await fetch('/question_stream', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},
+      body: JSON.stringify(body)
+    });
     typing.remove();
     showLoading(false);
 
@@ -1020,13 +1886,13 @@ async function envoyerMessage() {
         if (!line.startsWith('data:')) continue;
         try {
           const ev = JSON.parse(line.slice(5));
-          if (ev.type === 'sources') sources = ev.sources || [];
-          if (ev.type === 'token')   { reponse += ev.text; renderMessage(msgEl, reponse, sources); }
-          if (ev.type === 'fin')     {
-            convActuelle.messages.push({role:'assistant', content: reponse});
-            sauvegarderHistorique();
+          if (ev.type==='sources') sources = ev.sources||[];
+          if (ev.type==='token')   { reponse += ev.text; renderMsg(msgEl, reponse, sources); }
+          if (ev.type==='fin')     {
+            convActuelle.messages.push({role:'assistant', content:reponse});
+            sauvegarderHist();
             chargerHistorique();
-            if (reponse.length > 200) afficherCarteAutoAsync(q, reponse);
+            if (reponse.length > 300) genererCarteMentaleAuto(reponse);
           }
         } catch {}
       }
@@ -1034,11 +1900,11 @@ async function envoyerMessage() {
   } catch(e) {
     typing.remove();
     showLoading(false);
-    ajouterMessage('ai', 'Erreur : ' + e.message);
+    ajouterMsg('ai', 'Erreur : ' + e.message);
   }
 }
 
-function ajouterMessage(role, txt) {
+function ajouterMsg(role, txt) {
   const box = document.getElementById('chat-messages');
   const el = document.createElement('div');
   el.className = role === 'user' ? 'msg-user' : 'msg-ai';
@@ -1066,65 +1932,67 @@ function creerBulleAI() {
   return el;
 }
 
-function renderMessage(el, txt, sources) {
+function renderMsg(el, txt, sources) {
   const box = document.getElementById('chat-messages');
   let html = txt
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\n\n/g, '</p><p>')
     .replace(/\n/g, '<br/>');
   if (sources.length) {
-    html += '<div class="sources">' + [...new Set(sources)].map(s =>
-      `<span class="source-chip">${s}</span>`).join('') + '</div>';
+    html += '<div class="sources-row">' + [...new Set(sources)].map(s=>`<span class="source-chip">${s}</span>`).join('') + '</div>';
   }
   el.innerHTML = html;
   box.scrollTop = box.scrollHeight;
+}
+
+async function genererCarteMentaleAuto(reponse) {
+  if (!DOC_ACTIF) return;
+  try {
+    const r = await apiFetch('/carte_mentale', 'POST', {document_id: DOC_ACTIF.id});
+    if (r?.carte) {
+      document.getElementById('mind-panel').classList.add('open');
+      document.getElementById('mind-panel-body').innerHTML = buildMindMapSVG(r.carte);
+      mindOpen = true;
+    }
+  } catch {}
 }
 
 async function nouvelleConversation() {
   SESSION_ID = 'sess_' + Math.random().toString(36).slice(2);
   convActuelle = null;
   document.getElementById('chat-messages').innerHTML =
-    '<div class="msg-ai">Bonjour Maître. Nouvelle conversation démarrée. Comment puis-je vous aider ?</div>';
-  document.getElementById('mind-map-panel').style.display = 'none';
-  mmVisible = false;
+    '<div class="msg-ai">Nouvelle conversation démarrée. Comment puis-je vous aider ?</div>';
+  document.getElementById('mind-panel').classList.remove('open');
+  mindOpen = false;
   try { await apiFetch('/nouvelle-conversation', 'POST', {session_id: SESSION_ID}); } catch {}
   chargerHistorique();
 }
 
-// ── HISTORIQUE ───────────────────────────────────────
-function sauvegarderHistorique() {
-  localStorage.setItem('odyxia_convs', JSON.stringify(conversations.slice(0,50)));
+function sauvegarderHist() {
+  localStorage.setItem('od_convs', JSON.stringify(conversations.slice(0,50)));
 }
 
 function chargerHistorique() {
-  const list = document.getElementById('hist-list');
-  conversations = JSON.parse(localStorage.getItem('odyxia_convs') || '[]');
-  list.innerHTML = '';
-  if (!conversations.length) {
-    list.innerHTML = '<div style="padding:16px 14px;font-size:11px;color:var(--text3);text-align:center;">Aucune conversation</div>';
-    return;
-  }
+  conversations = JSON.parse(localStorage.getItem('od_convs') || '[]');
+  document.getElementById('stat-convs').textContent = conversations.length;
+  const hist = document.getElementById('chat-hist');
+  hist.innerHTML = '';
   conversations.forEach((c,i) => {
     const el = document.createElement('div');
     el.className = 'hist-item' + (c.id === SESSION_ID ? ' active' : '');
-    el.innerHTML = `<div class="hist-item-title">${c.titre || 'Conversation'}</div>
-                    <div class="hist-item-date">${c.date || ''}</div>`;
-    el.onclick = () => chargerConversation(c, i);
-    list.appendChild(el);
-    if (i < conversations.length - 1) {
-      const sep = document.createElement('div');
-      sep.className = 'hist-sep';
-      list.appendChild(sep);
-    }
+    el.innerHTML = `<div class="hist-title">${c.titre||'Conversation'}</div><div class="hist-date">${c.date||''}</div>`;
+    el.onclick = () => chargerConversation(c);
+    hist.appendChild(el);
   });
 }
 
-function chargerConversation(conv, idx) {
+function chargerConversation(conv) {
   SESSION_ID = conv.id;
   convActuelle = conv;
   const box = document.getElementById('chat-messages');
   box.innerHTML = '';
-  (conv.messages || []).forEach(m => {
+  (conv.messages||[]).forEach(m => {
     const el = document.createElement('div');
     el.className = m.role === 'user' ? 'msg-user' : 'msg-ai';
     el.innerHTML = m.role === 'assistant'
@@ -1134,399 +2002,14 @@ function chargerConversation(conv, idx) {
   });
   box.scrollTop = box.scrollHeight;
   chargerHistorique();
+  if (!chatOpen) toggleChat();
 }
 
-// ── CARTE MENTALE ────────────────────────────────────
-function toggleMindMap(forceShow) {
-  const panel = document.getElementById('mind-map-panel');
-  const body  = document.getElementById('mind-map-body');
-  const label = document.getElementById('mm-toggle-label');
-  if (forceShow) {
-    panel.style.display = 'block';
-    mmVisible = true;
-    mmOpen = true;
-    label.textContent = 'Réduire ▴';
-    return;
-  }
-  mmOpen = !mmOpen;
-  body.style.display = mmOpen ? 'block' : 'none';
-  label.textContent = mmOpen ? 'Réduire ▴' : 'Agrandir ▾';
-}
-
-async function afficherCarteAutoAsync(question, reponse) {
-  try {
-    const docs = document.querySelectorAll('[data-doc-id]');
-    if (!docs.length) return;
-    const docId = docs[0].dataset.docId;
-    const r = await apiFetch('/carte_mentale', 'POST', {document_id: docId});
-    if (r?.carte) afficherCarteMentale(r.carte);
-  } catch {}
-}
-
-function afficherCarteMentale(carte) {
-  if (!carte?.racine) return;
-  const panel = document.getElementById('mind-map-panel');
-  const body  = document.getElementById('mind-map-body');
-  panel.style.display = 'block';
-  mmVisible = true;
-
-  const branches = carte.branches || [];
-  const cx = 290, cy = 55, bw = 120, bh = 28;
-  let svg = `<svg viewBox="0 0 580 150" xmlns="http://www.w3.org/2000/svg">
-    <rect x="${cx-80}" y="${cy-14}" width="160" height="28" rx="6" fill="#2563EB"/>
-    <text x="${cx}" y="${cy+3}" text-anchor="middle" font-size="11" font-weight="600" fill="#FFFFFF" font-family="DM Sans,system-ui">${carte.racine.slice(0,22)}</text>`;
-
-  const n = branches.length;
-  branches.forEach((b, i) => {
-    const side = i < Math.ceil(n/2) ? -1 : 1;
-    const idx  = side === -1 ? i : i - Math.ceil(n/2);
-    const total= side === -1 ? Math.ceil(n/2) : Math.floor(n/2);
-    const by   = 20 + idx * (130 / Math.max(total, 1));
-    const bx   = side === -1 ? 40 : 580 - 40 - bw;
-    const lx1  = side === -1 ? cx - 80 : cx + 80;
-    const lx2  = side === -1 ? bx + bw : bx;
-    const cols = ['#FEF3C7','#DCFCE7','#EFF6FF','#FEE2E2','#F3E8FF'];
-    const tcols= ['#92400E','#15803D','#1D4ED8','#991B1B','#6B21A8'];
-    const ci   = i % cols.length;
-    svg += `<line x1="${lx1}" y1="${cy}" x2="${lx2}" y2="${by+bh/2}" stroke="#BFDBFE" stroke-width="1"/>
-    <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="5" fill="${cols[ci]}" stroke="#E2E8F0" stroke-width="0.5"/>
-    <text x="${bx+bw/2}" y="${by+bh/2+1}" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="500" fill="${tcols[ci]}" font-family="DM Sans,system-ui">${(b.label||'').slice(0,18)}</text>`;
-  });
-  svg += '</svg>';
-  body.innerHTML = svg;
-}
-
-// ── DOCUMENTS ────────────────────────────────────────
-async function chargerDocuments() {
-  if (!DOSSIER_ACTIF) return;
-  await chargerDocumentsDossier(DOSSIER_ACTIF.id);
-}
-
-async function chargerDocumentsDossier(dossierId) {
-  try {
-    const r = await apiFetch('/liste_documents?dossier_id=' + dossierId);
-    const listEl = document.getElementById('docs-list-dossier');
-    listEl.innerHTML = '';
-    if (!r?.length) {
-      listEl.innerHTML = '<div style="padding:8px 14px;font-size:11px;color:var(--text3);">Aucun document</div>';
-      document.getElementById('nav-docs-count').textContent = '0';
-      return;
-    }
-    document.getElementById('nav-docs-count').textContent = r.length;
-    r.forEach(d => {
-      const el = document.createElement('div');
-      el.className = 'doc-item';
-      el.dataset.docId = d.id;
-      const chiffre = d.metadata?.sensible;
-      el.innerHTML = `
-        <div class="doc-icon">PDF</div>
-        <div class="doc-name">${d.nom || d.filename || 'Document'}</div>
-        <span class="doc-badge ${chiffre ? 'badge-lock' : 'badge-ok'}">${chiffre ? '🔒' : 'OK'}</span>`;
-      el.onclick = () => afficherDocument(d);
-      listEl.appendChild(el);
-    });
-    afficherDocsChatSidebar(dossierId);
-  } catch(e) {}
-}
-
-async function afficherDocsChatSidebar(dossierId) {
-  try {
-    const r = await apiFetch('/liste_documents?dossier_id=' + dossierId);
-    const el = document.getElementById('chat-docs-list');
-    if (!r?.length) { el.innerHTML = '<span style="color:var(--text3)">Aucun document</span>'; return; }
-    el.innerHTML = r.slice(0,4).map(d =>
-      `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:0.5px solid var(--border);">
-        <span style="font-size:9px;background:var(--bg3);color:var(--blue);padding:1px 4px;border-radius:3px;">PDF</span>
-        <span style="font-size:10px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${d.nom||d.filename||'Doc'}</span>
-        <span style="font-size:9px;color:var(--green);">✓</span>
-      </div>`
-    ).join('');
-  } catch {}
-}
-
-function afficherDocument(doc) {
-  DOC_ACTIF = doc;
-  document.querySelectorAll('.doc-item').forEach(el => el.classList.remove('active'));
-  document.querySelector(`[data-doc-id="${doc.id}"]`)?.classList.add('active');
-
-  document.getElementById('doc-viewer-title').textContent = doc.nom || doc.filename || 'Document';
-  document.getElementById('btn-export-pdf').style.display  = 'inline-flex';
-  document.getElementById('btn-del-doc').style.display     = 'inline-flex';
-  document.getElementById('btn-rediger').style.display     = 'inline-flex';
-
-  const viewer = document.getElementById('doc-viewer');
-  viewer.innerHTML = `
-    <div class="doc-viewer-content">
-      <div class="doc-viewer-meta">
-        <div>
-          <div class="doc-viewer-meta-name">${doc.nom || doc.filename}</div>
-          <div class="doc-viewer-meta-date">Indexé · ${doc.storage_tier || 'hot'} · ${doc.metadata?.sensible ? '🔒 Confidentiel' : 'Standard'}</div>
-        </div>
-        <span class="badge badge-${doc.status === 'ready' ? 'green' : 'amber'}" style="margin-left:auto;">${doc.status === 'ready' ? 'Indexé' : 'En cours'}</span>
-      </div>
-      <p>Document chargé avec succès. Utilisez le <strong>Chat</strong> pour interroger ce document ou rédigez un acte depuis ce dossier.</p>
-      <p style="margin-top:12px;font-size:11px;color:var(--text3);">ID : ${doc.id}</p>
-    </div>`;
-}
-
-async function uploadFichier(file) {
-  if (!file) return;
-  if (!DOSSIER_ACTIF) { showToast('Sélectionnez un dossier d\'abord', true); return; }
-
-  showLoading(true);
-  const formData = new FormData();
-  formData.append('fichier', file);
-  formData.append('dossier_id', DOSSIER_ACTIF.id);
-  formData.append('sensible',  document.getElementById('chk-sensible').checked ? 'true' : 'false');
-  formData.append('manuscrit', document.getElementById('chk-manuscrit').checked ? 'true' : 'false');
-
-  try {
-    const r = await fetch(API + '/upload_document', {
-      method: 'POST',
-      headers: {'Authorization': 'Bearer ' + TOKEN},
-      body: formData
-    });
-    const d = await r.json();
-    showLoading(false);
-    if (d.succes) {
-      showToast(`"${file.name}" indexé — ${d.chunks} passages`);
-      await chargerDocumentsDossier(DOSSIER_ACTIF.id);
-    } else {
-      showToast('Erreur : ' + (d.erreur || 'Upload échoué'), true);
-    }
-  } catch(e) {
-    showLoading(false);
-    showToast('Erreur upload : ' + e.message, true);
-  }
-  document.getElementById('file-input').value = '';
-}
-
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('upload-zone').classList.remove('dragover');
-  const file = e.dataTransfer.files[0];
-  if (file?.type === 'application/pdf') uploadFichier(file);
-  else showToast('Format PDF uniquement', true);
-}
-
-function toggleOpt(id) {
-  document.getElementById(id).classList.toggle('active');
-}
-
-async function supprimerDocActif() {
-  if (!DOC_ACTIF) return;
-  if (!confirm('Supprimer ce document ?')) return;
-  try {
-    await apiFetch('/supprimer_document', 'DELETE', {id: DOC_ACTIF.id});
-    showToast('Document supprimé');
-    DOC_ACTIF = null;
-    document.getElementById('doc-viewer').innerHTML = '<div class="doc-viewer-empty"><div class="big-icon">📋</div><div>Document supprimé</div></div>';
-    document.getElementById('btn-export-pdf').style.display = 'none';
-    document.getElementById('btn-del-doc').style.display = 'none';
-    document.getElementById('btn-rediger').style.display = 'none';
-    if (DOSSIER_ACTIF) await chargerDocumentsDossier(DOSSIER_ACTIF.id);
-  } catch(e) { showToast('Erreur : ' + e.message, true); }
-}
-
-async function exporterPDF() {
-  if (!DOC_ACTIF) return;
-  const viewer = document.getElementById('doc-viewer');
-  const contenu = viewer.innerText;
-  if (!contenu.trim()) { showToast('Aucun contenu à exporter', true); return; }
-  try {
-    const r = await fetch(API + '/export_pdf', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},
-      body: JSON.stringify({contenu, nom: DOC_ACTIF.nom || 'Document'})
-    });
-    const blob = await r.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = (DOC_ACTIF.nom || 'document') + '.pdf';
-    a.click();
-    showToast('PDF exporté');
-  } catch(e) { showToast('Erreur export : ' + e.message, true); }
-}
-
-// ── ANALYSE ──────────────────────────────────────────
-function selectDomain(el, domain) {
-  document.querySelectorAll('.domain-chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  SELECTED_DOMAIN = domain;
-}
-
-async function lancerAnalyse() {
-  const desc = document.getElementById('analyse-description').value.trim();
-  const q    = document.getElementById('analyse-question').value.trim();
-  if (!SELECTED_DOMAIN) { showToast('Sélectionnez un domaine', true); return; }
-  if (!desc) { showToast('Décrivez le dossier', true); return; }
-
-  showLoading(true);
-  const result = document.getElementById('analyse-result');
-  result.innerHTML = '<div class="result-empty"><div class="spinner"></div></div>';
-
-  try {
-    const r = await apiFetch('/question', 'POST', {
-      question: `[Analyse ${SELECTED_DOMAIN}] ${desc}. Question : ${q}`,
-      session_id: 'analyse_' + Date.now(),
-      dossier_id: DOSSIER_ACTIF?.id
-    });
-    showLoading(false);
-    const reponse = r.reponse || '';
-    const sources = r.sources || [];
-
-    result.innerHTML = `
-      <div class="result-card">
-        <div class="result-card-header">
-          <span class="result-card-title">Analyse — ${SELECTED_DOMAIN}</span>
-          <span class="badge badge-blue">${SELECTED_DOMAIN.toUpperCase()}</span>
-        </div>
-        <div class="result-card-body">
-          ${reponse.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br/>')}
-          ${sources.length ? '<div class="msg-ai sources" style="margin-top:10px;">' +
-            sources.map(s=>`<span class="source-chip">${s}</span>`).join('') + '</div>' : ''}
-        </div>
-      </div>`;
-  } catch(e) {
-    showLoading(false);
-    result.innerHTML = `<div class="result-empty"><div>Erreur : ${e.message}</div></div>`;
-  }
-}
-
-// ── COMPARAISON ──────────────────────────────────────
-async function lancerComparaison() {
-  const juge   = document.getElementById('comp-juge').value.trim();
-  const jurid  = document.getElementById('comp-juridiction').value.trim();
-  const domaine= document.getElementById('comp-domaine').value;
-  const infos  = document.getElementById('comp-infos').value.trim();
-
-  if (!juge && !jurid) { showToast('Renseignez un juge ou une juridiction', true); return; }
-
-  showLoading(true);
-  try {
-    const r = await apiFetch('/comparaison/analyser', 'POST', {
-      juge, juridiction: jurid, domaine, periode: 'Toutes'
-    });
-    showLoading(false);
-
-    const result = document.getElementById('comp-result');
-    if (!r.succes) {
-      result.innerHTML = `<div class="result-empty"><div>Aucune décision trouvée pour ces critères</div></div>`;
-      return;
-    }
-
-    const analyse = r.analyse || {};
-    const decisions = r.decisions || [];
-    const hint = document.getElementById('comp-save-hint');
-
-    result.innerHTML = `
-      <div class="result-card">
-        <div class="result-card-header">
-          <span class="result-card-title">Profil — ${juge || jurid}</span>
-          <span class="badge badge-blue">${r.nb} décision(s)</span>
-        </div>
-        <div class="score-ring">
-          <div>
-            <div class="ring-num">${analyse.taux_favorabilite || 0}%</div>
-            <div class="ring-label">Taux favorable</div>
-          </div>
-          <div style="flex:1;">
-            <div class="ring-bar"><div class="ring-fill" style="width:${analyse.taux_favorabilite||0}%"></div></div>
-          </div>
-        </div>
-        <div class="result-card-body">${(analyse.synthese||'Analyse disponible.').replace(/\n/g,'<br/>')}</div>
-      </div>
-      <div class="result-card">
-        <div class="result-card-header"><span class="result-card-title">Décisions trouvées</span></div>
-        <div class="result-card-body" style="display:flex;flex-direction:column;gap:8px;">
-          ${decisions.slice(0,5).map(d => `
-            <div class="dec-item">
-              <div class="dec-issue ${d.issue === 'favorable' ? 'fav' : d.issue === 'defavorable' ? 'defav' : 'partiel'}">${d.issue||'—'}</div>
-              <div>
-                <div class="dec-title">${d.titre||'Décision'}</div>
-                <div class="dec-meta">${d.juridiction||''} · ${d.date_dec||''} · ${d.reference||''}</div>
-              </div>
-            </div>`).join('')}
-        </div>
-      </div>`;
-
-    if (infos) {
-      hint.style.display = 'block';
-      setTimeout(() => hint.style.display = 'none', 4000);
-    }
-  } catch(e) {
-    showLoading(false);
-    showToast('Erreur : ' + e.message, true);
-  }
-}
-
-// ── REDACTION ────────────────────────────────────────
-function showRedaction() {
-  const type = prompt('Type de document à rédiger :\nrequete, conclusions, mise_en_demeure, assignation, contrat, rapport');
-  if (!type) return;
-  const faits = prompt('Décrivez brièvement les faits :');
-  if (!faits) return;
-  redigerDocument(type.trim(), faits);
-}
-
-async function redigerDocument(type, faits) {
-  showLoading(true);
-  try {
-    const r = await apiFetch('/rediger', 'POST', {
-      type, donnees: {faits}, session_id: SESSION_ID
-    });
-    showLoading(false);
-    if (!r.document) { showToast('Erreur rédaction', true); return; }
-
-    const viewer = document.getElementById('doc-viewer');
-    const nom = r.nom || type;
-    viewer.innerHTML = `
-      <div class="doc-viewer-content">
-        <div class="doc-viewer-meta">
-          <div>
-            <div class="doc-viewer-meta-name">${nom}</div>
-            <div class="doc-viewer-meta-date">Document généré · ${new Date().toLocaleDateString('fr')}</div>
-          </div>
-          <span class="badge badge-blue" style="margin-left:auto;">Généré</span>
-        </div>
-        ${r.document.replace(/^#{1,3} (.+)$/gm, '<h2>$1</h2>')
-                    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-                    .replace(/^---+$/gm, '<hr/>')
-                    .replace(/\n\n/g, '</p><p>')
-                    .replace(/\n/g, '<br/>')}`;
-
-    document.getElementById('doc-viewer-title').textContent = nom;
-    document.getElementById('btn-export-pdf').style.display = 'inline-flex';
-
-    const genEl = document.getElementById('docs-list-generes');
-    const docEl = document.createElement('div');
-    docEl.className = 'doc-item active';
-    docEl.innerHTML = `<div class="doc-icon">GEN</div><div class="doc-name">${nom}</div><span class="doc-badge badge-blue">Généré</span>`;
-    genEl.appendChild(docEl);
-
-    showToast('Document rédigé avec succès');
-  } catch(e) {
-    showLoading(false);
-    showToast('Erreur : ' + e.message, true);
-  }
-}
-
-// ── UTILITAIRES ──────────────────────────────────────
-async function apiFetch(url, method = 'GET', body = null, raw = false) {
-  const opts = {
-    method,
-    headers: {'Authorization': 'Bearer ' + TOKEN}
-  };
-  if (body && !raw) {
-    opts.headers['Content-Type'] = 'application/json';
-    opts.body = JSON.stringify(body);
-  } else if (body && raw) {
-    opts.headers['Content-Type'] = 'application/json';
-    opts.body = JSON.stringify(body);
-    return await fetch(API + url, opts);
-  }
-  const r = await fetch(API + url, opts);
+// ── API ───────────────────────────────────────────────
+async function apiFetch(url, method='GET', body=null) {
+  const opts = {method, headers:{'Authorization':'Bearer '+TOKEN}};
+  if (body) { opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(body); }
+  const r = await fetch(url, opts);
   return await r.json();
 }
 
@@ -1534,16 +2017,13 @@ function showLoading(show) {
   document.getElementById('loading').classList.toggle('show', show);
 }
 
-function showToast(msg, err = false) {
+function showToast(msg, err=false) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.style.borderLeftColor = err ? 'var(--red)' : 'var(--blue)';
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
-
-// ── DÉMARRAGE ────────────────────────────────────────
-if (TOKEN) init();
 </script>
 </body>
 </html>
