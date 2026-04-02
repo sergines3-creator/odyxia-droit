@@ -171,7 +171,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 /* ══ SIDEBAR ══════════════════════════════════════════ */
 .sidebar{
   background:var(--bg);border-right:0.5px solid var(--border2);
-  display:flex;flex-direction:column;overflow-y:auto;
+  display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;
 }
 .sb-section{padding:10px 0 4px;}
 .sb-label{
@@ -197,9 +197,12 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   font-size:11px;color:var(--text2);cursor:pointer;transition:var(--trans);
 }
 .sb-affaire:hover{background:var(--bg2);color:var(--text);}
+.sb-affaire:hover .sb-del{display:flex;}
 .sb-affaire.active{color:var(--blue);font-weight:500;}
 .sb-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);flex-shrink:0;}
 .sb-affaire.active .sb-dot{background:var(--blue);}
+.sb-del{display:none;margin-left:auto;width:16px;height:16px;align-items:center;justify-content:center;border-radius:3px;font-size:11px;color:var(--text3);}
+.sb-del:hover{background:var(--red-lt);color:var(--red);}
 .btn-new-affaire{
   margin:6px 14px;padding:7px 12px;border:0.5px dashed var(--blue-md);
   border-radius:var(--r);font-size:11px;color:var(--blue);
@@ -216,7 +219,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .page.active{display:flex;}
 
 /* ══ TABLEAU DE BORD ══════════════════════════════════ */
-.dash-layout{flex:1;overflow-y:auto;padding:20px;}
+.dash-layout{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px;}
 .dash-welcome{margin-bottom:20px;}
 .dash-welcome h1{font-family:var(--serif);font-size:24px;font-weight:500;color:var(--navy);margin-bottom:4px;}
 .dash-welcome p{font-size:12px;color:var(--text2);}
@@ -267,7 +270,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .bib-layout{flex:1;display:grid;grid-template-columns:280px 1fr;overflow:hidden;}
 .bib-sidebar{
   border-right:0.5px solid var(--border2);background:var(--bg);
-  display:flex;flex-direction:column;overflow:hidden;
+  display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;
 }
 .bib-sidebar-hdr{
   padding:10px 14px;border-bottom:0.5px solid var(--border2);
@@ -364,7 +367,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .aff-layout{flex:1;display:grid;grid-template-columns:260px 1fr;overflow:hidden;}
 .aff-sidebar{
   border-right:0.5px solid var(--border2);background:var(--bg);
-  display:flex;flex-direction:column;overflow:hidden;
+  display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;
 }
 .aff-sidebar-hdr{
   padding:10px 14px;border-bottom:0.5px solid var(--border2);
@@ -423,7 +426,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .analyse-layout{flex:1;display:grid;grid-template-columns:340px 1fr;overflow:hidden;}
 .analyse-form{
   border-right:0.5px solid var(--border2);background:var(--bg);
-  padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;
+  padding:14px;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:10px;
 }
 .form-step-indicator{
   display:flex;gap:4px;margin-bottom:6px;
@@ -476,7 +479,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .comp-layout{flex:1;display:grid;grid-template-columns:340px 1fr;overflow:hidden;}
 .comp-form{
   border-right:0.5px solid var(--border2);background:var(--bg);
-  padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;
+  padding:14px;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:10px;
 }
 .comp-result{
   flex:1;overflow-y:auto;padding:16px;background:var(--bg2);
@@ -1268,7 +1271,7 @@ async function chargerAffaires() {
     r.slice(0,5).forEach(a => {
       const el = document.createElement('div');
       el.className = 'sb-affaire' + (AFFAIRE_ACTIVE?.id === a.id ? ' active' : '');
-      el.innerHTML = `<div class="sb-dot"></div><span>${a.nom}</span>`;
+      el.innerHTML = `<div class="sb-dot"></div><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.nom}</span><span class="sb-del" onclick="event.stopPropagation();supprimerAffaire('${a.id}','${a.nom.replace(/'/g,"\'")}')">&#x2715;</span>`;
       el.onclick = () => selectionnerAffaire(a);
       sb.appendChild(el);
     });
@@ -1284,7 +1287,10 @@ async function chargerAffaires() {
       const el = document.createElement('div');
       el.className = 'aff-item' + (AFFAIRE_ACTIVE?.id === a.id ? ' active' : '');
       el.innerHTML = `
-        <div class="aff-item-name">${a.nom}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="aff-item-name">${a.nom}</div>
+          <button onclick="event.stopPropagation();supprimerAffaire('${a.id}','${a.nom.replace(/'/g,"\'")}')}" style="background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;padding:2px 6px;border-radius:4px;" onmouseover="this.style.background='var(--red-lt)';this.style.color='var(--red)'" onmouseout="this.style.background='none';this.style.color='var(--text3)'">&#x2715;</button>
+        </div>
         <div class="aff-item-meta">${a.description || 'Aucune description'}</div>
         <span class="aff-item-status s-blue">En cours</span>`;
       el.onclick = () => selectionnerAffaire(a);
@@ -1377,6 +1383,22 @@ async function chargerCorpsAffaire(a) {
         </div>
       </div>
     </div>`;
+}
+
+async function supprimerAffaire(id, nom) {
+  if (!confirm(`Supprimer l'affaire "${nom}" et tous ses documents ?`)) return;
+  try {
+    await apiFetch('/dossiers/' + id, 'DELETE');
+    showToast('Affaire supprimée');
+    if (AFFAIRE_ACTIVE?.id === id) {
+      AFFAIRE_ACTIVE = null;
+      document.getElementById('hdr-dossier').style.display = 'none';
+      document.getElementById('aff-main-title').textContent = 'Sélectionnez une affaire';
+      document.getElementById('btn-aff-upload').style.display = 'none';
+      document.getElementById('aff-body').innerHTML = '<div class="result-empty"><div style="font-size:13px;">Sélectionnez une affaire</div></div>';
+    }
+    await chargerAffaires();
+  } catch(e) { showToast('Erreur suppression', true); }
 }
 
 async function creerAffaire() {
