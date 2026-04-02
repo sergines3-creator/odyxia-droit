@@ -65,6 +65,8 @@ CABINET_VILLE  = os.environ.get("CABINET_VILLE",  "Douala, Cameroun")
 
 # ─── FLASK ────────────────────────────────────────────────────────────────────
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 CORS(app)
 Talisman(app,
     force_https=False,
