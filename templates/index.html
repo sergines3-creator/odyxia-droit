@@ -391,7 +391,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   display:flex;align-items:center;justify-content:space-between;
 }
 .aff-main-title{font-size:13px;font-weight:500;color:var(--text);}
-.aff-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px;background:var(--bg2);display:flex;flex-direction:column;gap:12px;}
+.aff-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px 16px 40px;background:var(--bg2);display:flex;flex-direction:column;gap:12px;}
 .aff-section{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;}
 .aff-section-hdr{
   padding:9px 14px;border-bottom:0.5px solid var(--border2);background:var(--bg2);
@@ -401,14 +401,14 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .aff-section-body{padding:12px 14px;}
 
 /* Suivi procédural */
-.proc-track{display:flex;align-items:center;gap:0;padding:8px 0;}
+.proc-track{display:flex;align-items:center;gap:0;padding:12px 0 8px;justify-content:center;}
 .proc-step{display:flex;flex-direction:column;align-items:center;gap:3px;}
-.proc-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);}
+.proc-dot{width:10px;height:10px;border-radius:50%;background:var(--border2);}
 .proc-dot.done{background:var(--blue);}
 .proc-dot.active{background:var(--bg);border:2px solid var(--blue);box-shadow:0 0 0 3px var(--blue-lt);}
-.proc-name{font-size:9px;color:var(--text3);}
+.proc-name{font-size:10px;color:var(--text3);margin-top:4px;}
 .proc-name.done{color:var(--blue);}
-.proc-line{width:40px;height:1px;background:var(--border2);margin-bottom:12px;}
+.proc-line{width:48px;height:1.5px;background:var(--border2);margin-bottom:14px;}
 .proc-line.done{background:var(--blue);}
 
 /* Rédaction acte */
@@ -540,7 +540,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
 #chat-panel{
   position:fixed;bottom:80px;right:24px;
-  width:420px;height:560px;
+  width:440px;height:560px;
   background:var(--bg);border:0.5px solid var(--border2);
   border-radius:var(--r-lg);display:none;flex-direction:column;
   z-index:400;overflow:hidden;
@@ -550,8 +550,9 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .chat-panel-hdr{
   padding:10px 14px;background:var(--navy);
   display:flex;align-items:center;justify-content:space-between;
-  flex-shrink:0;
+  flex-shrink:0;min-height:44px;
 }
+.chat-panel-actions{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;}
 .chat-panel-title{font-size:12px;font-weight:500;color:#FFFFFF;}
 .chat-panel-actions{display:flex;gap:6px;align-items:center;}
 .chat-panel-btn{
@@ -744,7 +745,11 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
     </div>
     <div class="hdr-right">
       <span class="hdr-status">En ligne</span>
-      <div class="hdr-avatar" onclick="doLogout()" title="Déconnexion">Me</div>
+      <div class="hdr-avatar" onclick="doLogout()" title="Déconnexion">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round">
+        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+      </svg>
+    </div>
     </div>
   </div>
 
