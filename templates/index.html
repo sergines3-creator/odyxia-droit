@@ -600,7 +600,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   border-top:0.5px solid var(--border2);background:var(--bg);
   flex-shrink:0;overflow:hidden;max-height:0;transition:max-height .3s ease;
 }
-.mind-panel.open{max-height:180px;}
+.mind-panel.open{max-height:280px;}
 .mind-panel-hdr{
   padding:5px 12px;display:flex;align-items:center;justify-content:space-between;
   border-bottom:0.5px solid var(--border2);cursor:pointer;
@@ -1569,42 +1569,57 @@ function toggleCarteMentaleViewer() {
 
 function buildMindMapSVG(carte) {
   const branches = carte.branches || [];
-  const W = 640, H = 200;
-  const cx = W/2, cy = 48;
-  const bw = 130, bh = 28;
+  const W = 720, H = 260;
+  const cx = W/2, cy = 56;
+  const bw = 160, bh = 48;  // Boîtes larges et hautes pour 2 lignes
   const cols  = ['#FEF3C7','#DCFCE7','#EFF6FF','#FEE2E2','#F3E8FF','#FFF7ED'];
   const tcols = ['#92400E','#15803D','#1D4ED8','#991B1B','#6B21A8','#9A3412'];
   const n = branches.length;
 
-  // Tronquer proprement sans couper un mot
-  function truncate(str, max) {
-    if (!str) return '';
-    if (str.length <= max) return str;
-    const cut = str.slice(0, max);
-    const lastSpace = cut.lastIndexOf(' ');
-    return (lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut) + '…';
+  // Découper le texte en max 2 lignes de ~22 chars
+  function wrapText(str, maxChars) {
+    if (!str) return [''];
+    if (str.length <= maxChars) return [str];
+    const words = str.split(' ');
+    let line1 = '', line2 = '';
+    for (const w of words) {
+      if ((line1 + ' ' + w).trim().length <= maxChars) {
+        line1 = (line1 + ' ' + w).trim();
+      } else if ((line2 + ' ' + w).trim().length <= maxChars) {
+        line2 = (line2 + ' ' + w).trim();
+      } else {
+        line2 = line2 ? line2.slice(0,-1)+'…' : w.slice(0,maxChars-1)+'…';
+        break;
+      }
+    }
+    return line2 ? [line1, line2] : [line1];
   }
 
   let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:${H}px;">
-    <rect x="${cx-85}" y="${cy-14}" width="170" height="28" rx="7" fill="#2563EB"/>
-    <text x="${cx}" y="${cy+4}" text-anchor="middle" font-size="12" font-weight="600" fill="#FFFFFF" font-family="DM Sans,system-ui">${truncate(carte.racine||'',22)}</text>`;
+    <rect x="${cx-100}" y="${cy-16}" width="200" height="32" rx="8" fill="#2563EB"/>
+    <text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="13" font-weight="600" fill="#FFFFFF" font-family="DM Sans,system-ui">${(carte.racine||'').slice(0,26)}</text>`;
 
   const leftBranches  = branches.filter((_, i) => i < Math.ceil(n/2));
   const rightBranches = branches.filter((_, i) => i >= Math.ceil(n/2));
 
   function drawBranches(list, side) {
-    const total = list.length;
-    const spacing = Math.max((H - 40) / Math.max(total, 1), 32);
+    const total   = list.length;
+    const spacing = Math.max((H - 30) / Math.max(total, 1), bh + 10);
     list.forEach((b, idx) => {
-      const by  = 20 + idx * spacing;
-      const bx  = side === 'left' ? 10 : W - 10 - bw;
-      const lx1 = side === 'left' ? cx - 85 : cx + 85;
-      const lx2 = side === 'left' ? bx + bw : bx;
+      const by  = 16 + idx * spacing;
+      const bx  = side === 'left' ? 8 : W - 8 - bw;
+      const lx1 = side === 'left' ? cx - 100 : cx + 100;
+      const lx2 = side === 'left' ? bx + bw  : bx;
       const ci  = (branches.indexOf(b)) % cols.length;
-      const lbl = truncate(b.label||'', 18);
-      svg += `<line x1="${lx1}" y1="${cy}" x2="${lx2}" y2="${by+bh/2}" stroke="#BFDBFE" stroke-width="1.2" stroke-dasharray="none"/>
-      <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="5" fill="${cols[ci]}" stroke="#E2E8F0" stroke-width="0.5"/>
-      <text x="${bx+bw/2}" y="${by+bh/2+1}" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="500" fill="${tcols[ci]}" font-family="DM Sans,system-ui">${lbl}</text>`;
+      const lines = wrapText(b.label||'', 22);
+      const y1 = by + bh/2 - (lines.length > 1 ? 8 : 0);
+
+      svg += `<line x1="${lx1}" y1="${cy}" x2="${lx2}" y2="${by+bh/2}" stroke="#BFDBFE" stroke-width="1.5"/>
+      <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="7" fill="${cols[ci]}" stroke="#E2E8F0" stroke-width="0.5"/>`;
+
+      lines.forEach((line, li) => {
+        svg += `<text x="${bx+bw/2}" y="${y1 + li*16}" text-anchor="middle" dominant-baseline="central" font-size="10.5" font-weight="500" fill="${tcols[ci]}" font-family="DM Sans,system-ui">${line}</text>`;
+      });
     });
   }
 
