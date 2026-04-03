@@ -1483,7 +1483,8 @@ async function chargerCorpsAffaire(a) {
               <div class="redac-btn-name">Note de doctrine</div>
               <div class="redac-btn-desc">Analyse doctrinale OHADA</div>
             </div>
-          </div>`;
+          </div>
+          <span class="doc-badge ${locked ? 'b-lock' : 'b-ok'}">${locked ? '🔒' : '✓'}</span>`;
         el.onclick = () => afficherDocViewer(d);
         list.appendChild(el);
       });
