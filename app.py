@@ -1,4 +1,4 @@
-from dotenv import load_dotenv
+﻿from dotenv import load_dotenv
 load_dotenv()
 
 import sys
@@ -75,7 +75,7 @@ Talisman(app,
     content_security_policy=False
 )
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "Odyxia-JWT-2026!")
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=8)
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
 jwt_manager = JWTManager(app)
 
 limiter = Limiter(
