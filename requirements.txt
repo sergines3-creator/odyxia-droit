@@ -17,3 +17,5 @@ qrcode[pil]
 schedule
 cryptography
 voyageai
+zstandard
+"zstandard==0.23.0" 
