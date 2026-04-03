@@ -172,48 +172,50 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
 /* ══ SIDEBAR ══════════════════════════════════════════ */
 .sidebar{
-  background:#FAFAFA;border-right:0.5px solid #EBEBEB;
+  background:#0D0D0D;border-right:none;
   display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;
 }
 .sb-section{padding:10px 0 4px;}
 .sb-label{
-  font-size:9px;font-weight:600;color:#A3A3A3;
+  font-size:9px;font-weight:600;color:#3F3F3F;
   padding:0 14px 4px;letter-spacing:0.8px;text-transform:uppercase;
 }
 .nav-item{
-  display:flex;align-items:center;gap:10px;padding:9px 14px;
-  font-size:13px;color:#737373;cursor:pointer;
-  transition:var(--trans);border-left:2px solid transparent;user-select:none;
-  border-radius:0;
+  display:flex;align-items:center;gap:10px;padding:9px 12px;margin:1px 8px;
+  font-size:13px;color:#6B6B6B;cursor:pointer;
+  transition:var(--trans);border-left:none;user-select:none;
+  border-radius:6px;
 }
-.nav-item:hover{background:#F0F0F0;color:#0A0A0A;}
-.nav-item.active{background:#EBEBEB;color:#0A0A0A;font-weight:500;border-left:none;}
-.nav-icon{width:16px;height:16px;flex-shrink:0;opacity:0.4;}
-.nav-item.active .nav-icon{opacity:1;}
+.nav-item:hover{background:#1C1C1C;color:#D4D4D4;}
+.nav-item.active{background:#1C1C1C;color:#FFFFFF;font-weight:500;}
+.nav-icon{width:16px;height:16px;flex-shrink:0;}
+.nav-item .nav-icon{stroke:#6B6B6B;}
+.nav-item:hover .nav-icon,.nav-item.active .nav-icon{stroke:#FFFFFF;}
 .nav-count{
-  margin-left:auto;font-size:9px;background:#E5E5E5;
-  color:#525252;padding:1px 6px;border-radius:10px;
+  margin-left:auto;font-size:9px;background:#1C1C1C;
+  color:#6B6B6B;padding:1px 6px;border-radius:10px;
 }
-.nav-item.active .nav-count{background:#0A0A0A;color:#FFFFFF;}
-.sb-sep{height:0.5px;background:#EBEBEB;margin:6px 14px;}
+.nav-item.active .nav-count{background:#2A2A2A;color:#A3A3A3;}
+.sb-sep{height:0.5px;background:#1C1C1C;margin:6px 14px;}
 .sb-affaire{
-  display:flex;align-items:center;gap:8px;padding:6px 14px;
-  font-size:13px;color:#737373;cursor:pointer;transition:var(--trans);
+  display:flex;align-items:center;gap:8px;padding:6px 12px;margin:1px 8px;
+  font-size:12px;color:#6B6B6B;cursor:pointer;transition:var(--trans);
+  border-radius:6px;
 }
-.sb-affaire:hover{background:#F0F0F0;color:#0A0A0A;}
+.sb-affaire:hover{background:#1C1C1C;color:#D4D4D4;}
 .sb-affaire:hover .sb-del{display:flex;}
-.sb-affaire.active{color:#0A0A0A;font-weight:500;}
-.sb-dot{width:5px;height:5px;border-radius:50%;background:#D4D4D4;flex-shrink:0;}
-.sb-affaire.active .sb-dot{background:#0A0A0A;}
-.sb-del{display:none;margin-left:auto;width:16px;height:16px;align-items:center;justify-content:center;border-radius:3px;font-size:11px;color:#A3A3A3;}
-.sb-del:hover{background:#FEE2E2;color:#DC2626;}
+.sb-affaire.active{color:#FFFFFF;font-weight:500;background:#1C1C1C;}
+.sb-dot{width:5px;height:5px;border-radius:50%;background:#3F3F3F;flex-shrink:0;}
+.sb-affaire.active .sb-dot{background:#FFFFFF;}
+.sb-del{display:none;margin-left:auto;width:16px;height:16px;align-items:center;justify-content:center;border-radius:3px;font-size:11px;color:#3F3F3F;}
+.sb-del:hover{background:#2A2A2A;color:#F87171;}
 .btn-new-affaire{
-  margin:6px 14px;padding:7px 12px;border:0.5px dashed #D4D4D4;
-  border-radius:var(--r);font-size:13px;color:#737373;
+  margin:6px 8px;padding:7px 12px;border:0.5px solid #1C1C1C;
+  border-radius:6px;font-size:12px;color:#6B6B6B;
   cursor:pointer;text-align:center;transition:var(--trans);background:transparent;
   font-family:var(--font);
 }
-.btn-new-affaire:hover{background:#F0F0F0;color:#0A0A0A;}
+.btn-new-affaire:hover{background:#1C1C1C;color:#D4D4D4;}
 
 /* ══ MAIN ═════════════════════════════════════════════ */
 .main{display:flex;flex-direction:column;overflow:hidden;}
@@ -759,6 +761,10 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
   <!-- Sidebar -->
   <div class="sidebar">
+    <div style="padding:16px 14px 12px;display:flex;align-items:center;gap:10px;border-bottom:0.5px solid #1C1C1C;margin-bottom:8px;">
+      <div style="width:28px;height:28px;background:#2563EB;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:12px;font-weight:600;color:#fff;flex-shrink:0;">OD</div>
+      <span style="font-family:var(--serif);font-size:16px;font-weight:500;color:#FFFFFF;">Odyxia</span>
+    </div>
     <div class="sb-section">
       <div class="sb-label">Navigation</div>
 
