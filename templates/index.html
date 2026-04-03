@@ -219,50 +219,99 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .page.active{display:flex;}
 
 /* ══ TABLEAU DE BORD ══════════════════════════════════ */
-.dash-layout{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px;}
-.dash-welcome{margin-bottom:20px;}
-.dash-welcome h1{font-family:var(--serif);font-size:24px;font-weight:500;color:var(--navy);margin-bottom:4px;}
-.dash-welcome p{font-size:12px;color:var(--text2);}
-.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
-.stat-card{
-  background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r-lg);
-  padding:16px;display:flex;flex-direction:column;gap:6px;
+/* ══ DASHBOARD v2 ═════════════════════════════════════ */
+.dash-layout{flex:1;overflow-y:auto;overflow-x:hidden;padding:24px;display:flex;flex-direction:column;gap:0;}
+.dash-top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;}
+.dash-greeting{font-family:var(--serif);font-size:26px;font-weight:400;color:var(--navy);line-height:1.2;}
+.dash-date{font-size:11px;color:var(--text3);margin-top:3px;}
+.dash-body{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start;}
+
+/* Affaires cards */
+.dossiers-wrap{display:flex;flex-direction:column;gap:0;}
+.dossiers-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.dossiers-label{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;}
+.dossiers-count{font-size:10px;color:var(--text3);}
+.dossiers-scroll{display:flex;flex-direction:column;gap:8px;max-height:calc(100vh - 200px);overflow-y:auto;padding-right:4px;}
+.dossiers-scroll::-webkit-scrollbar{width:3px;}
+.dossiers-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.dossier-card{
+  background:var(--bg);border:0.5px solid var(--border2);border-radius:10px;
+  padding:14px 16px;cursor:pointer;transition:var(--trans);
+  display:flex;align-items:center;gap:14px;
 }
-.stat-icon{width:32px;height:32px;background:var(--bg3);border-radius:var(--r);display:flex;align-items:center;justify-content:center;}
-.stat-val{font-size:24px;font-weight:500;color:var(--navy);}
-.stat-label{font-size:11px;color:var(--text2);}
-.dash-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.dash-card{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;}
-.dash-card-hdr{
+.dossier-card:hover{border-color:var(--blue);box-shadow:0 2px 12px rgba(37,99,235,.06);}
+.dossier-card.active-card{border-color:var(--blue);background:var(--bg3);}
+.dossier-step-dot{
+  width:36px;height:36px;border-radius:50%;background:var(--blue-lt);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.dossier-info{flex:1;min-width:0;}
+.dossier-nom{font-size:13px;font-weight:500;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;}
+.dossier-etape{font-size:11px;color:var(--text2);}
+.dossier-action{
+  font-size:10px;font-weight:500;color:var(--blue);
+  background:var(--blue-lt);border:none;border-radius:5px;
+  padding:4px 10px;cursor:pointer;font-family:var(--font);
+  white-space:nowrap;flex-shrink:0;transition:var(--trans);
+}
+.dossier-action:hover{background:var(--blue-md);}
+.dossier-empty{
+  text-align:center;padding:40px 20px;border:0.5px dashed var(--border2);
+  border-radius:10px;color:var(--text3);font-size:12px;line-height:1.7;
+}
+
+/* Colonne droite */
+.dash-right{display:flex;flex-direction:column;gap:12px;}
+.dash-widget{background:var(--bg);border:0.5px solid var(--border2);border-radius:10px;overflow:hidden;}
+.dash-widget-hdr{
   padding:10px 14px;border-bottom:0.5px solid var(--border2);background:var(--bg2);
   display:flex;align-items:center;justify-content:space-between;
 }
-.dash-card-title{font-size:11px;font-weight:500;color:var(--text);}
-.dash-card-body{padding:10px 14px;}
-.affaire-row{
-  display:flex;align-items:center;gap:10px;padding:7px 0;
-  border-bottom:0.5px solid var(--border);cursor:pointer;transition:var(--trans);
+.dash-widget-title{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;}
+.dash-widget-body{padding:14px;}
+
+/* Dernière session */
+.session-card{display:flex;flex-direction:column;gap:8px;}
+.session-titre{font-size:13px;font-weight:500;color:var(--navy);line-height:1.4;}
+.session-meta{font-size:10px;color:var(--text3);}
+.session-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:500;color:var(--blue);
+  background:var(--blue-lt);border:none;border-radius:6px;
+  padding:6px 12px;cursor:pointer;font-family:var(--font);
+  transition:var(--trans);width:fit-content;
 }
-.affaire-row:last-child{border:none;}
-.affaire-row:hover{opacity:.8;}
+.session-btn:hover{background:var(--blue-md);}
+.session-empty{font-size:12px;color:var(--text3);line-height:1.6;}
+
+/* Actions rapides */
+.actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.action-btn{
+  display:flex;flex-direction:column;align-items:flex-start;gap:4px;
+  padding:12px;border:0.5px solid var(--border2);border-radius:8px;
+  background:var(--bg2);cursor:pointer;transition:var(--trans);text-align:left;
+  font-family:var(--font);
+}
+.action-btn:hover{border-color:var(--blue);background:var(--bg3);}
+.action-btn svg{color:var(--blue);opacity:.8;}
+.action-btn:hover svg{opacity:1;}
+.action-label{font-size:11px;font-weight:500;color:var(--text);line-height:1.3;}
+
+/* Stats compactes */
+.dash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:0.5px solid var(--border2);}
+.dash-stat{padding:10px 14px;text-align:center;border-right:0.5px solid var(--border2);}
+.dash-stat:last-child{border-right:none;}
+.dash-stat-val{font-size:20px;font-weight:500;color:var(--navy);}
+.dash-stat-label{font-size:9px;color:var(--text3);margin-top:1px;}
+
+/* Compat ancienne CSS */
 .affaire-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0;}
-.affaire-dot.orange{background:var(--amber);}
-.affaire-dot.green{background:var(--green);}
 .affaire-name{font-size:11px;color:var(--text);flex:1;}
 .affaire-status{font-size:9px;padding:2px 7px;border-radius:20px;}
 .s-blue{background:var(--blue-lt);color:#1D4ED8;}
 .s-amber{background:var(--amber-lt);color:var(--amber);}
 .s-green{background:var(--green-lt);color:var(--green);}
-.doc-row-dash{
-  display:flex;align-items:center;gap:8px;padding:6px 0;
-  border-bottom:0.5px solid var(--border);
-}
-.doc-row-dash:last-child{border:none;}
-.doc-icon-sm{
-  width:24px;height:24px;background:var(--bg3);border-radius:5px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:8px;font-weight:600;color:var(--blue);flex-shrink:0;
-}
+.doc-icon-sm{width:24px;height:24px;background:var(--bg3);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;color:var(--blue);flex-shrink:0;}
 .doc-name-sm{font-size:11px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .doc-date-sm{font-size:9px;color:var(--text3);}
 
@@ -401,8 +450,8 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .aff-section-body{padding:12px 14px;}
 
 /* Suivi procédural */
-.proc-track{display:flex;align-items:center;gap:0;padding:16px 8px 12px;justify-content:center;width:100%;}
-.proc-step{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;}
+.proc-track{display:flex;align-items:center;gap:0;padding:12px 0 8px;justify-content:center;}
+.proc-step{display:flex;flex-direction:column;align-items:center;gap:3px;}
 .proc-dot{width:10px;height:10px;border-radius:50%;background:var(--border2);}
 .proc-dot.done{background:var(--blue);}
 .proc-dot.active{background:var(--bg);border:2px solid var(--blue);box-shadow:0 0 0 3px var(--blue-lt);}
@@ -412,11 +461,10 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .proc-line.done{background:var(--blue);}
 
 /* Rédaction acte */
-.redac-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;}
+.redac-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .redac-btn{
-  padding:10px 6px;border:0.5px solid var(--border2);border-radius:var(--r);
+  padding:10px;border:0.5px solid var(--border2);border-radius:var(--r);
   cursor:pointer;text-align:center;transition:var(--trans);background:var(--bg2);
-  min-width:0;overflow:hidden;
 }
 .redac-btn:hover{border-color:var(--blue);background:var(--bg3);}
 .redac-btn-icon{display:flex;align-items:center;justify-content:center;margin-bottom:6px;color:#2563EB;opacity:0.75;}
@@ -549,16 +597,17 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 }
 #chat-panel.show{display:flex;}
 .chat-panel-hdr{
-  padding:8px 12px;background:var(--navy);
+  padding:10px 14px;background:var(--navy);
   display:flex;align-items:center;justify-content:space-between;
-  flex-shrink:0;min-height:42px;gap:6px;
+  flex-shrink:0;min-height:44px;
 }
-.chat-panel-title{font-size:11px;font-weight:500;color:#FFFFFF;flex-shrink:1;min-width:0;}
-.chat-panel-actions{display:flex;gap:4px;align-items:center;flex-shrink:0;}
+.chat-panel-actions{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;}
+.chat-panel-title{font-size:12px;font-weight:500;color:#FFFFFF;}
+.chat-panel-actions{display:flex;gap:6px;align-items:center;}
 .chat-panel-btn{
-  font-size:10px;background:rgba(255,255,255,.12);color:#FFFFFF;
-  border:none;border-radius:5px;padding:3px 7px;cursor:pointer;
-  font-family:var(--font);transition:var(--trans);white-space:nowrap;
+  font-size:10px;background:rgba(255,255,255,.1);color:#FFFFFF;
+  border:none;border-radius:5px;padding:3px 9px;cursor:pointer;
+  font-family:var(--font);transition:var(--trans);
 }
 .chat-panel-btn:hover{background:rgba(255,255,255,.2);}
 .chat-close{
@@ -813,68 +862,103 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
     <!-- ── TABLEAU DE BORD ──────────────────────────── -->
     <div class="page active" id="page-dashboard">
       <div class="dash-layout">
-        <div class="dash-welcome">
-          <h1 id="dash-greeting">Bonjour, Maître</h1>
-          <p id="dash-date">Chargement...</p>
+
+        <!-- Salutation -->
+        <div class="dash-top">
+          <div>
+            <div class="dash-greeting" id="dash-greeting">Bonjour, Maître</div>
+            <div class="dash-date" id="dash-date"></div>
+          </div>
+          <button class="btn-sm primary" onclick="creerAffaire()" style="flex-shrink:0;">+ Nouvelle affaire</button>
         </div>
-        <div class="dash-grid">
-          <div class="stat-card">
-            <div class="stat-icon">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2563EB" stroke-width="1.5">
-                <path d="M2 4h12v10H2zM5 4V2h6v2"/>
-              </svg>
+
+        <!-- Corps -->
+        <div class="dash-body">
+
+          <!-- Colonne gauche : affaires -->
+          <div class="dossiers-wrap">
+            <div class="dossiers-hdr">
+              <span class="dossiers-label">Affaires en cours</span>
+              <span class="dossiers-count" id="dash-dossiers-count">—</span>
             </div>
-            <div class="stat-val" id="stat-affaires">0</div>
-            <div class="stat-label">Affaires actives</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2563EB" stroke-width="1.5">
-                <path d="M2 2h4v12H2zM6 2h4v12H6z"/>
-              </svg>
-            </div>
-            <div class="stat-val" id="stat-docs">0</div>
-            <div class="stat-label">Documents indexés</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2563EB" stroke-width="1.5">
-                <path d="M3 12L6 6l3 4 2-3 2 5"/>
-              </svg>
-            </div>
-            <div class="stat-val" id="stat-actes">0</div>
-            <div class="stat-label">Actes générés</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2563EB" stroke-width="1.5">
-                <circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/>
-              </svg>
-            </div>
-            <div class="stat-val" id="stat-convs">0</div>
-            <div class="stat-label">Conversations</div>
-          </div>
-        </div>
-        <div class="dash-row">
-          <div class="dash-card">
-            <div class="dash-card-hdr">
-              <span class="dash-card-title">Affaires en cours</span>
-              <span class="badge badge-blue" id="dash-aff-count">0</span>
-            </div>
-            <div class="dash-card-body" id="dash-affaires-list">
-              <div style="font-size:11px;color:var(--text3);padding:8px 0;">Aucune affaire — créez-en une</div>
+            <div class="dossiers-scroll" id="dash-dossiers-scroll">
+              <div class="dossier-empty">
+                Aucune affaire en cours.<br>Créez votre première affaire pour commencer.
+              </div>
             </div>
           </div>
-          <div class="dash-card">
-            <div class="dash-card-hdr">
-              <span class="dash-card-title">Documents récents</span>
+
+          <!-- Colonne droite -->
+          <div class="dash-right">
+
+            <!-- Dernière session -->
+            <div class="dash-widget">
+              <div class="dash-widget-hdr">
+                <span class="dash-widget-title">Dernière session</span>
+              </div>
+              <div class="dash-widget-body">
+                <div id="dash-session-wrap" class="session-card" style="display:none;">
+                  <div class="session-titre" id="dash-session-titre">—</div>
+                  <div class="session-meta" id="dash-session-meta">—</div>
+                  <button class="session-btn" onclick="reprendreSession()">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Reprendre
+                  </button>
+                </div>
+                <div id="dash-session-empty" class="session-empty">
+                  Aucune conversation récente.<br>Ouvrez le chat et posez votre première question.
+                </div>
+              </div>
             </div>
-            <div class="dash-card-body" id="dash-docs-list">
-              <div style="font-size:11px;color:var(--text3);padding:8px 0;">Aucun document</div>
+
+            <!-- Actions rapides -->
+            <div class="dash-widget">
+              <div class="dash-widget-hdr">
+                <span class="dash-widget-title">Actions rapides</span>
+              </div>
+              <div class="dash-widget-body">
+                <div class="actions-grid">
+                  <button class="action-btn" onclick="showPage('analyse')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <span class="action-label">Analyser un dossier</span>
+                  </button>
+                  <button class="action-btn" onclick="showPage('affaires');setTimeout(()=>showRedaction(null),500)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.5"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
+                    <span class="action-label">Rédiger un acte</span>
+                  </button>
+                  <button class="action-btn" onclick="showPage('comparaison')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.5"><path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.25C17.25 23.15 21 18.25 21 13V7z"/></svg>
+                    <span class="action-label">Préparer une audience</span>
+                  </button>
+                  <button class="action-btn" onclick="showPage('bibliotheque');setTimeout(()=>document.getElementById('upload-zone-bib').click(),300)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                    <span class="action-label">Uploader un document</span>
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
+
+            <!-- Stats compactes -->
+            <div class="dash-widget">
+              <div class="dash-stats">
+                <div class="dash-stat">
+                  <div class="dash-stat-val" id="stat-docs">0</div>
+                  <div class="dash-stat-label">Documents</div>
+                </div>
+                <div class="dash-stat">
+                  <div class="dash-stat-val" id="stat-affaires">0</div>
+                  <div class="dash-stat-label">Affaires</div>
+                </div>
+                <div class="dash-stat">
+                  <div class="dash-stat-val" id="stat-convs">0</div>
+                  <div class="dash-stat-label">Sessions</div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /dash-right -->
+        </div><!-- /dash-body -->
+      </div><!-- /dash-layout -->
     </div>
 
     <!-- ── BIBLIOTHEQUE ─────────────────────────────── -->
@@ -1293,6 +1377,7 @@ async function init() {
   chargerHistorique();
   await chargerAffaires();
   await chargerStats();
+  await chargerDashboard();
   await chargerDocsBib();
   await chargerContexteMemoire();
   setTimeout(initAllResizers, 100);
@@ -1306,20 +1391,84 @@ function showPage(p) {
   document.getElementById('nav-' + p).classList.add('active');
   if (p === 'bibliotheque') chargerDocsBib();
   if (p === 'affaires') chargerAffaires();
-  if (p === 'dashboard') chargerStats();
+  if (p === 'dashboard') { chargerStats(); chargerDashboard(); }
 }
 
-// ── STATS DASHBOARD ──────────────────────────────────
+// ── DASHBOARD v2 ─────────────────────────────────────
+const ETAPES = ['Saisine','Instruction','Audience','Délibéré','Clôture'];
+const ETAPE_ICONS = [
+  '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>',
+  '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>',
+  '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  '<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+];
+const ETAPE_ACTIONS = ['Instruire','Continuer','Préparer audience','Attendre délibéré','Clôturer'];
+
 async function chargerStats() {
   try {
     const r = await apiFetch('/stats');
     if (!r) return;
     document.getElementById('stat-affaires').textContent = r.dossiers || 0;
     document.getElementById('stat-docs').textContent = r.documents || 0;
-    document.getElementById('stat-actes').textContent = 0;
     document.getElementById('stat-convs').textContent = conversations.length;
-    document.getElementById('dash-aff-count').textContent = r.dossiers || 0;
   } catch(e) {}
+}
+
+async function chargerDashboard() {
+  try {
+    const r = await apiFetch('/dossiers') || [];
+    const scroll = document.getElementById('dash-dossiers-scroll');
+    const count  = document.getElementById('dash-dossiers-count');
+    count.textContent = r.length + ' affaire' + (r.length > 1 ? 's' : '');
+
+    if (!r.length) {
+      scroll.innerHTML = '<div class="dossier-empty">Aucune affaire en cours.<br>Créez votre première affaire pour commencer.</div>';
+      return;
+    }
+
+    scroll.innerHTML = '';
+    r.slice(0,15).forEach((a, idx) => {
+      const etapeIdx = Math.min(a.etape_index || 1, ETAPES.length - 1);
+      const etape    = ETAPES[etapeIdx];
+      const action   = ETAPE_ACTIONS[etapeIdx];
+      const icon     = ETAPE_ICONS[etapeIdx];
+
+      const card = document.createElement('div');
+      card.className = 'dossier-card' + (AFFAIRE_ACTIVE?.id === a.id ? ' active-card' : '');
+      card.innerHTML =
+        '<div class="dossier-step-dot">'
+        + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.5">' + icon + '</svg>'
+        + '</div>'
+        + '<div class="dossier-info">'
+        + '<div class="dossier-nom">' + a.nom + '</div>'
+        + '<div class="dossier-etape">Étape : ' + etape + '</div>'
+        + '</div>'
+        + '<button class="dossier-action" onclick="event.stopPropagation();selectionnerAffaire(' + JSON.stringify(a).replace(/'/g,"&apos;") + ')">' + action + ' →</button>';
+
+      card.onclick = () => selectionnerAffaire(a);
+      scroll.appendChild(card);
+    });
+  } catch(e) {}
+
+  // Dernière session
+  try {
+    const convs = JSON.parse(localStorage.getItem('od_convs') || '[]');
+    if (convs.length) {
+      const last = convs[0];
+      document.getElementById('dash-session-wrap').style.display = 'flex';
+      document.getElementById('dash-session-empty').style.display = 'none';
+      document.getElementById('dash-session-titre').textContent = last.titre || 'Conversation';
+      document.getElementById('dash-session-meta').textContent = last.date || '';
+    }
+  } catch(e) {}
+}
+
+function reprendreSession() {
+  const convs = JSON.parse(localStorage.getItem('od_convs') || '[]');
+  if (convs.length) {
+    chargerConversation(convs[0]);
+  }
 }
 
 // ── AFFAIRES ─────────────────────────────────────────
