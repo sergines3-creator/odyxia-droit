@@ -1800,33 +1800,6 @@ def creer_dossier():
     except Exception as e:
         return jsonify({"erreur": str(e)}), 500
 
-
-
-@app.route("/dossiers/<dossier_id>", methods=["DELETE"])
-@jwt_required()
-def supprimer_dossier(dossier_id):
-    try:
-        tenant_id = get_current_tenant_id()
-        # Vérifier que le dossier appartient au tenant
-        check = supabase.table("dossiers").select("id").eq(
-            "id", dossier_id
-        ).eq("tenant_id", tenant_id).execute()
-        if not check.data:
-            return jsonify({"erreur": "Dossier introuvable"}), 404
-        # Supprimer les documents liés
-        supabase.table("documents").delete().eq(
-            "dossier_id", dossier_id
-        ).eq("tenant_id", tenant_id).execute()
-        # Supprimer le dossier
-        supabase.table("dossiers").delete().eq(
-            "id", dossier_id
-        ).eq("tenant_id", tenant_id).execute()
-        audit_log("supprimer_dossier", {"dossier_id": dossier_id})
-        return jsonify({"succes": True})
-    except Exception as e:
-        return jsonify({"erreur": str(e)}), 500
-
-
 @app.route("/dossiers/<dossier_id>", methods=["PUT"])
 @jwt_required()
 def renommer_dossier(dossier_id):
