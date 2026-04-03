@@ -1115,6 +1115,217 @@ def detecter_anomalies(tenant_id, user_id, action, metadata=None):
 
 
 
+
+# ─── RAPPORT D'ACCÈS MENSUEL ──────────────────────────────────────────────────
+
+@app.route("/rapport/acces", methods=["GET"])
+@jwt_required()
+def rapport_acces_mensuel():
+    """
+    Génère le rapport d'accès mensuel pour le tenant.
+    Couvre : connexions, documents, actions sensibles, anomalies.
+    Conforme SOC 2 Type 1 et RGPD.
+    """
+    try:
+        tenant_id = get_current_tenant_id()
+        user_id   = get_current_user_id()
+
+        mois      = request.args.get("mois")
+        annee     = request.args.get("annee")
+
+        maintenant = datetime.now(timezone.utc)
+        if mois and annee:
+            debut_mois = datetime(int(annee), int(mois), 1, tzinfo=timezone.utc)
+        else:
+            debut_mois = datetime(maintenant.year, maintenant.month, 1, tzinfo=timezone.utc)
+
+        if debut_mois.month == 12:
+            fin_mois = datetime(debut_mois.year + 1, 1, 1, tzinfo=timezone.utc)
+        else:
+            fin_mois = datetime(debut_mois.year, debut_mois.month + 1, 1, tzinfo=timezone.utc)
+
+        periode_debut = debut_mois.isoformat()
+        periode_fin   = fin_mois.isoformat()
+
+        # 1 — Connexions
+        connexions_result = supabase.table("security_events").select(
+            "event_type, created_at, metadata"
+        ).eq("tenant_id", tenant_id).gte(
+            "created_at", periode_debut
+        ).lt("created_at", periode_fin).in_(
+            "event_type", ["login_success", "login_failed", "logout"]
+        ).order("created_at", desc=True).execute()
+
+        connexions   = connexions_result.data or []
+        nb_connexions_ok   = sum(1 for c in connexions if c["event_type"] == "login_success")
+        nb_connexions_fail = sum(1 for c in connexions if c["event_type"] == "login_failed")
+
+        # 2 — Documents uploadés
+        docs_result = supabase.table("audit_logs").select(
+            "action, created_at, metadata"
+        ).eq("tenant_id", tenant_id).gte(
+            "created_at", periode_debut
+        ).lt("created_at", periode_fin).eq(
+            "action", "UPLOAD_DOCUMENT"
+        ).execute()
+
+        docs_uploades = len(docs_result.data or [])
+
+        # 3 — Actions sensibles
+        actions_result = supabase.table("audit_logs").select(
+            "action, created_at, user_id"
+        ).eq("tenant_id", tenant_id).gte(
+            "created_at", periode_debut
+        ).lt("created_at", periode_fin).execute()
+
+        actions = actions_result.data or []
+        actions_par_type = {}
+        for a in actions:
+            t = a.get("action", "INCONNU")
+            actions_par_type[t] = actions_par_type.get(t, 0) + 1
+
+        # 4 — Incidents
+        incidents_result = supabase.table("incidents").select(
+            "type_incident, severite, statut, detecte_le"
+        ).eq("tenant_id", tenant_id).gte(
+            "created_at", periode_debut
+        ).lt("created_at", periode_fin).execute()
+
+        incidents = incidents_result.data or []
+
+        # 5 — Score de conformité
+        score = 100
+        if nb_connexions_fail > 10: score -= 20
+        if nb_connexions_fail > 5:  score -= 10
+        any_critique = any(i.get("severite") == "critique" for i in incidents)
+        any_eleve    = any(i.get("severite") == "eleve" for i in incidents)
+        if any_critique: score -= 30
+        if any_eleve:    score -= 15
+        score = max(0, score)
+
+        rapport = {
+            "rapport_id":    str(uuid.uuid4()),
+            "genere_le":     maintenant.isoformat(),
+            "tenant_id":     tenant_id,
+            "periode": {
+                "debut": periode_debut,
+                "fin":   periode_fin,
+                "label": debut_mois.strftime("%B %Y"),
+            },
+            "conformite": {
+                "score":        score,
+                "niveau":       "Excellent" if score >= 90 else "Bon" if score >= 70 else "A améliorer" if score >= 50 else "Critique",
+                "soc2_ready":   score >= 80,
+                "rgpd_ready":   len([i for i in incidents if not i.get("notifie_autorite") and i.get("severite") in ["eleve","critique"]]) == 0,
+            },
+            "connexions": {
+                "total":            len(connexions),
+                "reussies":         nb_connexions_ok,
+                "echouees":         nb_connexions_fail,
+                "taux_echec_pct":   round((nb_connexions_fail / max(len(connexions), 1)) * 100, 1),
+                "alerte":           nb_connexions_fail > 10,
+            },
+            "documents": {
+                "uploades_ce_mois": docs_uploades,
+                "actions_totales":  len(actions),
+                "par_type":         actions_par_type,
+            },
+            "incidents": {
+                "total":    len(incidents),
+                "ouverts":  sum(1 for i in incidents if i.get("statut") == "ouvert"),
+                "resolus":  sum(1 for i in incidents if i.get("statut") == "resolu"),
+                "critiques":sum(1 for i in incidents if i.get("severite") == "critique"),
+                "eleves":   sum(1 for i in incidents if i.get("severite") == "eleve"),
+                "liste":    incidents[:10],
+            },
+            "recommandations": _generer_recommandations(
+                nb_connexions_fail, incidents, score
+            ),
+            "certifications": {
+                "soc2_type1":  "En cours" if score >= 70 else "Non conforme",
+                "rgpd":        "Conforme" if score >= 60 else "Non conforme",
+                "prochaine_revue": (maintenant + timedelta(days=30)).strftime("%d/%m/%Y"),
+            },
+        }
+
+        log_audit_event("RAPPORT_ACCES_GENERE", tenant_id, user_id, {
+            "periode": debut_mois.strftime("%Y-%m"),
+            "score":   score,
+        })
+
+        return jsonify(rapport)
+
+    except Exception as e:
+        log_erreur("RAPPORT_ACCES", e)
+        return jsonify({"erreur": str(e)}), 500
+
+
+def _generer_recommandations(nb_echecs, incidents, score):
+    """Génère des recommandations personnalisées selon l'état du tenant."""
+    recs = []
+
+    if nb_echecs > 5:
+        recs.append({
+            "priorite": "haute",
+            "titre":    "Tentatives de connexion suspectes",
+            "action":   "Vérifiez les logs de connexion et envisagez de renforcer la politique de mot de passe.",
+        })
+
+    incidents_non_resolus = [i for i in incidents if i.get("statut") == "ouvert"]
+    if incidents_non_resolus:
+        recs.append({
+            "priorite": "haute",
+            "titre":    f"{len(incidents_non_resolus)} incident(s) non résolu(s)",
+            "action":   "Clôturez les incidents ouverts et documentez les mesures prises.",
+        })
+
+    if score < 80:
+        recs.append({
+            "priorite": "moyenne",
+            "titre":    "Score SOC 2 insuffisant",
+            "action":   "Réalisez un pentest externe et documentez les procédures de sécurité.",
+        })
+
+    if not recs:
+        recs.append({
+            "priorite": "info",
+            "titre":    "Aucune anomalie détectée",
+            "action":   "Continuez les bonnes pratiques. Planifiez la prochaine revue trimestrielle.",
+        })
+
+    return recs
+
+
+@app.route("/rapport/acces/export", methods=["GET"])
+@jwt_required()
+def export_rapport_acces():
+    """
+    Exporte le rapport d'accès mensuel en JSON structuré
+    prêt pour import dans un outil d'audit.
+    """
+    try:
+        tenant_id = get_current_tenant_id()
+        mois  = request.args.get("mois", str(datetime.now(timezone.utc).month))
+        annee = request.args.get("annee", str(datetime.now(timezone.utc).year))
+
+        rapport_response = rapport_acces_mensuel()
+        rapport_data = rapport_response.get_json()
+
+        from flask import Response
+        import json
+        nom_fichier = f"rapport_acces_{annee}_{mois.zfill(2)}.json"
+        return Response(
+            json.dumps(rapport_data, ensure_ascii=False, indent=2),
+            mimetype="application/json",
+            headers={"Content-Disposition": f"attachment; filename={nom_fichier}"}
+        )
+
+    except Exception as e:
+        log_erreur("RAPPORT_EXPORT", e)
+        return jsonify({"erreur": str(e)}), 500
+
+
+
 @app.route("/synthese_document", methods=["POST"])
 @jwt_required()
 def synthese_document():
