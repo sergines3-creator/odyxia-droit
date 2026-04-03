@@ -671,6 +671,17 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 #toast.show{display:block;animation:fadeUp .2s ease;}
 @keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
+.resizer{width:5px;background:var(--border2);cursor:col-resize;flex-shrink:0;transition:background .2s;}
+.resizer:hover,.resizer.active{background:var(--blue);}
+.search-input{
+  width:calc(100% - 28px);margin:6px 14px;
+  border:0.5px solid var(--border2);border-radius:6px;
+  padding:6px 10px 6px 28px;font-size:11px;font-family:var(--font);
+  color:var(--text);background:var(--bg2);outline:none;transition:var(--trans);
+}
+.search-input:focus{border-color:var(--blue);background:var(--bg);}
+.search-wrap{position:relative;margin:6px 14px;}
+.search-wrap svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);pointer-events:none;}
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
@@ -862,10 +873,16 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
     <!-- ── BIBLIOTHEQUE ─────────────────────────────── -->
     <div class="page" id="page-bibliotheque">
-      <div class="bib-layout" style="flex:1;">
-        <div class="bib-sidebar">
+      <div class="bib-layout" style="flex:1;display:flex;">
+        <div class="bib-sidebar" id="bib-sidebar-col" style="width:280px;min-width:180px;max-width:480px;flex-shrink:0;">
           <div class="bib-sidebar-hdr">
             <span class="bib-sidebar-title">Bibliothèque</span>
+          </div>
+          <div class="search-wrap">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="var(--text3)" stroke-width="1.5">
+              <circle cx="6.5" cy="6.5" r="4.5"/><line x1="10" y1="10" x2="14" y2="14"/>
+            </svg>
+            <input class="search-input" type="text" id="bib-search" placeholder="Rechercher un document..." oninput="filtrerDocs(this.value)"/>
           </div>
 
           <div class="upload-zone" id="upload-zone-bib"
@@ -905,6 +922,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
           <div id="bib-generes-list"></div>
         </div>
 
+        <div class="resizer" id="resizer-bib"></div>
         <div class="bib-main">
           <div class="bib-toolbar">
             <span class="bib-toolbar-title" id="bib-doc-title">Sélectionnez un document</span>
@@ -920,8 +938,10 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1">
                 <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
               </svg>
-              <div style="font-size:13px;font-weight:500;">Aucun document sélectionné</div>
-              <div style="font-size:11px;">Uploadez un PDF ou sélectionnez un document</div>
+              <div style="font-size:13px;font-weight:500;color:var(--text2);">Aucun document sélectionné</div>
+              <div style="font-size:11px;color:var(--text3);text-align:center;max-width:240px;line-height:1.6;">
+                Uploadez un PDF — Code OHADA, CIMA, pièces de dossier — et interrogez-le directement via le chat.
+              </div>
             </div>
           </div>
         </div>
@@ -930,8 +950,8 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
     <!-- ── AFFAIRES ─────────────────────────────────── -->
     <div class="page" id="page-affaires">
-      <div class="aff-layout" style="flex:1;">
-        <div class="aff-sidebar">
+      <div class="aff-layout" style="flex:1;display:flex;">
+        <div class="aff-sidebar" id="aff-sidebar-col" style="width:260px;min-width:160px;max-width:420px;flex-shrink:0;">
           <div class="aff-sidebar-hdr">
             <span style="font-size:11px;font-weight:500;color:var(--text);">Mes affaires</span>
             <button class="btn-sm" onclick="creerAffaire()">+ Nouvelle</button>
@@ -941,6 +961,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
           </div>
         </div>
 
+        <div class="resizer" id="resizer-aff"></div>
         <div class="aff-main">
           <div class="aff-main-hdr">
             <span class="aff-main-title" id="aff-main-title">Sélectionnez une affaire</span>
@@ -956,7 +977,10 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1">
                 <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
               </svg>
-              <div style="font-size:13px;font-weight:500;">Sélectionnez ou créez une affaire</div>
+              <div style="font-size:13px;font-weight:500;color:var(--text2);">Aucune affaire en cours</div>
+              <div style="font-size:11px;color:var(--text3);text-align:center;max-width:240px;line-height:1.6;">
+                Créez une affaire pour y rattacher les pièces, suivre la procédure et rédiger vos actes.
+              </div>
             </div>
           </div>
         </div>
@@ -965,8 +989,8 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
     <!-- ── ANALYSE ──────────────────────────────────── -->
     <div class="page" id="page-analyse">
-      <div class="analyse-layout" style="flex:1;">
-        <div class="analyse-form">
+      <div class="analyse-layout" style="flex:1;display:flex;">
+        <div class="analyse-form" id="analyse-form-col" style="width:340px;min-width:220px;max-width:520px;flex-shrink:0;">
           <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;">Analyse juridique</div>
           <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">
             Décrivez votre situation juridique. L'analyse s'appuie sur la base documentaire et la jurisprudence OHADA/CEMAC.
@@ -1029,13 +1053,16 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
           <button class="btn-full" id="btn-analyser" onclick="lancerAnalyse()">Lancer l'analyse</button>
         </div>
 
+        <div class="resizer" id="resizer-analyse"></div>
         <div class="analyse-result" id="analyse-result">
           <div class="result-empty">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1">
               <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
-            <div style="font-size:13px;font-weight:500;">Aucune analyse</div>
-            <div style="font-size:11px;">Renseignez le formulaire et lancez l'analyse</div>
+            <div style="font-size:13px;font-weight:500;color:var(--text2);">Aucune analyse en cours</div>
+            <div style="font-size:11px;color:var(--text3);text-align:center;max-width:260px;line-height:1.6;">
+              Sélectionnez un domaine juridique, décrivez les faits et posez votre question. L'analyse s'appuie sur vos documents indexés.
+            </div>
           </div>
         </div>
       </div>
@@ -1043,8 +1070,8 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
     <!-- ── COMPARAISON ──────────────────────────────── -->
     <div class="page" id="page-comparaison">
-      <div class="comp-layout" style="flex:1;">
-        <div class="comp-form">
+      <div class="comp-layout" style="flex:1;display:flex;">
+        <div class="comp-form" id="comp-form-col" style="width:340px;min-width:220px;max-width:520px;flex-shrink:0;">
           <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;">Profil juge & stratégie</div>
           <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">
             Renseignez le juge et votre affaire. L'outil analyse le profil décisionnel et vous prépare une stratégie d'audience.
@@ -1100,13 +1127,16 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
           <div class="save-confirm" id="cmp-save-confirm">✓ Dossier enregistré dans la base documentaire</div>
         </div>
 
+        <div class="resizer" id="resizer-comp"></div>
         <div class="comp-result" id="comp-result">
           <div class="result-empty">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1">
               <path d="M12 2L3 7v6c0 5 4 9.3 9 10 5-.7 9-5 9-10V7L12 2z"/>
             </svg>
-            <div style="font-size:13px;font-weight:500;">Aucune analyse comparative</div>
-            <div style="font-size:11px;">Renseignez le formulaire pour obtenir le profil du juge</div>
+            <div style="font-size:13px;font-weight:500;color:var(--text2);">Aucun profil juge analysé</div>
+            <div style="font-size:11px;color:var(--text3);text-align:center;max-width:260px;line-height:1.6;">
+              Renseignez le nom du juge, la juridiction et votre affaire pour obtenir son profil décisionnel et une stratégie d'audience.
+            </div>
           </div>
         </div>
       </div>
@@ -1159,6 +1189,10 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
 <script>
 const API = '';
+// Migration ancienne clé → nouvelle clé
+if (!localStorage.getItem('od_token') && localStorage.getItem('odyxia_token')) {
+  localStorage.setItem('od_token', localStorage.getItem('odyxia_token'));
+}
 let TOKEN = localStorage.getItem('od_token') || '';
 let SESSION_ID = 'sess_' + Math.random().toString(36).slice(2);
 let TENANT_ID  = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
@@ -1168,6 +1202,7 @@ let SELECTED_DOMAIN = '';
 let conversations = JSON.parse(localStorage.getItem('od_convs') || '[]');
 let convActuelle = null;
 let chatOpen = false;
+let CONTEXTE_MEMOIRE = '';
 let histOpen = false;
 let mindOpen = false;
 
@@ -1232,6 +1267,8 @@ async function init() {
   await chargerAffaires();
   await chargerStats();
   await chargerDocsBib();
+  await chargerContexteMemoire();
+  setTimeout(initAllResizers, 100);
 }
 
 // ── NAVIGATION ───────────────────────────────────────
@@ -1429,8 +1466,11 @@ async function chargerDocsBib() {
         const locked = d.metadata?.sensible;
         el.innerHTML = `
           <div class="doc-icon">PDF</div>
-          <div class="doc-name">${d.nom || d.filename}</div>
-          <span class="doc-badge ${locked ? 'b-lock' : 'b-ok'}">${locked ? '🔒' : 'OK'}</span>`;
+          <div style="flex:1;overflow:hidden;">
+            <div class="doc-name">${d.nom || d.filename}</div>
+            <div style="font-size:9px;color:var(--text3);margin-top:1px;">${d.status === 'ready' ? 'Indexé' : 'En cours'} · ${d.storage_tier || 'hot'}</div>
+          </div>
+          <span class="doc-badge ${locked ? 'b-lock' : 'b-ok'}">${locked ? '🔒' : '✓'}</span>`;
         el.onclick = () => afficherDocViewer(d);
         list.appendChild(el);
       });
@@ -1553,7 +1593,8 @@ async function uploadFichier(file, dossierId) {
     const d = await r.json();
     showLoading(false);
     if (d.succes) {
-      showToast(`"${file.name}" indexé — ${d.chunks} passages`);
+      const chunks = d.chunks || 0;
+      showToast(`"${file.name}" indexé — ${chunks} passage${chunks > 1 ? 's' : ''} extraits`);
       await chargerDocsBib();
       if (dossierId && AFFAIRE_ACTIVE) await chargerCorpsAffaire(AFFAIRE_ACTIVE);
     } else {
@@ -1849,6 +1890,19 @@ async function lancerComparaison() {
 }
 
 // ── CHAT FLOTTANT ─────────────────────────────────────
+async function chargerContexteMemoire() {
+  try {
+    const r = await apiFetch('/memoire/contexte');
+    if (r && r.count > 0) {
+      const resumes = r.memoires.map(m =>
+        '[' + (m.domaine || 'Juridique') + '] ' + m.resume
+      ).join(' | ');
+      CONTEXTE_MEMOIRE = resumes;
+      console.log('[MEMOIRE] Contexte chargé — ' + r.count + ' session(s)');
+    }
+  } catch(e) {}
+}
+
 function toggleChat() {
   chatOpen = !chatOpen;
   document.getElementById('chat-panel').classList.toggle('show', chatOpen);
@@ -1883,7 +1937,11 @@ async function envoyerMessage() {
   convActuelle.messages.push({role:'user', content:q});
 
   try {
-    const body = {question:q, session_id:SESSION_ID};
+    let q_enrichie = q;
+    if (CONTEXTE_MEMOIRE) {
+      q_enrichie = '[Contexte sessions précédentes: ' + CONTEXTE_MEMOIRE + '] ' + q;
+    }
+    const body = {question: q_enrichie, session_id:SESSION_ID};
     if (AFFAIRE_ACTIVE) body.dossier_id = AFFAIRE_ACTIVE.id;
 
     const r = await fetch('/question_stream', {
@@ -1968,6 +2026,15 @@ function renderMsg(el, txt, sources) {
   box.scrollTop = box.scrollHeight;
 }
 
+async function sauvegarderMemoireAsync(sessionId, historique) {
+  try {
+    await apiFetch('/memoire/sauvegarder', 'POST', {
+      session_id: sessionId,
+      historique: historique
+    });
+  } catch(e) {}
+}
+
 async function genererCarteMentaleAuto(reponse) {
   if (!DOC_ACTIF) return;
   try {
@@ -2033,6 +2100,50 @@ async function apiFetch(url, method='GET', body=null) {
   if (body) { opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(body); }
   const r = await fetch(url, opts);
   return await r.json();
+}
+
+
+// ── RESIZER PANNEAUX ─────────────────────────────────
+function initResizer(resizerId, colId) {
+  const resizer = document.getElementById(resizerId);
+  const col     = document.getElementById(colId);
+  if (!resizer || !col) return;
+  let x0 = 0, w0 = 0, active = false;
+  resizer.addEventListener('mousedown', e => {
+    active = true; x0 = e.clientX; w0 = col.offsetWidth;
+    resizer.classList.add('active');
+    document.body.style.cssText += 'cursor:col-resize;user-select:none;';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!active) return;
+    const newW = w0 + (e.clientX - x0);
+    const mn = parseInt(col.style.minWidth)||160;
+    const mx = parseInt(col.style.maxWidth)||520;
+    col.style.width = Math.min(mx, Math.max(mn, newW)) + 'px';
+  });
+  document.addEventListener('mouseup', () => {
+    if (!active) return;
+    active = false;
+    resizer.classList.remove('active');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  });
+}
+function filtrerDocs(q) {
+  const items = document.querySelectorAll('#bib-docs-list .doc-item');
+  const term  = q.toLowerCase().trim();
+  items.forEach(el => {
+    const nom = el.querySelector('.doc-name')?.textContent?.toLowerCase() || '';
+    el.style.display = (!term || nom.includes(term)) ? 'flex' : 'none';
+  });
+}
+
+function initAllResizers() {
+  initResizer('resizer-bib',     'bib-sidebar-col');
+  initResizer('resizer-aff',     'aff-sidebar-col');
+  initResizer('resizer-analyse', 'analyse-form-col');
+  initResizer('resizer-comp',    'comp-form-col');
 }
 
 function showLoading(show) {
