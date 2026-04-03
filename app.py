@@ -75,7 +75,7 @@ Talisman(app,
     content_security_policy=False
 )
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "Odyxia-JWT-2026!")
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=8)
 jwt_manager = JWTManager(app)
 
 limiter = Limiter(
@@ -1918,8 +1918,9 @@ def upload_document():
             fichier.save(tmp.name)
             tmp_path = tmp.name
 
-        doc      = fitz.open(tmp_path)
+        doc         = fitz.open(tmp_path)
         pages_texte = []
+        nb_pages    = len(doc)
 
         for i, page in enumerate(doc):
             texte = page.get_text().strip()
@@ -1929,8 +1930,17 @@ def upload_document():
         doc.close()
         os.unlink(tmp_path)
 
+        # PDF scanné (image) — pas de texte extractible
         if not pages_texte:
-            return jsonify({"erreur": "Impossible d'extraire le texte du PDF"}), 400
+            if est_manuscrit:
+                # OCR demandé — on insère quand même le document
+                # et on marque pour traitement OCR ultérieur
+                pages_texte = [{"page": 1, "texte": f"[Document scanné — {nb_pages} page(s) — OCR requis]"}]
+                print(f"[UPLOAD] PDF scanné — {fichier.filename} — {nb_pages} pages — OCR marqué")
+            else:
+                # Pas d'OCR demandé — on insère avec avertissement
+                pages_texte = [{"page": 1, "texte": f"[Document PDF image — {nb_pages} page(s) — activez l'option Manuscrit pour indexer le contenu]"}]
+                print(f"[UPLOAD] PDF image sans texte — {fichier.filename} — indexé sans contenu")
 
         doc_id = str(uuid.uuid4())
 
