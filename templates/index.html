@@ -418,7 +418,8 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   cursor:pointer;text-align:center;transition:var(--trans);background:var(--bg2);
 }
 .redac-btn:hover{border-color:var(--blue);background:var(--bg3);}
-.redac-btn-icon{font-size:18px;margin-bottom:4px;}
+.redac-btn-icon{display:flex;align-items:center;justify-content:center;margin-bottom:6px;color:#2563EB;opacity:0.75;}
+.redac-btn:hover .redac-btn-icon{opacity:1;}
 .redac-btn-name{font-size:10px;font-weight:500;color:var(--text);}
 .redac-btn-desc{font-size:9px;color:var(--text3);}
 
@@ -1357,12 +1358,14 @@ async function chargerAffaires() {
 
     // Dashboard
     const dashList = document.getElementById('dash-affaires-list');
-    dashList.innerHTML = r.slice(0,4).map(a => `
-      <div class="affaire-row" onclick="selectionnerAffaire(${JSON.stringify(a).replace(/"/g,'&quot;')})">
-        <div class="affaire-dot"></div>
-        <div class="affaire-name">${a.nom}</div>
-        <span class="affaire-status s-blue">En cours</span>
-      </div>`).join('');
+    dashList.innerHTML = r.slice(0,4).map(a => {
+      const nom = a.nom || 'Affaire';
+      return '<div class="affaire-row" onclick="showPage(\'affaires\')">'
+           + '<div class="affaire-dot"></div>'
+           + '<div class="affaire-name">' + nom + '</div>'
+           + '<span class="affaire-status s-blue">En cours</span>'
+           + '</div>';
+    }).join('');
   } catch(e) {}
 }
 
@@ -1410,12 +1413,7 @@ async function chargerCorpsAffaire(a) {
         <span class="badge badge-blue">${docs.length} fichier(s)</span>
       </div>
       <div class="aff-section-body" id="aff-docs-body">
-        ${docs.length ? docs.map(d => `
-          <div class="doc-row-dash">
-            <div class="doc-icon-sm">PDF</div>
-            <div class="doc-name-sm">${d.nom || d.filename}</div>
-            <span class="doc-date-sm">${new Date(d.created_at).toLocaleDateString('fr')}</span>
-          </div>`).join('') : '<div style="font-size:11px;color:var(--text3);">Aucune pièce — ajoutez des documents</div>'}
+        ${docs.length ? docs.map(d => '<div class="doc-row-dash"><div class="doc-icon-sm">PDF</div><div class="doc-name-sm">' + (d.nom||d.filename) + '</div><span class="doc-date-sm">' + (d.created_at ? new Date(d.created_at).toLocaleDateString('fr') : '') + '</span></div>').join('') : '<div style="font-size:11px;color:var(--text3);">Aucune pièce — ajoutez des documents</div>'}
       </div>
     </div>
 
@@ -1424,74 +1422,68 @@ async function chargerCorpsAffaire(a) {
         <span class="aff-section-title">Rédiger un acte</span>
       </div>
       <div class="aff-section-body">
-        <div class="redac-grid">
-          ${[
-            {key:'requete',icon:'📋',name:'Requête introductive',desc:'Saisine du tribunal'},
-            {key:'conclusions',icon:'📝',name:'Conclusions',desc:'Mémoire en défense/demande'},
-            {key:'assignation',icon:'📨',name:'Assignation',desc:'Citation à comparaître'},
-            {key:'mise_en_demeure',icon:'⚠️',name:'Mise en demeure',desc:'Sommation préalable'},
-            {key:'contrat',icon:'✍️',name:'Contrat',desc:'Rédaction contractuelle'},
-            {key:'rapport',icon:'📊',name:'Rapport client',desc:'Compte rendu d\'avancement'},
-          ].map(t => `
-            <div class="redac-btn" onclick="showRedaction('${t.key}')">
-              <div class="redac-btn-icon">${t.icon}</div>
-              <div class="redac-btn-name">${t.name}</div>
-              <div class="redac-btn-desc">${t.desc}</div>
-            </div>`).join('')}
-        </div>
-      </div>
-    </div>`;
-}
-
-async function supprimerAffaire(id, nom) {
-  if (!confirm(`Supprimer l'affaire "${nom}" et tous ses documents ?`)) return;
-  try {
-    await apiFetch('/dossiers/' + id, 'DELETE');
-    showToast('Affaire supprimée');
-    if (AFFAIRE_ACTIVE?.id === id) {
-      AFFAIRE_ACTIVE = null;
-      document.getElementById('hdr-dossier').style.display = 'none';
-      document.getElementById('aff-main-title').textContent = 'Sélectionnez une affaire';
-      document.getElementById('btn-aff-upload').style.display = 'none';
-      document.getElementById('aff-body').innerHTML = '<div class="result-empty"><div style="font-size:13px;">Sélectionnez une affaire</div></div>';
-    }
-    await chargerAffaires();
-  } catch(e) { showToast('Erreur suppression', true); }
-}
-
-async function creerAffaire() {
-  const nom = prompt('Nom de l\'affaire :');
-  if (!nom?.trim()) return;
-  const desc = prompt('Description (optionnel) :') || '';
-  try {
-    await apiFetch('/dossiers', 'POST', {nom: nom.trim(), description: desc});
-    showToast('Affaire créée');
-    await chargerAffaires();
-  } catch(e) { showToast('Erreur : ' + e.message, true); }
-}
-
-// ── BIBLIOTHEQUE ─────────────────────────────────────
-async function chargerDocsBib() {
-  try {
-    const r = await apiFetch('/liste_documents') || [];
-    document.getElementById('nav-bib-count').textContent = r.length;
-
-    const list = document.getElementById('bib-docs-list');
-    list.innerHTML = '';
-    if (!r.length) {
-      list.innerHTML = '<div style="padding:8px 14px;font-size:11px;color:var(--text3);">Aucun document</div>';
-    } else {
-      r.forEach(d => {
-        const el = document.createElement('div');
-        el.className = 'doc-item';
-        const locked = d.metadata?.sensible;
-        el.innerHTML = `
-          <div class="doc-icon">PDF</div>
-          <div style="flex:1;overflow:hidden;">
-            <div class="doc-name">${d.nom || d.filename}</div>
-            <div style="font-size:9px;color:var(--text3);margin-top:1px;">${d.status === 'ready' ? 'Indexé' : 'En cours'} · ${d.storage_tier || 'hot'}</div>
-          </div>
-          <span class="doc-badge ${locked ? 'b-lock' : 'b-ok'}">${locked ? '🔒' : '✓'}</span>`;
+        <div class="redac-grid" style="grid-template-columns:repeat(3,1fr);">
+            <div class="redac-btn" onclick="showRedaction('requete')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+              <div class="redac-btn-name">Requête introductive</div>
+              <div class="redac-btn-desc">Saisine du tribunal</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('conclusions')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg></div>
+              <div class="redac-btn-name">Conclusions</div>
+              <div class="redac-btn-desc">Mémoire en défense/demande</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('assignation')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+              <div class="redac-btn-name">Assignation</div>
+              <div class="redac-btn-desc">Citation à comparaître</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('mise_en_demeure')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/></svg></div>
+              <div class="redac-btn-name">Mise en demeure</div>
+              <div class="redac-btn-desc">Sommation préalable</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('contrat')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg></div>
+              <div class="redac-btn-name">Contrat</div>
+              <div class="redac-btn-desc">Rédaction contractuelle</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('rapport')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg></div>
+              <div class="redac-btn-name">Rapport client</div>
+              <div class="redac-btn-desc">Compte rendu d'avancement</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('replique')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg></div>
+              <div class="redac-btn-name">Mémoire en réplique</div>
+              <div class="redac-btn-desc">Réponse aux conclusions adverses</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('refere')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+              <div class="redac-btn-name">Requête en référé</div>
+              <div class="redac-btn-desc">Procédure d'urgence</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('signification')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+              <div class="redac-btn-name">Acte de signification</div>
+              <div class="redac-btn-desc">Notification officielle</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('jurisprudence')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.25C17.25 23.15 21 18.25 21 13V7z"/></svg></div>
+              <div class="redac-btn-name">Résumé jurisprudence</div>
+              <div class="redac-btn-desc">Note de décision CCJA/OHADA</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('protocole')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><path d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9a12.02 12.02 0 00-.382-3.016z"/></svg></div>
+              <div class="redac-btn-name">Protocole transactionnel</div>
+              <div class="redac-btn-desc">Accord amiable entre parties</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('note_doctrine')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
+              <div class="redac-btn-name">Note de doctrine</div>
+              <div class="redac-btn-desc">Analyse doctrinale OHADA</div>
+            </div>
+          </div>`;
         el.onclick = () => afficherDocViewer(d);
         list.appendChild(el);
       });
@@ -1499,12 +1491,16 @@ async function chargerDocsBib() {
 
     // Dashboard docs récents
     const dashDocs = document.getElementById('dash-docs-list');
-    dashDocs.innerHTML = r.slice(0,4).map(d => `
-      <div class="doc-row-dash">
-        <div class="doc-icon-sm">PDF</div>
-        <div class="doc-name-sm">${d.nom || d.filename}</div>
-        <div class="doc-date-sm">${new Date(d.created_at).toLocaleDateString('fr')}</div>
-      </div>`).join('') || '<div style="font-size:11px;color:var(--text3);">Aucun document</div>';
+    if (dashDocs) {
+      const dashItems = r.slice(0,4).map(d => {
+        const nom  = d.nom || d.filename || 'Document';
+        const date = d.created_at ? new Date(d.created_at).toLocaleDateString('fr') : '';
+        return '<div class="doc-row-dash"><div class="doc-icon-sm">PDF</div>'
+             + '<div class="doc-name-sm">' + nom + '</div>'
+             + '<div class="doc-date-sm">' + date + '</div></div>';
+      }).join('');
+      dashDocs.innerHTML = dashItems || '<div style="font-size:11px;color:var(--text3);">Aucun document</div>';
+    }
   } catch(e) {}
 }
 
@@ -1971,14 +1967,13 @@ async function lancerComparaison() {
         <div class="result-card">
           <div class="result-card-hdr"><span class="result-card-title">Décisions antérieures</span><span class="badge badge-blue">${decisions.length}</span></div>
           <div class="result-card-body" style="display:flex;flex-direction:column;gap:8px;">
-            ${decisions.slice(0,5).map(d => `
-              <div class="dec-item">
-                <div class="dec-issue ${d.issue==='favorable'?'i-fav':d.issue==='defavorable'?'i-def':'i-par'}">${d.issue||'—'}</div>
-                <div>
-                  <div class="dec-title">${d.titre||'Décision'}</div>
-                  <div class="dec-meta">${d.juridiction||''} · ${d.date_dec||''} · ${d.reference||''}</div>
-                </div>
-              </div>`).join('')}
+            ${decisions.slice(0,5).map(d => {
+              const cls = d.issue==='favorable'?'i-fav':d.issue==='defavorable'?'i-def':'i-par';
+              return '<div class="dec-item"><div class="dec-issue ' + cls + '">' + (d.issue||'—') + '</div>'
+                   + '<div><div class="dec-title">' + (d.titre||'Décision') + '</div>'
+                   + '<div class="dec-meta">' + (d.juridiction||'') + ' · ' + (d.date_dec||'') + ' · ' + (d.reference||'') + '</div>'
+                   + '</div></div>';
+            }).join('')}
           </div>
         </div>` : ''}`;
     }
