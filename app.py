@@ -875,6 +875,246 @@ def contexte_memoire():
         log_erreur("MEMOIRE_CONTEXTE", e)
         return jsonify({"memoires": [], "count": 0}), 500
 
+
+# ─── SÉCURITÉ — GESTION INCIDENTS 72H RGPD ───────────────────────────────────
+
+@app.route("/incident/declarer", methods=["POST"])
+@jwt_required()
+def declarer_incident():
+    """
+    Déclare un incident de sécurité.
+    Génère automatiquement un rapport RGPD et logue l'incident.
+    """
+    try:
+        data      = request.json
+        tenant_id = get_current_tenant_id()
+        user_id   = get_current_user_id()
+
+        type_incident     = data.get("type_incident", "violation_donnees")
+        severite          = data.get("severite", "moyen")
+        description       = data.get("description", "")
+        donnees_impactees = data.get("donnees_impactees", [])
+        users_impactes    = data.get("users_impactes", 0)
+        mesures_prises    = data.get("mesures_prises", "")
+
+        if not description:
+            return jsonify({"erreur": "Description de l'incident requise"}), 400
+
+        incident_id = str(uuid.uuid4())
+        maintenant  = datetime.now(timezone.utc)
+        deadline_72h = maintenant + timedelta(hours=72)
+
+        supabase.table("incidents").insert({
+            "id":               incident_id,
+            "tenant_id":        tenant_id,
+            "type_incident":    type_incident,
+            "severite":         severite,
+            "description":      description,
+            "donnees_impactees": donnees_impactees,
+            "users_impactes":   users_impactes,
+            "detecte_le":       maintenant.isoformat(),
+            "declare_le":       maintenant.isoformat(),
+            "statut":           "ouvert",
+            "mesures_prises":   mesures_prises,
+            "notifie_autorite": False,
+            "notifie_users":    False,
+        }).execute()
+
+        log_audit_event("INCIDENT_DECLARE", tenant_id, user_id, {
+            "incident_id": incident_id,
+            "severite":    severite,
+            "type":        type_incident,
+        })
+
+        log_security_event("incident_declared", tenant_id, user_id, {
+            "incident_id": incident_id,
+            "severite":    severite,
+        })
+
+        print(f"[INCIDENT] Déclaré — {severite} | {type_incident} | tenant {tenant_id[:8]}")
+
+        return jsonify({
+            "succes":       True,
+            "incident_id":  incident_id,
+            "declare_le":   maintenant.isoformat(),
+            "deadline_72h": deadline_72h.isoformat(),
+            "message":      "Incident déclaré. Vous avez jusqu'au "
+                           + deadline_72h.strftime("%d/%m/%Y %H:%M UTC")
+                           + " pour notifier l'autorité compétente.",
+        })
+
+    except Exception as e:
+        log_erreur("INCIDENT_DECLARER", e)
+        return jsonify({"erreur": str(e)}), 500
+
+
+@app.route("/incident/rapport/<incident_id>", methods=["GET"])
+@jwt_required()
+def rapport_incident(incident_id):
+    """
+    Génère le rapport RGPD complet pour un incident déclaré.
+    Format conforme aux exigences de notification des autorités.
+    """
+    try:
+        tenant_id = get_current_tenant_id()
+
+        result = supabase.table("incidents").select("*").eq(
+            "id", incident_id
+        ).eq("tenant_id", tenant_id).execute()
+
+        if not result.data:
+            return jsonify({"erreur": "Incident introuvable"}), 404
+
+        inc = result.data[0]
+
+        detecte_le  = inc.get("detecte_le", "")
+        declare_le  = inc.get("declare_le", "")
+        deadline_dt = datetime.fromisoformat(declare_le.replace("Z", "+00:00")) + timedelta(hours=72) if declare_le else None
+        deadline    = deadline_dt.strftime("%d/%m/%Y %H:%M UTC") if deadline_dt else "N/A"
+
+        rapport = {
+            "incident_id":     incident_id,
+            "genere_le":       datetime.now(timezone.utc).isoformat(),
+            "conforme_rgpd":   True,
+            "delai_72h":       deadline,
+            "statut":          inc.get("statut", "ouvert"),
+            "details": {
+                "type_violation":      inc.get("type_incident", ""),
+                "severite":            inc.get("severite", ""),
+                "description":         inc.get("description", ""),
+                "date_detection":      detecte_le,
+                "date_declaration":    declare_le,
+                "categories_donnees":  inc.get("donnees_impactees", []),
+                "nombre_personnes":    inc.get("users_impactes", 0),
+                "mesures_prises":      inc.get("mesures_prises", ""),
+                "notifie_autorite":    inc.get("notifie_autorite", False),
+                "notifie_utilisateurs":inc.get("notifie_users", False),
+            },
+            "obligations_rgpd": {
+                "notification_autorite": {
+                    "obligatoire": inc.get("severite") in ["eleve", "critique"],
+                    "deadline":    deadline,
+                    "autorite_cmr": "CNIL Cameroun — Agence Nationale des Technologies de l'Information et de la Communication (ANTIC)",
+                    "effectuee":   inc.get("notifie_autorite", False),
+                },
+                "notification_personnes": {
+                    "obligatoire": inc.get("severite") == "critique",
+                    "effectuee":  inc.get("notifie_users", False),
+                },
+            },
+            "checklist_rgpd": [
+                {"action": "Incident détecté et documenté",          "fait": True},
+                {"action": "Incident déclaré dans le système",       "fait": True},
+                {"action": "Mesures correctives immédiates prises",  "fait": bool(inc.get("mesures_prises"))},
+                {"action": "Autorité compétente notifiée (72h)",     "fait": inc.get("notifie_autorite", False)},
+                {"action": "Personnes concernées notifiées",         "fait": inc.get("notifie_users", False)},
+                {"action": "Incident résolu et clôturé",             "fait": inc.get("statut") == "resolu"},
+            ],
+        }
+
+        return jsonify(rapport)
+
+    except Exception as e:
+        log_erreur("INCIDENT_RAPPORT", e)
+        return jsonify({"erreur": str(e)}), 500
+
+
+@app.route("/incident/liste", methods=["GET"])
+@jwt_required()
+def liste_incidents():
+    """Liste tous les incidents du tenant."""
+    try:
+        tenant_id = get_current_tenant_id()
+        result = supabase.table("incidents").select(
+            "id, type_incident, severite, statut, detecte_le, declare_le, notifie_autorite"
+        ).eq("tenant_id", tenant_id).order(
+            "created_at", desc=True
+        ).execute()
+        return jsonify({"incidents": result.data or []})
+    except Exception as e:
+        log_erreur("INCIDENT_LISTE", e)
+        return jsonify({"incidents": []}), 500
+
+
+@app.route("/incident/resoudre/<incident_id>", methods=["POST"])
+@jwt_required()
+def resoudre_incident(incident_id):
+    """Marque un incident comme résolu."""
+    try:
+        tenant_id = get_current_tenant_id()
+        user_id   = get_current_user_id()
+        data      = request.json
+
+        supabase.table("incidents").update({
+            "statut":           "resolu",
+            "resolu_le":        datetime.now(timezone.utc).isoformat(),
+            "mesures_prises":   data.get("mesures_prises", ""),
+            "notifie_autorite": data.get("notifie_autorite", False),
+            "notifie_users":    data.get("notifie_users", False),
+        }).eq("id", incident_id).eq("tenant_id", tenant_id).execute()
+
+        log_audit_event("INCIDENT_RESOLU", tenant_id, user_id, {"incident_id": incident_id})
+
+        return jsonify({"succes": True, "message": "Incident clôturé"})
+
+    except Exception as e:
+        log_erreur("INCIDENT_RESOUDRE", e)
+        return jsonify({"erreur": str(e)}), 500
+
+
+def detecter_anomalies(tenant_id, user_id, action, metadata=None):
+    """
+    Détecteur d'anomalies appelé à chaque action sensible.
+    Crée automatiquement un incident si une anomalie est détectée.
+    """
+    try:
+        if not metadata:
+            metadata = {}
+
+        anomalie = None
+        severite = "faible"
+
+        # Tentatives de connexion répétées
+        if action == "login_failed":
+            recent = supabase.table("security_events").select("id").eq(
+                "event_type", "login_failed"
+            ).eq("tenant_id", tenant_id).gte(
+                "created_at",
+                (datetime.now(timezone.utc) - timedelta(minutes=15)).isoformat()
+            ).execute()
+            if len(recent.data or []) >= 5:
+                anomalie = "Tentatives de connexion répétées détectées"
+                severite = "eleve"
+
+        # Upload massif de documents
+        elif action == "upload_document":
+            recent = supabase.table("audit_logs").select("id").eq(
+                "action", "UPLOAD_DOCUMENT"
+            ).eq("tenant_id", tenant_id).gte(
+                "created_at",
+                (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
+            ).execute()
+            if len(recent.data or []) >= 50:
+                anomalie = "Volume d'upload anormalement élevé"
+                severite = "moyen"
+
+        if anomalie:
+            supabase.table("incidents").insert({
+                "id":            str(uuid.uuid4()),
+                "tenant_id":     tenant_id,
+                "type_incident": "anomalie_detectee",
+                "severite":      severite,
+                "description":   anomalie,
+                "detecte_le":    datetime.now(timezone.utc).isoformat(),
+                "statut":        "ouvert",
+            }).execute()
+            print(f"[INCIDENT AUTO] {anomalie} — tenant {tenant_id[:8]}")
+
+    except Exception:
+        pass
+
+
+
 @app.route("/synthese_document", methods=["POST"])
 @jwt_required()
 def synthese_document():
