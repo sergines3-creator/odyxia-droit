@@ -1,4 +1,4 @@
-flask
+﻿flask
 flask-cors
 anthropic
 supabase
@@ -17,5 +17,6 @@ qrcode[pil]
 schedule
 cryptography
 voyageai
-zstandard
-zstandard==0.23.0 
+zstandard==0.23.0
+pytesseract==0.3.13
+Pillow==10.4.0

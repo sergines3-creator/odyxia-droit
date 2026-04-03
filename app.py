@@ -1930,17 +1930,37 @@ def upload_document():
         doc.close()
         os.unlink(tmp_path)
 
-        # PDF scanné (image) — pas de texte extractible
+        # PDF scanné (image) — tentative OCR Tesseract
         if not pages_texte:
             if est_manuscrit:
-                # OCR demandé — on insère quand même le document
-                # et on marque pour traitement OCR ultérieur
-                pages_texte = [{"page": 1, "texte": f"[Document scanné — {nb_pages} page(s) — OCR requis]"}]
-                print(f"[UPLOAD] PDF scanné — {fichier.filename} — {nb_pages} pages — OCR marqué")
+                try:
+                    import pytesseract
+                    from PIL import Image
+                    import io
+                    doc_ocr = fitz.open(tmp_path if os.path.exists(tmp_path) else "-")
+                    print(f"[OCR] Démarrage OCR — {fichier.filename} — {nb_pages} pages")
+                    for i, page in enumerate(doc_ocr):
+                        # Convertir page en image haute résolution
+                        mat  = fitz.Matrix(2.0, 2.0)
+                        pix  = page.get_pixmap(matrix=mat)
+                        img  = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                        texte_ocr = pytesseract.image_to_string(img, lang="fra+eng").strip()
+                        if texte_ocr:
+                            pages_texte.append({"page": i+1, "texte": texte_ocr})
+                    doc_ocr.close()
+                    print(f"[OCR] OK — {len(pages_texte)} pages extraites")
+                except ImportError:
+                    print("[OCR] pytesseract non disponible — texte minimal inséré")
+                    pages_texte = [{"page": 1, "texte": f"[Document manuscrit scanné — {nb_pages} page(s) — OCR non disponible]"}]
+                except Exception as e_ocr:
+                    print(f"[OCR] Erreur : {e_ocr}")
+                    pages_texte = [{"page": 1, "texte": f"[Document scanné — {nb_pages} page(s) — erreur OCR]"}]
             else:
-                # Pas d'OCR demandé — on insère avec avertissement
-                pages_texte = [{"page": 1, "texte": f"[Document PDF image — {nb_pages} page(s) — activez l'option Manuscrit pour indexer le contenu]"}]
-                print(f"[UPLOAD] PDF image sans texte — {fichier.filename} — indexé sans contenu")
+                pages_texte = [{"page": 1, "texte": f"[Document PDF image — {nb_pages} page(s) — cochez Manuscrit pour activer l'OCR]"}]
+                print(f"[UPLOAD] PDF image sans texte — {fichier.filename}")
+
+        if not pages_texte:
+            pages_texte = [{"page": 1, "texte": "[Document vide ou illisible]"}]
 
         doc_id = str(uuid.uuid4())
 
@@ -2001,9 +2021,11 @@ def upload_document():
             "status":           "ready",
             "storage_tier":     "hot",
             "metadata":         {
-                "sensible":  est_sensible,
-                "chiffre":   est_chiffre_d,
-                "manuscrit": est_manuscrit
+                "sensible":    est_sensible,
+                "chiffre":     est_chiffre_d,
+                "manuscrit":   est_manuscrit,
+                "type_doc":    request.form.get("type_doc", "juridique"),
+                "juge":        request.form.get("juge", ""),
             }
         }).execute()
 
@@ -2144,10 +2166,51 @@ def supprimer_document():
 def comparaison_analyser():
     try:
         data        = request.json
-        juge        = data.get("juge",        "").strip()
-        juridiction = data.get("juridiction", "").strip()
-        domaine     = data.get("domaine",     "")
-        periode     = data.get("periode",     "Toutes")
+        juge          = data.get("juge",        "").strip()
+        juridiction   = data.get("juridiction", "").strip()
+        chambre       = data.get("chambre",     "").strip()
+        domaine       = data.get("domaine",     "")
+        periode       = data.get("periode",     "Toutes")
+        affaire       = data.get("affaire",     "")
+        arguments_def = data.get("arguments_defense", "")
+        antecedents   = data.get("antecedents", "")
+        decisions_ids = data.get("decisions_ids", [])
+        tenant_id_cmp = get_current_tenant_id()
+
+        # Récupérer chunks des décisions uploadées de ce juge
+        contexte_decisions = ""
+        try:
+            if decisions_ids:
+                chunks_dec = supabase.table("chunks").select(
+                    "contenu"
+                ).eq("tenant_id", tenant_id_cmp).in_(
+                    "document_id", decisions_ids
+                ).limit(20).execute()
+                if chunks_dec.data:
+                    contexte_decisions = " | ".join([
+                        c.get("contenu","")[:200] for c in chunks_dec.data if c.get("contenu")
+                    ])
+                    print(f"[COMP] {len(chunks_dec.data)} chunks decisions — {juge}")
+            elif juge:
+                docs_juge = supabase.table("documents").select("id").eq(
+                    "tenant_id", tenant_id_cmp
+                ).execute()
+                ids_juge = [
+                    d["id"] for d in (docs_juge.data or [])
+                    if d.get("metadata") and d["metadata"].get("juge","").lower() in juge.lower()
+                ]
+                if ids_juge:
+                    chunks_dec = supabase.table("chunks").select(
+                        "contenu"
+                    ).eq("tenant_id", tenant_id_cmp).in_(
+                        "document_id", ids_juge
+                    ).limit(20).execute()
+                    if chunks_dec.data:
+                        contexte_decisions = " | ".join([
+                            c.get("contenu","")[:200] for c in chunks_dec.data if c.get("contenu")
+                        ])
+        except Exception as e_ctx:
+            print(f"[COMP] Erreur contexte decisions : {e_ctx}")
         tenant_id   = get_current_tenant_id()
 
         if not juge and not juridiction:
