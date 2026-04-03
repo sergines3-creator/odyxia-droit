@@ -219,99 +219,50 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .page.active{display:flex;}
 
 /* ══ TABLEAU DE BORD ══════════════════════════════════ */
-/* ══ DASHBOARD v2 ═════════════════════════════════════ */
-.dash-layout{flex:1;overflow-y:auto;overflow-x:hidden;padding:24px;display:flex;flex-direction:column;gap:0;}
-.dash-top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;}
-.dash-greeting{font-family:var(--serif);font-size:26px;font-weight:400;color:var(--navy);line-height:1.2;}
-.dash-date{font-size:11px;color:var(--text3);margin-top:3px;}
-.dash-body{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start;}
-
-/* Affaires cards */
-.dossiers-wrap{display:flex;flex-direction:column;gap:0;}
-.dossiers-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.dossiers-label{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;}
-.dossiers-count{font-size:10px;color:var(--text3);}
-.dossiers-scroll{display:flex;flex-direction:column;gap:8px;max-height:calc(100vh - 200px);overflow-y:auto;padding-right:4px;}
-.dossiers-scroll::-webkit-scrollbar{width:3px;}
-.dossiers-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
-.dossier-card{
-  background:var(--bg);border:0.5px solid var(--border2);border-radius:10px;
-  padding:14px 16px;cursor:pointer;transition:var(--trans);
-  display:flex;align-items:center;gap:14px;
+.dash-layout{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px;}
+.dash-welcome{margin-bottom:20px;}
+.dash-welcome h1{font-family:var(--serif);font-size:24px;font-weight:500;color:var(--navy);margin-bottom:4px;}
+.dash-welcome p{font-size:12px;color:var(--text2);}
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.stat-card{
+  background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r-lg);
+  padding:16px;display:flex;flex-direction:column;gap:6px;
 }
-.dossier-card:hover{border-color:var(--blue);box-shadow:0 2px 12px rgba(37,99,235,.06);}
-.dossier-card.active-card{border-color:var(--blue);background:var(--bg3);}
-.dossier-step-dot{
-  width:36px;height:36px;border-radius:50%;background:var(--blue-lt);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.dossier-info{flex:1;min-width:0;}
-.dossier-nom{font-size:13px;font-weight:500;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;}
-.dossier-etape{font-size:11px;color:var(--text2);}
-.dossier-action{
-  font-size:10px;font-weight:500;color:var(--blue);
-  background:var(--blue-lt);border:none;border-radius:5px;
-  padding:4px 10px;cursor:pointer;font-family:var(--font);
-  white-space:nowrap;flex-shrink:0;transition:var(--trans);
-}
-.dossier-action:hover{background:var(--blue-md);}
-.dossier-empty{
-  text-align:center;padding:40px 20px;border:0.5px dashed var(--border2);
-  border-radius:10px;color:var(--text3);font-size:12px;line-height:1.7;
-}
-
-/* Colonne droite */
-.dash-right{display:flex;flex-direction:column;gap:12px;}
-.dash-widget{background:var(--bg);border:0.5px solid var(--border2);border-radius:10px;overflow:hidden;}
-.dash-widget-hdr{
+.stat-icon{width:32px;height:32px;background:var(--bg3);border-radius:var(--r);display:flex;align-items:center;justify-content:center;}
+.stat-val{font-size:24px;font-weight:500;color:var(--navy);}
+.stat-label{font-size:11px;color:var(--text2);}
+.dash-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.dash-card{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;}
+.dash-card-hdr{
   padding:10px 14px;border-bottom:0.5px solid var(--border2);background:var(--bg2);
   display:flex;align-items:center;justify-content:space-between;
 }
-.dash-widget-title{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;}
-.dash-widget-body{padding:14px;}
-
-/* Dernière session */
-.session-card{display:flex;flex-direction:column;gap:8px;}
-.session-titre{font-size:13px;font-weight:500;color:var(--navy);line-height:1.4;}
-.session-meta{font-size:10px;color:var(--text3);}
-.session-btn{
-  display:inline-flex;align-items:center;gap:6px;
-  font-size:11px;font-weight:500;color:var(--blue);
-  background:var(--blue-lt);border:none;border-radius:6px;
-  padding:6px 12px;cursor:pointer;font-family:var(--font);
-  transition:var(--trans);width:fit-content;
+.dash-card-title{font-size:11px;font-weight:500;color:var(--text);}
+.dash-card-body{padding:10px 14px;}
+.affaire-row{
+  display:flex;align-items:center;gap:10px;padding:7px 0;
+  border-bottom:0.5px solid var(--border);cursor:pointer;transition:var(--trans);
 }
-.session-btn:hover{background:var(--blue-md);}
-.session-empty{font-size:12px;color:var(--text3);line-height:1.6;}
-
-/* Actions rapides */
-.actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.action-btn{
-  display:flex;flex-direction:column;align-items:flex-start;gap:4px;
-  padding:12px;border:0.5px solid var(--border2);border-radius:8px;
-  background:var(--bg2);cursor:pointer;transition:var(--trans);text-align:left;
-  font-family:var(--font);
-}
-.action-btn:hover{border-color:var(--blue);background:var(--bg3);}
-.action-btn svg{color:var(--blue);opacity:.8;}
-.action-btn:hover svg{opacity:1;}
-.action-label{font-size:11px;font-weight:500;color:var(--text);line-height:1.3;}
-
-/* Stats compactes */
-.dash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:0.5px solid var(--border2);}
-.dash-stat{padding:10px 14px;text-align:center;border-right:0.5px solid var(--border2);}
-.dash-stat:last-child{border-right:none;}
-.dash-stat-val{font-size:20px;font-weight:500;color:var(--navy);}
-.dash-stat-label{font-size:9px;color:var(--text3);margin-top:1px;}
-
-/* Compat ancienne CSS */
+.affaire-row:last-child{border:none;}
+.affaire-row:hover{opacity:.8;}
 .affaire-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0;}
+.affaire-dot.orange{background:var(--amber);}
+.affaire-dot.green{background:var(--green);}
 .affaire-name{font-size:11px;color:var(--text);flex:1;}
 .affaire-status{font-size:9px;padding:2px 7px;border-radius:20px;}
 .s-blue{background:var(--blue-lt);color:#1D4ED8;}
 .s-amber{background:var(--amber-lt);color:var(--amber);}
 .s-green{background:var(--green-lt);color:var(--green);}
-.doc-icon-sm{width:24px;height:24px;background:var(--bg3);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;color:var(--blue);flex-shrink:0;}
+.doc-row-dash{
+  display:flex;align-items:center;gap:8px;padding:8px 0;
+  border-bottom:0.5px solid var(--border);
+}
+.doc-row-dash:last-child{border:none;}
+.doc-icon-sm{
+  width:24px;height:24px;background:var(--bg3);border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;font-weight:600;color:var(--blue);flex-shrink:0;
+}
 .doc-name-sm{font-size:11px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .doc-date-sm{font-size:9px;color:var(--text3);}
 
@@ -440,24 +391,24 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   display:flex;align-items:center;justify-content:space-between;
 }
 .aff-main-title{font-size:13px;font-weight:500;color:var(--text);}
-.aff-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px 16px 40px;background:var(--bg2);display:flex;flex-direction:column;gap:12px;}
+.aff-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 14px 60px;background:var(--bg2);display:flex;flex-direction:column;gap:10px;}
 .aff-section{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;}
 .aff-section-hdr{
   padding:9px 14px;border-bottom:0.5px solid var(--border2);background:var(--bg2);
   display:flex;align-items:center;justify-content:space-between;
 }
 .aff-section-title{font-size:11px;font-weight:500;color:var(--text);}
-.aff-section-body{padding:12px 14px;}
+.aff-section-body{padding:12px 14px;overflow-y:auto;}
 
 /* Suivi procédural */
 .proc-track{display:flex;align-items:center;gap:0;padding:12px 0 8px;justify-content:center;}
 .proc-step{display:flex;flex-direction:column;align-items:center;gap:3px;}
-.proc-dot{width:10px;height:10px;border-radius:50%;background:var(--border2);}
+.proc-dot{width:12px;height:12px;border-radius:50%;background:var(--border2);}
 .proc-dot.done{background:var(--blue);}
-.proc-dot.active{background:var(--bg);border:2px solid var(--blue);box-shadow:0 0 0 3px var(--blue-lt);}
-.proc-name{font-size:10px;color:var(--text3);margin-top:4px;}
-.proc-name.done{color:var(--blue);}
-.proc-line{width:48px;height:1.5px;background:var(--border2);margin-bottom:14px;}
+.proc-dot.active{background:var(--bg);border:2.5px solid var(--blue);box-shadow:0 0 0 4px var(--blue-lt);}
+.proc-name{font-size:11px;color:var(--text2);margin-top:5px;font-weight:400;}
+.proc-name.done{color:var(--blue);font-weight:500;}
+.proc-line{width:56px;height:2px;background:var(--border2);margin-bottom:16px;}
 .proc-line.done{background:var(--blue);}
 
 /* Rédaction acte */
@@ -467,10 +418,10 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   cursor:pointer;text-align:center;transition:var(--trans);background:var(--bg2);
 }
 .redac-btn:hover{border-color:var(--blue);background:var(--bg3);}
-.redac-btn-icon{display:flex;align-items:center;justify-content:center;margin-bottom:6px;color:#2563EB;opacity:0.75;}
+.redac-btn-icon{display:flex;align-items:center;justify-content:center;margin-bottom:4px;color:#2563EB;opacity:0.75;}
 .redac-btn:hover .redac-btn-icon{opacity:1;}
-.redac-btn-name{font-size:10px;font-weight:500;color:var(--text);}
-.redac-btn-desc{font-size:9px;color:var(--text3);}
+.redac-btn-name{font-size:9px;font-weight:500;color:var(--text);}
+.redac-btn-desc{font-size:8px;color:var(--text3);}
 
 /* ══ ANALYSE ══════════════════════════════════════════ */
 .analyse-layout{flex:1;display:grid;grid-template-columns:340px 1fr;overflow:hidden;}
@@ -862,103 +813,68 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
     <!-- ── TABLEAU DE BORD ──────────────────────────── -->
     <div class="page active" id="page-dashboard">
       <div class="dash-layout">
-
-        <!-- Salutation -->
-        <div class="dash-top">
-          <div>
-            <div class="dash-greeting" id="dash-greeting">Bonjour, Maître</div>
-            <div class="dash-date" id="dash-date"></div>
-          </div>
-          <button class="btn-sm primary" onclick="creerAffaire()" style="flex-shrink:0;">+ Nouvelle affaire</button>
+        <div class="dash-welcome">
+          <h1 id="dash-greeting">Bonjour, Maître</h1>
+          <p id="dash-date">Chargement...</p>
         </div>
-
-        <!-- Corps -->
-        <div class="dash-body">
-
-          <!-- Colonne gauche : affaires -->
-          <div class="dossiers-wrap">
-            <div class="dossiers-hdr">
-              <span class="dossiers-label">Affaires en cours</span>
-              <span class="dossiers-count" id="dash-dossiers-count">—</span>
+        <div class="dash-grid">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2563EB" stroke-width="1.5">
+                <path d="M2 4h12v10H2zM5 4V2h6v2"/>
+              </svg>
             </div>
-            <div class="dossiers-scroll" id="dash-dossiers-scroll">
-              <div class="dossier-empty">
-                Aucune affaire en cours.<br>Créez votre première affaire pour commencer.
-              </div>
+            <div class="stat-val" id="stat-affaires">0</div>
+            <div class="stat-label">Affaires actives</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2563EB" stroke-width="1.5">
+                <path d="M2 2h4v12H2zM6 2h4v12H6z"/>
+              </svg>
+            </div>
+            <div class="stat-val" id="stat-docs">0</div>
+            <div class="stat-label">Documents indexés</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2563EB" stroke-width="1.5">
+                <path d="M3 12L6 6l3 4 2-3 2 5"/>
+              </svg>
+            </div>
+            <div class="stat-val" id="stat-actes">0</div>
+            <div class="stat-label">Actes générés</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2563EB" stroke-width="1.5">
+                <circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/>
+              </svg>
+            </div>
+            <div class="stat-val" id="stat-convs">0</div>
+            <div class="stat-label">Conversations</div>
+          </div>
+        </div>
+        <div class="dash-row">
+          <div class="dash-card">
+            <div class="dash-card-hdr">
+              <span class="dash-card-title">Affaires en cours</span>
+              <span class="badge badge-blue" id="dash-aff-count">0</span>
+            </div>
+            <div class="dash-card-body" id="dash-affaires-list">
+              <div style="font-size:11px;color:var(--text3);padding:8px 0;">Aucune affaire — créez-en une</div>
             </div>
           </div>
-
-          <!-- Colonne droite -->
-          <div class="dash-right">
-
-            <!-- Dernière session -->
-            <div class="dash-widget">
-              <div class="dash-widget-hdr">
-                <span class="dash-widget-title">Dernière session</span>
-              </div>
-              <div class="dash-widget-body">
-                <div id="dash-session-wrap" class="session-card" style="display:none;">
-                  <div class="session-titre" id="dash-session-titre">—</div>
-                  <div class="session-meta" id="dash-session-meta">—</div>
-                  <button class="session-btn" onclick="reprendreSession()">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                    Reprendre
-                  </button>
-                </div>
-                <div id="dash-session-empty" class="session-empty">
-                  Aucune conversation récente.<br>Ouvrez le chat et posez votre première question.
-                </div>
-              </div>
+          <div class="dash-card">
+            <div class="dash-card-hdr">
+              <span class="dash-card-title">Documents récents</span>
             </div>
-
-            <!-- Actions rapides -->
-            <div class="dash-widget">
-              <div class="dash-widget-hdr">
-                <span class="dash-widget-title">Actions rapides</span>
-              </div>
-              <div class="dash-widget-body">
-                <div class="actions-grid">
-                  <button class="action-btn" onclick="showPage('analyse')">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <span class="action-label">Analyser un dossier</span>
-                  </button>
-                  <button class="action-btn" onclick="showPage('affaires');setTimeout(()=>showRedaction(null),500)">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.5"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
-                    <span class="action-label">Rédiger un acte</span>
-                  </button>
-                  <button class="action-btn" onclick="showPage('comparaison')">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.5"><path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.25C17.25 23.15 21 18.25 21 13V7z"/></svg>
-                    <span class="action-label">Préparer une audience</span>
-                  </button>
-                  <button class="action-btn" onclick="showPage('bibliotheque');setTimeout(()=>document.getElementById('upload-zone-bib').click(),300)">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-                    <span class="action-label">Uploader un document</span>
-                  </button>
-                </div>
-              </div>
+            <div class="dash-card-body" id="dash-docs-list">
+              <div style="font-size:11px;color:var(--text3);padding:8px 0;">Aucun document</div>
             </div>
-
-            <!-- Stats compactes -->
-            <div class="dash-widget">
-              <div class="dash-stats">
-                <div class="dash-stat">
-                  <div class="dash-stat-val" id="stat-docs">0</div>
-                  <div class="dash-stat-label">Documents</div>
-                </div>
-                <div class="dash-stat">
-                  <div class="dash-stat-val" id="stat-affaires">0</div>
-                  <div class="dash-stat-label">Affaires</div>
-                </div>
-                <div class="dash-stat">
-                  <div class="dash-stat-val" id="stat-convs">0</div>
-                  <div class="dash-stat-label">Sessions</div>
-                </div>
-              </div>
-            </div>
-
-          </div><!-- /dash-right -->
-        </div><!-- /dash-body -->
-      </div><!-- /dash-layout -->
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ── BIBLIOTHEQUE ─────────────────────────────── -->
@@ -1377,7 +1293,6 @@ async function init() {
   chargerHistorique();
   await chargerAffaires();
   await chargerStats();
-  await chargerDashboard();
   await chargerDocsBib();
   await chargerContexteMemoire();
   setTimeout(initAllResizers, 100);
@@ -1391,84 +1306,20 @@ function showPage(p) {
   document.getElementById('nav-' + p).classList.add('active');
   if (p === 'bibliotheque') chargerDocsBib();
   if (p === 'affaires') chargerAffaires();
-  if (p === 'dashboard') { chargerStats(); chargerDashboard(); }
+  if (p === 'dashboard') chargerStats();
 }
 
-// ── DASHBOARD v2 ─────────────────────────────────────
-const ETAPES = ['Saisine','Instruction','Audience','Délibéré','Clôture'];
-const ETAPE_ICONS = [
-  '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>',
-  '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
-  '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>',
-  '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
-  '<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
-];
-const ETAPE_ACTIONS = ['Instruire','Continuer','Préparer audience','Attendre délibéré','Clôturer'];
-
+// ── STATS DASHBOARD ──────────────────────────────────
 async function chargerStats() {
   try {
     const r = await apiFetch('/stats');
     if (!r) return;
     document.getElementById('stat-affaires').textContent = r.dossiers || 0;
     document.getElementById('stat-docs').textContent = r.documents || 0;
+    document.getElementById('stat-actes').textContent = 0;
     document.getElementById('stat-convs').textContent = conversations.length;
+    document.getElementById('dash-aff-count').textContent = r.dossiers || 0;
   } catch(e) {}
-}
-
-async function chargerDashboard() {
-  try {
-    const r = await apiFetch('/dossiers') || [];
-    const scroll = document.getElementById('dash-dossiers-scroll');
-    const count  = document.getElementById('dash-dossiers-count');
-    count.textContent = r.length + ' affaire' + (r.length > 1 ? 's' : '');
-
-    if (!r.length) {
-      scroll.innerHTML = '<div class="dossier-empty">Aucune affaire en cours.<br>Créez votre première affaire pour commencer.</div>';
-      return;
-    }
-
-    scroll.innerHTML = '';
-    r.slice(0,15).forEach((a, idx) => {
-      const etapeIdx = Math.min(a.etape_index || 1, ETAPES.length - 1);
-      const etape    = ETAPES[etapeIdx];
-      const action   = ETAPE_ACTIONS[etapeIdx];
-      const icon     = ETAPE_ICONS[etapeIdx];
-
-      const card = document.createElement('div');
-      card.className = 'dossier-card' + (AFFAIRE_ACTIVE?.id === a.id ? ' active-card' : '');
-      card.innerHTML =
-        '<div class="dossier-step-dot">'
-        + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.5">' + icon + '</svg>'
-        + '</div>'
-        + '<div class="dossier-info">'
-        + '<div class="dossier-nom">' + a.nom + '</div>'
-        + '<div class="dossier-etape">Étape : ' + etape + '</div>'
-        + '</div>'
-        + '<button class="dossier-action" onclick="event.stopPropagation();selectionnerAffaire(' + JSON.stringify(a).replace(/'/g,"&apos;") + ')">' + action + ' →</button>';
-
-      card.onclick = () => selectionnerAffaire(a);
-      scroll.appendChild(card);
-    });
-  } catch(e) {}
-
-  // Dernière session
-  try {
-    const convs = JSON.parse(localStorage.getItem('od_convs') || '[]');
-    if (convs.length) {
-      const last = convs[0];
-      document.getElementById('dash-session-wrap').style.display = 'flex';
-      document.getElementById('dash-session-empty').style.display = 'none';
-      document.getElementById('dash-session-titre').textContent = last.titre || 'Conversation';
-      document.getElementById('dash-session-meta').textContent = last.date || '';
-    }
-  } catch(e) {}
-}
-
-function reprendreSession() {
-  const convs = JSON.parse(localStorage.getItem('od_convs') || '[]');
-  if (convs.length) {
-    chargerConversation(convs[0]);
-  }
 }
 
 // ── AFFAIRES ─────────────────────────────────────────
@@ -1523,6 +1374,25 @@ async function chargerAffaires() {
         + '</div>';
     }).join('');
   } catch(e) {}
+}
+
+async function supprimerAffaire(id, nom) {
+  if (!window.confirm("Supprimer cette affaire ? Action irréversible.")) return;
+  try {
+    const r = await apiFetch('/dossiers/' + id, 'DELETE');
+    showToast('Affaire supprimée');
+    if (AFFAIRE_ACTIVE?.id === id) {
+      AFFAIRE_ACTIVE = null;
+      document.getElementById('hdr-dossier').style.display = 'none';
+      document.getElementById('aff-body').innerHTML = '<div class="result-empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><div style="font-size:13px;font-weight:500;color:var(--text2);">Aucune affaire sélectionnée</div></div>';
+      document.getElementById('aff-main-title').textContent = 'Sélectionnez une affaire';
+      document.getElementById('btn-aff-upload').style.display = 'none';
+    }
+    await chargerAffaires();
+    await chargerDashboard();
+  } catch(e) {
+    showToast('Erreur suppression : ' + e.message, true);
+  }
 }
 
 async function selectionnerAffaire(a) {
@@ -1580,62 +1450,62 @@ async function chargerCorpsAffaire(a) {
       <div class="aff-section-body">
         <div class="redac-grid" style="grid-template-columns:repeat(3,1fr);">
             <div class="redac-btn" onclick="showRedaction('requete')">
-              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
               <div class="redac-btn-name">Requête introductive</div>
               <div class="redac-btn-desc">Saisine du tribunal</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('conclusions')">
-              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg></div>
+              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg></div>
               <div class="redac-btn-name">Conclusions</div>
               <div class="redac-btn-desc">Mémoire en défense/demande</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('assignation')">
-              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
               <div class="redac-btn-name">Assignation</div>
               <div class="redac-btn-desc">Citation à comparaître</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('mise_en_demeure')">
-              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/></svg></div>
+              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/></svg></div>
               <div class="redac-btn-name">Mise en demeure</div>
               <div class="redac-btn-desc">Sommation préalable</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('contrat')">
-              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg></div>
+              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg></div>
               <div class="redac-btn-name">Contrat</div>
               <div class="redac-btn-desc">Rédaction contractuelle</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('rapport')">
-              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg></div>
+              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg></div>
               <div class="redac-btn-name">Rapport client</div>
               <div class="redac-btn-desc">Compte rendu d'avancement</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('replique')">
-              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg></div>
+              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg></div>
               <div class="redac-btn-name">Mémoire en réplique</div>
               <div class="redac-btn-desc">Réponse aux conclusions adverses</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('refere')">
-              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
               <div class="redac-btn-name">Requête en référé</div>
               <div class="redac-btn-desc">Procédure d'urgence</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('signification')">
-              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
               <div class="redac-btn-name">Acte de signification</div>
               <div class="redac-btn-desc">Notification officielle</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('jurisprudence')">
-              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.25C17.25 23.15 21 18.25 21 13V7z"/></svg></div>
+              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.25C17.25 23.15 21 18.25 21 13V7z"/></svg></div>
               <div class="redac-btn-name">Résumé jurisprudence</div>
               <div class="redac-btn-desc">Note de décision CCJA/OHADA</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('protocole')">
-              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><path d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9a12.02 12.02 0 00-.382-3.016z"/></svg></div>
+              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><path d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9a12.02 12.02 0 00-.382-3.016z"/></svg></div>
               <div class="redac-btn-name">Protocole transactionnel</div>
               <div class="redac-btn-desc">Accord amiable entre parties</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('note_doctrine')">
-              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
+              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
               <div class="redac-btn-name">Note de doctrine</div>
               <div class="redac-btn-desc">Analyse doctrinale OHADA</div>
             </div>
