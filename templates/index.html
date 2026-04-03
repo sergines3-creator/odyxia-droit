@@ -1330,7 +1330,10 @@ async function chargerAffaires() {
     r.slice(0,5).forEach(a => {
       const el = document.createElement('div');
       el.className = 'sb-affaire' + (AFFAIRE_ACTIVE?.id === a.id ? ' active' : '');
-      el.innerHTML = `<div class="sb-dot"></div><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.nom}</span><span class="sb-del" onclick="event.stopPropagation();supprimerAffaire('${a.id}','${a.nom.replace(/'/g,"\'")}')">&#x2715;</span>`;
+      const _sid = a.id, _snom = a.nom.replace(/'/g,"&apos;");
+      el.innerHTML = '<div class="sb-dot"></div>'
+        + '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + a.nom + '</span>'
+        + '<span class="sb-del" onclick="event.stopPropagation();supprimerAffaire(\'' + _sid + '\',\'' + _snom + '\')">&#x2715;</span>';
       el.onclick = () => selectionnerAffaire(a);
       sb.appendChild(el);
     });
@@ -1345,13 +1348,13 @@ async function chargerAffaires() {
     r.forEach(a => {
       const el = document.createElement('div');
       el.className = 'aff-item' + (AFFAIRE_ACTIVE?.id === a.id ? ' active' : '');
-      el.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div class="aff-item-name">${a.nom}</div>
-          <button onclick="event.stopPropagation();supprimerAffaire('${a.id}','${a.nom.replace(/'/g,"\'")}')}" style="background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;padding:2px 6px;border-radius:4px;" onmouseover="this.style.background='var(--red-lt)';this.style.color='var(--red)'" onmouseout="this.style.background='none';this.style.color='var(--text3)'">&#x2715;</button>
-        </div>
-        <div class="aff-item-meta">${a.description || 'Aucune description'}</div>
-        <span class="aff-item-status s-blue">En cours</span>`;
+      const _aid = a.id, _anom = a.nom.replace(/'/g,"&apos;");
+      el.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;">'
+        + '<div class="aff-item-name">' + a.nom + '</div>'
+        + '<button onclick="event.stopPropagation();supprimerAffaire(\'' + _aid + '\',\'' + _anom + '\')" style="background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;padding:2px 6px;">&#x2715;</button>'
+        + '</div>'
+        + '<div class="aff-item-meta">' + (a.description || 'Aucune description') + '</div>'
+        + '<span class="aff-item-status s-blue">En cours</span>';
       el.onclick = () => selectionnerAffaire(a);
       list.appendChild(el);
     });
@@ -1359,12 +1362,11 @@ async function chargerAffaires() {
     // Dashboard
     const dashList = document.getElementById('dash-affaires-list');
     dashList.innerHTML = r.slice(0,4).map(a => {
-      const nom = a.nom || 'Affaire';
-      return '<div class="affaire-row" onclick="showPage(\'affaires\')">'
-           + '<div class="affaire-dot"></div>'
-           + '<div class="affaire-name">' + nom + '</div>'
-           + '<span class="affaire-status s-blue">En cours</span>'
-           + '</div>';
+      return '<div class="affaire-row">'
+        + '<div class="affaire-dot"></div>'
+        + '<div class="affaire-name">' + a.nom + '</div>'
+        + '<span class="affaire-status s-blue">En cours</span>'
+        + '</div>';
     }).join('');
   } catch(e) {}
 }
@@ -1484,7 +1486,30 @@ async function chargerCorpsAffaire(a) {
               <div class="redac-btn-desc">Analyse doctrinale OHADA</div>
             </div>
           </div>
-          <span class="doc-badge ${locked ? 'b-lock' : 'b-ok'}">${locked ? '🔒' : '✓'}</span>`;
+        </div>
+      </div>
+    </div>`;
+}
+
+async function chargerDocsBib() {
+  try {
+    const r = await apiFetch('/liste_documents') || [];
+    document.getElementById('nav-bib-count').textContent = r.length;
+    const list = document.getElementById('bib-docs-list');
+    list.innerHTML = '';
+    if (!r.length) {
+      list.innerHTML = '<div style="padding:8px 14px;font-size:11px;color:var(--text3);">Aucun document</div>';
+    } else {
+      r.forEach(d => {
+        const el = document.createElement('div');
+        el.className = 'doc-item';
+        const locked = d.metadata && d.metadata.sensible;
+        el.innerHTML = '<div class="doc-icon">PDF</div>'
+          + '<div style="flex:1;overflow:hidden;">'
+          + '<div class="doc-name">' + (d.nom || d.filename) + '</div>'
+          + '<div style="font-size:9px;color:var(--text3);">' + (d.status === 'ready' ? 'Indexé' : 'En cours') + ' · ' + (d.storage_tier || 'hot') + '</div>'
+          + '</div>'
+          + '<span class="doc-badge ' + (locked ? 'b-lock' : 'b-ok') + '">' + (locked ? '🔒' : '✓') + '</span>';
         el.onclick = () => afficherDocViewer(d);
         list.appendChild(el);
       });
@@ -1508,7 +1533,7 @@ async function chargerCorpsAffaire(a) {
 function afficherDocViewer(doc) {
   DOC_ACTIF = doc;
   document.querySelectorAll('.doc-item').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll(`[data-doc-id="${doc.id}"]`).forEach(el => el.classList.add('active'));
+  document.querySelectorAll('[data-doc-id="' + doc.id + '"]').forEach(el => el.classList.add('active'));
 
   document.getElementById('bib-doc-title').textContent = doc.nom || doc.filename;
   document.getElementById('btn-carte-mentale').style.display = 'inline-flex';
@@ -1516,23 +1541,26 @@ function afficherDocViewer(doc) {
   document.getElementById('btn-export-bib').style.display    = 'inline-flex';
   document.getElementById('btn-del-bib').style.display       = 'inline-flex';
 
-  document.getElementById('bib-viewer').innerHTML = `
-    <div class="viewer-content">
-      <div class="viewer-meta">
-        <div>
-          <div class="viewer-meta-name">${doc.nom || doc.filename}</div>
-          <div class="viewer-meta-date">${doc.storage_tier || 'hot'} · ${new Date(doc.created_at).toLocaleDateString('fr')}</div>
-        </div>
-        <span class="badge badge-${doc.status === 'ready' ? 'green' : 'amber'}" style="margin-left:auto;">${doc.status === 'ready' ? 'Indexé' : 'En cours'}</span>
-      </div>
-      <p>Document chargé. Utilisez le <strong>chat flottant</strong> pour l'interroger, ou générez un acte depuis l'onglet Affaires.</p>
-      <div class="mind-map-section" id="mind-map-section" style="display:none;">
-        <div class="mind-map-toggle" onclick="toggleCarteMentaleViewer()">
-          🗺 <span id="mm-viewer-lbl">Afficher la carte mentale</span>
-        </div>
-        <div class="mind-map-body" id="mm-viewer-body" style="display:none;"></div>
-      </div>
-    </div>`;
+  const _nom   = doc.nom || doc.filename || '';
+  const _tier  = doc.storage_tier || 'hot';
+  const _date  = doc.created_at ? new Date(doc.created_at).toLocaleDateString('fr') : '';
+  const _badge = doc.status === 'ready' ? 'badge-green' : 'badge-amber';
+  const _label = doc.status === 'ready' ? 'Indexé' : 'En cours';
+  document.getElementById('bib-viewer').innerHTML =
+    '<div class="viewer-content">'
+    + '<div class="viewer-meta">'
+    + '<div>'
+    + '<div class="viewer-meta-name">' + _nom + '</div>'
+    + '<div class="viewer-meta-date">' + _tier + ' · ' + _date + '</div>'
+    + '</div>'
+    + '<span class="badge ' + _badge + '" style="margin-left:auto;">' + _label + '</span>'
+    + '</div>'
+    + '<p>Document charg&eacute;. Utilisez le <strong>chat flottant</strong> pour l\'interroger.</p>'
+    + '<div class="mind-map-section" id="mind-map-section" style="display:none;">'
+    + '<div class="mind-map-toggle" onclick="toggleCarteMentaleViewer()">🗺 <span id="mm-viewer-lbl">Afficher la carte mentale</span></div>'
+    + '<div class="mind-map-body" id="mm-viewer-body" style="display:none;"></div>'
+    + '</div>'
+    + '</div>';
 }
 
 async function afficherCarteMentale() {
@@ -1592,9 +1620,9 @@ function buildMindMapSVG(carte) {
     return line2 ? [line1, line2] : [line1];
   }
 
-  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:${H}px;">
-    <rect x="${cx-100}" y="${cy-16}" width="200" height="32" rx="8" fill="#2563EB"/>
-    <text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="13" font-weight="600" fill="#FFFFFF" font-family="DM Sans,system-ui">${(carte.racine||'').slice(0,26)}</text>`;
+  let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:' + H + 'px;">'
+    + '<rect x="' + (cx-100) + '" y="' + (cy-16) + '" width="200" height="32" rx="8" fill="#2563EB"/>'
+    + '<text x="' + cx + '" y="' + (cy+5) + '" text-anchor="middle" font-size="13" font-weight="600" fill="#FFFFFF" font-family="DM Sans,system-ui">' + (carte.racine||'').slice(0,26) + '</text>';
 
   const leftBranches  = branches.filter((_, i) => i < Math.ceil(n/2));
   const rightBranches = branches.filter((_, i) => i >= Math.ceil(n/2));
@@ -1611,11 +1639,10 @@ function buildMindMapSVG(carte) {
       const lines = wrapText(b.label||'', 22);
       const y1 = by + bh/2 - (lines.length > 1 ? 8 : 0);
 
-      svg += `<line x1="${lx1}" y1="${cy}" x2="${lx2}" y2="${by+bh/2}" stroke="#BFDBFE" stroke-width="1.5"/>
-      <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="7" fill="${cols[ci]}" stroke="#E2E8F0" stroke-width="0.5"/>`;
-
+      svg += '<line x1="' + lx1 + '" y1="' + cy + '" x2="' + lx2 + '" y2="' + (by+bh/2) + '" stroke="#BFDBFE" stroke-width="1.5"/>'
+           + '<rect x="' + bx + '" y="' + by + '" width="' + bw + '" height="' + bh + '" rx="7" fill="' + cols[ci] + '" stroke="#E2E8F0" stroke-width="0.5"/>';
       lines.forEach((line, li) => {
-        svg += `<text x="${bx+bw/2}" y="${y1 + li*16}" text-anchor="middle" dominant-baseline="central" font-size="10.5" font-weight="500" fill="${tcols[ci]}" font-family="DM Sans,system-ui">${line}</text>`;
+        svg += '<text x="' + (bx+bw/2) + '" y="' + (y1+li*16) + '" text-anchor="middle" dominant-baseline="central" font-size="10.5" font-weight="500" fill="' + tcols[ci] + '" font-family="DM Sans,system-ui">' + line + '</text>';
       });
     });
   }
@@ -1647,7 +1674,7 @@ async function uploadFichier(file, dossierId) {
     showLoading(false);
     if (d.succes) {
       const chunks = d.chunks || 0;
-      showToast(`"${file.name}" indexé — ${chunks} passage${chunks > 1 ? 's' : ''} extraits`);
+      showToast('"' + file.name + '" indexé — ' + chunks + ' passage' + (chunks > 1 ? 's' : '') + ' extraits');
       await chargerDocsBib();
       if (dossierId && AFFAIRE_ACTIVE) await chargerCorpsAffaire(AFFAIRE_ACTIVE);
     } else {
@@ -1715,24 +1742,24 @@ async function redigerActe(type, faits) {
       .replace(/\n\n/g,         '</p><p>')
       .replace(/\n/g,           '<br/>');
 
-    document.getElementById('bib-viewer').innerHTML = `
-      <div class="viewer-content">
-        <div class="viewer-meta">
-          <div>
-            <div class="viewer-meta-name">${r.nom || type}</div>
-            <div class="viewer-meta-date">Généré le ${new Date().toLocaleDateString('fr')}</div>
-          </div>
-          <span class="badge badge-blue" style="margin-left:auto;">Généré</span>
-        </div>
-        <p>${html}</p>
-      </div>`;
+    document.getElementById('bib-viewer').innerHTML =
+      '<div class="viewer-content">'
+      + '<div class="viewer-meta">'
+      + '<div>'
+      + '<div class="viewer-meta-name">' + (r.nom || type) + '</div>'
+      + '<div class="viewer-meta-date">Généré le ' + new Date().toLocaleDateString('fr') + '</div>'
+      + '</div>'
+      + '<span class="badge badge-blue" style="margin-left:auto;">Généré</span>'
+      + '</div>'
+      + '<p>' + html + '</p>'
+      + '</div>';
     document.getElementById('bib-doc-title').textContent = r.nom || type;
     document.getElementById('btn-export-bib').style.display = 'inline-flex';
 
     const genEl = document.getElementById('bib-generes-list');
     const docEl = document.createElement('div');
     docEl.className = 'doc-item active';
-    docEl.innerHTML = `<div class="doc-icon">GEN</div><div class="doc-name">${r.nom||type}</div><span class="doc-badge badge-blue">Généré</span>`;
+    docEl.innerHTML = '<div class="doc-icon">GEN</div><div class="doc-name">' + (r.nom||type) + '</div><span class="doc-badge badge-blue">Généré</span>';
     genEl.appendChild(docEl);
     showToast('Acte rédigé');
   } catch(e) {
@@ -1790,14 +1817,13 @@ async function lancerAnalyse() {
   // Mise à jour indicateur
   document.querySelectorAll('.fsi-dot').forEach(d => d.classList.add('active'));
 
-  const prompt_complet = `[Analyse ${SELECTED_DOMAIN}]
-Parties : ${dem || 'Non précisé'} c/ ${def || 'Non précisé'}
-Faits : ${faits}
-Textes invoqués : ${textes || 'Non précisés'}
-Enjeu : ${enjeu || 'Non précisé'}
-Question : ${q}
-
-Répondez de façon détaillée et conversationnelle, en développant l'analyse juridique, la qualification des faits, les risques et la stratégie recommandée. Citez les textes applicables et la jurisprudence OHADA/CEMAC pertinente.`;
+  const prompt_complet = '[Analyse ' + SELECTED_DOMAIN + ']\n'
+    + 'Parties : ' + (dem || 'Non précisé') + ' c/ ' + (def || 'Non précisé') + '\n'
+    + 'Faits : ' + faits + '\n'
+    + 'Textes invoqués : ' + (textes || 'Non précisés') + '\n'
+    + 'Enjeu : ' + (enjeu || 'Non précisé') + '\n'
+    + 'Question : ' + q + '\n\n'
+    + 'Répondez de façon détaillée et conversationnelle, en développant l\'analyse juridique, la qualification des faits, les risques et la stratégie recommandée. Citez les textes applicables et la jurisprudence OHADA/CEMAC pertinente.';
 
   try {
     const r = await apiFetch('/question', 'POST', {
@@ -1808,23 +1834,22 @@ Répondez de façon détaillée et conversationnelle, en développant l'analyse 
     const reponse = r.reponse || '';
     const sources = r.sources || [];
 
-    result.innerHTML = `
-      <div class="result-card">
-        <div class="result-card-hdr">
-          <span class="result-card-title">Analyse — ${SELECTED_DOMAIN}</span>
-          <div style="display:flex;gap:6px;">
-            <span class="badge badge-blue">${SELECTED_DOMAIN.toUpperCase()}</span>
-            <button class="btn-sm" onclick="exporterAnalyse()">Exporter PDF</button>
-          </div>
-        </div>
-        <div class="result-card-body" id="analyse-result-text">
-          ${reponse.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br/>')}
-          ${sources.length ? '<div class="sources-row">' + sources.map(s=>`<span class="source-chip">${s}</span>`).join('') + '</div>' : ''}
-        </div>
-      </div>`;
+    const _reponse_html = reponse.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br/>');
+    const _sources_html = sources.length ? '<div class="sources-row">' + sources.map(s => '<span class="source-chip">' + s + '</span>').join('') + '</div>' : '';
+    result.innerHTML =
+      '<div class="result-card">'
+      + '<div class="result-card-hdr">'
+      + '<span class="result-card-title">Analyse — ' + SELECTED_DOMAIN + '</span>'
+      + '<div style="display:flex;gap:6px;">'
+      + '<span class="badge badge-blue">' + SELECTED_DOMAIN.toUpperCase() + '</span>'
+      + '<button class="btn-sm" onclick="exporterAnalyse()">Exporter PDF</button>'
+      + '</div></div>'
+      + '<div class="result-card-body" id="analyse-result-text">'
+      + _reponse_html + _sources_html
+      + '</div></div>';
   } catch(e) {
     showLoading(false);
-    result.innerHTML = `<div class="result-empty"><div>Erreur : ${e.message}</div></div>`;
+    result.innerHTML = '<div class="result-empty"><div>Erreur : ' + e.message + '</div></div>';
   }
 }
 
@@ -1876,12 +1901,11 @@ async function uploadDecision(file) {
       const list = document.getElementById('decisions-list');
       const el = document.createElement('div');
       el.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--bg);border:0.5px solid var(--border2);border-radius:5px;';
-      el.innerHTML = `
-        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="var(--green)" stroke-width="1.5"><path d="M2 2h4v12H2zM6 2h4v12H6z"/></svg>
-        <span style="font-size:10px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${file.name}</span>
-        <span style="font-size:9px;color:var(--green);">✓ ${manuscrit ? 'OCR' : 'Indexé'}</span>`;
+      el.innerHTML = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="var(--green)" stroke-width="1.5"><path d="M2 2h4v12H2zM6 2h4v12H6z"/></svg>'
+        + '<span style="font-size:10px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + file.name + '</span>'
+        + '<span style="font-size:9px;color:var(--green);">✓ ' + (manuscrit ? 'OCR' : 'Indexé') + '</span>';
       list.appendChild(el);
-      showToast(`Décision "${file.name}" indexée`);
+      showToast('Décision "' + file.name + '" indexée');
     } else {
       showToast('Erreur : ' + (d.erreur || 'Upload échoué'), true);
     }
@@ -1919,64 +1943,37 @@ async function lancerComparaison() {
     const initiales = (juge || jurid).split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
 
     if (!r.succes && !decisions.length) {
-      result.innerHTML = `
-        <div class="result-card">
-          <div class="result-card-hdr"><span class="result-card-title">Analyse basée sur votre dossier</span></div>
-          <div class="result-card-body">
-            <p>Aucune décision antérieure trouvée pour <strong>${juge || jurid}</strong>. L'analyse se base sur votre description et les tendances jurisprudentielles OHADA/CEMAC.</p>
-            <p style="margin-top:10px;"><strong>Votre affaire :</strong> ${affaire}</p>
-            ${args ? `<p><strong>Arguments :</strong> ${args}</p>` : ''}
-            ${ant ? `<p><strong>Antécédents :</strong> ${ant}</p>` : ''}
-          </div>
-        </div>`;
+      result.innerHTML =
+        '<div class="result-card">'
+        + '<div class="result-card-hdr"><span class="result-card-title">Analyse basée sur votre dossier</span></div>'
+        + '<div class="result-card-body">'
+        + '<p>Aucune décision antérieure trouvée pour <strong>' + (juge || jurid) + '</strong>. L\'analyse se base sur votre description.</p>'
+        + '<p style="margin-top:10px;"><strong>Votre affaire :</strong> ' + affaire + '</p>'
+        + (args ? '<p><strong>Arguments :</strong> ' + args + '</p>' : '')
+        + (ant  ? '<p><strong>Antécédents :</strong> ' + ant + '</p>' : '')
+        + '</div></div>';
     } else {
       const taux = analyse.taux_favorabilite || Math.round((decisions.filter(d=>d.issue==='favorable').length / Math.max(decisions.length,1)) * 100);
-      result.innerHTML = `
-        <div class="juge-profile-card">
-          <div class="juge-profile-hdr">
-            <div class="juge-avatar">${initiales}</div>
-            <div>
-              <div class="juge-name">${juge || jurid}</div>
-              <div class="juge-meta">${jurid || ''}${chambre ? ' · ' + chambre : ''}${domaine ? ' · ' + domaine : ''}</div>
-            </div>
-          </div>
-          <div class="juge-stats">
-            <div class="juge-stat">
-              <div class="juge-stat-val">${decisions.length}</div>
-              <div class="juge-stat-label">Décisions</div>
-            </div>
-            <div class="juge-stat">
-              <div class="juge-stat-val" style="color:var(--blue);">${taux}%</div>
-              <div class="juge-stat-label">Taux favorable</div>
-              <div class="prog-bar"><div class="prog-fill" style="width:${taux}%"></div></div>
-            </div>
-            <div class="juge-stat">
-              <div class="juge-stat-val">${decisions.filter(d=>d.issue==='defavorable').length}</div>
-              <div class="juge-stat-label">Défavorables</div>
-            </div>
-          </div>
-          ${analyse.synthese ? `<div style="padding:12px 14px;font-size:12px;color:var(--text);line-height:1.7;border-bottom:0.5px solid var(--border2);">${analyse.synthese}</div>` : ''}
-          <div style="padding:10px 14px;">
-            <div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">Stratégie recommandée pour votre affaire</div>
-            <div style="font-size:12px;color:var(--text);line-height:1.7;">
-              ${affaire ? `Compte tenu du profil décisionnel et de votre affaire (<em>${affaire.slice(0,100)}...</em>), privilégiez une argumentation axée sur les textes OHADA et la jurisprudence CCJA. ${taux > 60 ? 'Ce juge tend à être favorable dans ce domaine.' : 'Préparez des arguments solides — ce juge est exigeant.'}` : ''}
-            </div>
-          </div>
-        </div>
-
-        ${decisions.length ? `
-        <div class="result-card">
-          <div class="result-card-hdr"><span class="result-card-title">Décisions antérieures</span><span class="badge badge-blue">${decisions.length}</span></div>
-          <div class="result-card-body" style="display:flex;flex-direction:column;gap:8px;">
-            ${decisions.slice(0,5).map(d => {
-              const cls = d.issue==='favorable'?'i-fav':d.issue==='defavorable'?'i-def':'i-par';
-              return '<div class="dec-item"><div class="dec-issue ' + cls + '">' + (d.issue||'—') + '</div>'
-                   + '<div><div class="dec-title">' + (d.titre||'Décision') + '</div>'
-                   + '<div class="dec-meta">' + (d.juridiction||'') + ' · ' + (d.date_dec||'') + ' · ' + (d.reference||'') + '</div>'
-                   + '</div></div>';
-            }).join('')}
-          </div>
-        </div>` : ''}`;
+      const _synthese = analyse.synthese ? '<div style="padding:12px 14px;font-size:12px;color:var(--text);line-height:1.7;border-bottom:0.5px solid var(--border2);">' + analyse.synthese + '</div>' : '';
+      const _strategie = affaire ? 'Compte tenu du profil décisionnel et de votre affaire (<em>' + affaire.slice(0,100) + '...</em>), privilégiez une argumentation axée sur les textes OHADA et la jurisprudence CCJA. ' + (taux > 60 ? 'Ce juge tend à être favorable dans ce domaine.' : 'Préparez des arguments solides — ce juge est exigeant.') : '';
+      const _decisions_html = decisions.length ? '<div class="result-card"><div class="result-card-hdr"><span class="result-card-title">Décisions antérieures</span><span class="badge badge-blue">' + decisions.length + '</span></div><div class="result-card-body" style="display:flex;flex-direction:column;gap:8px;">'
+        + decisions.slice(0,5).map(d => {
+            const cls = d.issue==='favorable'?'i-fav':d.issue==='defavorable'?'i-def':'i-par';
+            return '<div class="dec-item"><div class="dec-issue ' + cls + '">' + (d.issue||'—') + '</div><div><div class="dec-title">' + (d.titre||'Décision') + '</div><div class="dec-meta">' + (d.juridiction||'') + ' · ' + (d.date_dec||'') + '</div></div></div>';
+          }).join('')
+        + '</div></div>' : '';
+      result.innerHTML =
+        '<div class="juge-profile-card">'
+        + '<div class="juge-profile-hdr"><div class="juge-avatar">' + initiales + '</div><div><div class="juge-name">' + (juge || jurid) + '</div><div class="juge-meta">' + (jurid||'') + (chambre?' · '+chambre:'') + (domaine?' · '+domaine:'') + '</div></div></div>'
+        + '<div class="juge-stats">'
+        + '<div class="juge-stat"><div class="juge-stat-val">' + decisions.length + '</div><div class="juge-stat-label">Décisions</div></div>'
+        + '<div class="juge-stat"><div class="juge-stat-val" style="color:var(--blue);">' + taux + '%</div><div class="juge-stat-label">Taux favorable</div><div class="prog-bar"><div class="prog-fill" style="width:' + taux + '%"></div></div></div>'
+        + '<div class="juge-stat"><div class="juge-stat-val">' + decisions.filter(d=>d.issue==='defavorable').length + '</div><div class="juge-stat-label">Défavorables</div></div>'
+        + '</div>'
+        + _synthese
+        + '<div style="padding:10px 14px;"><div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">Stratégie recommandée</div><div style="font-size:12px;color:var(--text);line-height:1.7;">' + _strategie + '</div></div>'
+        + '</div>'
+        + _decisions_html;
     }
 
     if (affaire) {
@@ -2120,7 +2117,7 @@ function renderMsg(el, txt, sources) {
     .replace(/\n\n/g, '</p><p>')
     .replace(/\n/g, '<br/>');
   if (sources.length) {
-    html += '<div class="sources-row">' + [...new Set(sources)].map(s=>`<span class="source-chip">${s}</span>`).join('') + '</div>';
+    html += '<div class="sources-row">' + [...new Set(sources)].map(s => '<span class="source-chip">' + s + '</span>').join('') + '</div>';
   }
   el.innerHTML = html;
   box.scrollTop = box.scrollHeight;
@@ -2170,7 +2167,7 @@ function chargerHistorique() {
   conversations.forEach((c,i) => {
     const el = document.createElement('div');
     el.className = 'hist-item' + (c.id === SESSION_ID ? ' active' : '');
-    el.innerHTML = `<div class="hist-title">${c.titre||'Conversation'}</div><div class="hist-date">${c.date||''}</div>`;
+    el.innerHTML = '<div class="hist-title">' + (c.titre||'Conversation') + '</div><div class="hist-date">' + (c.date||'') + '</div>';
     el.onclick = () => chargerConversation(c);
     hist.appendChild(el);
   });
