@@ -36,7 +36,7 @@
   --trans:    all .18s ease;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:14px;line-height:1.6;height:100vh;overflow:hidden;}
+body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:13px;line-height:1.6;height:100vh;overflow:hidden;}
 
 /* ══ SPLASH ══════════════════════════════════════════ */
 #splash {
@@ -182,7 +182,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 }
 .nav-item{
   display:flex;align-items:center;gap:10px;padding:9px 14px;
-  font-size:12px;color:#737373;cursor:pointer;
+  font-size:13px;color:#737373;cursor:pointer;
   transition:var(--trans);border-left:2px solid transparent;user-select:none;
   border-radius:0;
 }
@@ -198,7 +198,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .sb-sep{height:0.5px;background:#EBEBEB;margin:6px 14px;}
 .sb-affaire{
   display:flex;align-items:center;gap:8px;padding:6px 14px;
-  font-size:11px;color:#737373;cursor:pointer;transition:var(--trans);
+  font-size:13px;color:#737373;cursor:pointer;transition:var(--trans);
 }
 .sb-affaire:hover{background:#F0F0F0;color:#0A0A0A;}
 .sb-affaire:hover .sb-del{display:flex;}
@@ -209,7 +209,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .sb-del:hover{background:#FEE2E2;color:#DC2626;}
 .btn-new-affaire{
   margin:6px 14px;padding:7px 12px;border:0.5px dashed #D4D4D4;
-  border-radius:var(--r);font-size:11px;color:#737373;
+  border-radius:var(--r);font-size:13px;color:#737373;
   cursor:pointer;text-align:center;transition:var(--trans);background:transparent;
   font-family:var(--font);
 }
@@ -544,7 +544,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
 #chat-panel{
   position:fixed;bottom:80px;right:24px;
-  width:440px;height:560px;
+  width:380px;height:500px;
   background:var(--bg);border:0.5px solid var(--border2);
   border-radius:var(--r-lg);display:none;flex-direction:column;
   z-index:400;overflow:hidden;
@@ -808,16 +808,6 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
       <div class="sb-label">Affaires récentes</div>
       <div id="affaires-sidebar"></div>
       <button class="btn-new-affaire" onclick="creerAffaire()">+ Nouvelle affaire</button>
-    </div>
-    <div style="padding:12px 14px;border-top:0.5px solid #EBEBEB;display:flex;align-items:center;gap:10px;margin-top:auto;">
-      <div style="width:30px;height:30px;border-radius:50%;background:#E5E5E5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#525252;flex-shrink:0;" id="sb-avatar-initiales">M</div>
-      <div style="min-width:0;flex:1;">
-        <div style="font-size:11px;font-weight:500;color:#0A0A0A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="sb-user-nom">Maître</div>
-        <div style="font-size:10px;color:#A3A3A3;">Cabinet Odyxia</div>
-      </div>
-      <div onclick="doLogout()" title="Déconnexion" style="cursor:pointer;flex-shrink:0;padding:4px;border-radius:5px;transition:.2s;" onmouseover="this.style.background='#F0F0F0'" onmouseout="this.style.background='transparent'">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" stroke-width="1.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-      </div>
     </div>
   </div>
 
@@ -1310,17 +1300,6 @@ async function init() {
   await chargerDocsBib();
   await chargerContexteMemoire();
   setTimeout(initAllResizers, 100);
-  // Profil sidebar
-  try {
-    const info = await apiFetch('/me');
-    if (info && info.nom) {
-      const initiales = info.nom.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-      const el = document.getElementById('sb-avatar-initiales');
-      const nm = document.getElementById('sb-user-nom');
-      if (el) el.textContent = initiales;
-      if (nm) nm.textContent = info.nom;
-    }
-  } catch(e) {}
 }
 
 // ── NAVIGATION ───────────────────────────────────────
