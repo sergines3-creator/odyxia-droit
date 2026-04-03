@@ -163,53 +163,57 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
 .hdr-status{font-size:9px;padding:2px 9px;border-radius:20px;background:#14532D;color:#86EFAC;}
 .hdr-avatar{
-  width:26px;height:26px;background:#1E293B;border-radius:50%;
+  width:28px;height:28px;background:rgba(255,255,255,.1);border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  font-size:9px;color:#94A3B8;cursor:pointer;font-weight:500;
+  font-size:9px;color:#CBD5E1;cursor:pointer;font-weight:500;
+  transition:var(--trans);
 }
+.hdr-avatar:hover{background:rgba(255,255,255,.2);}
 
 /* ══ SIDEBAR ══════════════════════════════════════════ */
 .sidebar{
-  background:var(--bg);border-right:0.5px solid var(--border2);
+  background:#FAFAFA;border-right:0.5px solid #EBEBEB;
   display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;
 }
 .sb-section{padding:10px 0 4px;}
 .sb-label{
-  font-size:9px;font-weight:500;color:var(--text3);
+  font-size:9px;font-weight:600;color:#A3A3A3;
   padding:0 14px 4px;letter-spacing:0.8px;text-transform:uppercase;
 }
 .nav-item{
-  display:flex;align-items:center;gap:10px;padding:8px 14px;
-  font-size:12px;color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;gap:10px;padding:9px 14px;
+  font-size:12px;color:#737373;cursor:pointer;
   transition:var(--trans);border-left:2px solid transparent;user-select:none;
+  border-radius:0;
 }
-.nav-item:hover{background:var(--bg2);color:var(--text);}
-.nav-item.active{background:var(--bg3);color:var(--blue);font-weight:500;border-left-color:var(--blue);}
-.nav-icon{width:16px;height:16px;flex-shrink:0;opacity:0.6;}
+.nav-item:hover{background:#F0F0F0;color:#0A0A0A;}
+.nav-item.active{background:#EBEBEB;color:#0A0A0A;font-weight:500;border-left:none;}
+.nav-icon{width:16px;height:16px;flex-shrink:0;opacity:0.4;}
 .nav-item.active .nav-icon{opacity:1;}
 .nav-count{
-  margin-left:auto;font-size:9px;background:var(--blue-lt);
-  color:#1D4ED8;padding:1px 6px;border-radius:10px;
+  margin-left:auto;font-size:9px;background:#E5E5E5;
+  color:#525252;padding:1px 6px;border-radius:10px;
 }
-.sb-sep{height:0.5px;background:var(--border);margin:6px 14px;}
+.nav-item.active .nav-count{background:#0A0A0A;color:#FFFFFF;}
+.sb-sep{height:0.5px;background:#EBEBEB;margin:6px 14px;}
 .sb-affaire{
   display:flex;align-items:center;gap:8px;padding:6px 14px;
-  font-size:11px;color:var(--text2);cursor:pointer;transition:var(--trans);
+  font-size:11px;color:#737373;cursor:pointer;transition:var(--trans);
 }
-.sb-affaire:hover{background:var(--bg2);color:var(--text);}
+.sb-affaire:hover{background:#F0F0F0;color:#0A0A0A;}
 .sb-affaire:hover .sb-del{display:flex;}
-.sb-affaire.active{color:var(--blue);font-weight:500;}
-.sb-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);flex-shrink:0;}
-.sb-affaire.active .sb-dot{background:var(--blue);}
-.sb-del{display:none;margin-left:auto;width:16px;height:16px;align-items:center;justify-content:center;border-radius:3px;font-size:11px;color:var(--text3);}
-.sb-del:hover{background:var(--red-lt);color:var(--red);}
+.sb-affaire.active{color:#0A0A0A;font-weight:500;}
+.sb-dot{width:5px;height:5px;border-radius:50%;background:#D4D4D4;flex-shrink:0;}
+.sb-affaire.active .sb-dot{background:#0A0A0A;}
+.sb-del{display:none;margin-left:auto;width:16px;height:16px;align-items:center;justify-content:center;border-radius:3px;font-size:11px;color:#A3A3A3;}
+.sb-del:hover{background:#FEE2E2;color:#DC2626;}
 .btn-new-affaire{
-  margin:6px 14px;padding:7px 12px;border:0.5px dashed var(--blue-md);
-  border-radius:var(--r);font-size:11px;color:var(--blue);
+  margin:6px 14px;padding:7px 12px;border:0.5px dashed #D4D4D4;
+  border-radius:var(--r);font-size:11px;color:#737373;
   cursor:pointer;text-align:center;transition:var(--trans);background:transparent;
   font-family:var(--font);
 }
-.btn-new-affaire:hover{background:var(--bg3);}
+.btn-new-affaire:hover{background:#F0F0F0;color:#0A0A0A;}
 
 /* ══ MAIN ═════════════════════════════════════════════ */
 .main{display:flex;flex-direction:column;overflow:hidden;}
@@ -254,7 +258,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .s-amber{background:var(--amber-lt);color:var(--amber);}
 .s-green{background:var(--green-lt);color:var(--green);}
 .doc-row-dash{
-  display:flex;align-items:center;gap:8px;padding:8px 0;
+  display:flex;align-items:center;gap:8px;padding:6px 0;
   border-bottom:0.5px solid var(--border);
 }
 .doc-row-dash:last-child{border:none;}
@@ -263,8 +267,8 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   display:flex;align-items:center;justify-content:center;
   font-size:8px;font-weight:600;color:var(--blue);flex-shrink:0;
 }
-.doc-name-sm{font-size:12px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.doc-date-sm{font-size:11px;color:var(--text3);}
+.doc-name-sm{font-size:11px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.doc-date-sm{font-size:9px;color:var(--text3);}
 
 /* ══ BIBLIOTHEQUE ═════════════════════════════════════ */
 .bib-layout{flex:1;display:grid;grid-template-columns:280px 1fr;overflow:hidden;}
@@ -391,24 +395,24 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   display:flex;align-items:center;justify-content:space-between;
 }
 .aff-main-title{font-size:13px;font-weight:500;color:var(--text);}
-.aff-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 14px 60px;background:var(--bg2);display:flex;flex-direction:column;gap:10px;align-items:stretch;}
-.aff-section{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;flex-shrink:0;}
+.aff-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px 16px 40px;background:var(--bg2);display:flex;flex-direction:column;gap:12px;}
+.aff-section{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;}
 .aff-section-hdr{
   padding:9px 14px;border-bottom:0.5px solid var(--border2);background:var(--bg2);
   display:flex;align-items:center;justify-content:space-between;
 }
-.aff-section-title{font-size:12px;font-weight:500;color:var(--text);}
+.aff-section-title{font-size:11px;font-weight:500;color:var(--text);}
 .aff-section-body{padding:12px 14px;}
 
 /* Suivi procédural */
 .proc-track{display:flex;align-items:center;gap:0;padding:12px 0 8px;justify-content:center;}
 .proc-step{display:flex;flex-direction:column;align-items:center;gap:3px;}
-.proc-dot{width:12px;height:12px;border-radius:50%;background:var(--border2);}
+.proc-dot{width:10px;height:10px;border-radius:50%;background:var(--border2);}
 .proc-dot.done{background:var(--blue);}
-.proc-dot.active{background:var(--bg);border:2.5px solid var(--blue);box-shadow:0 0 0 4px var(--blue-lt);}
-.proc-name{font-size:11px;color:var(--text2);margin-top:5px;font-weight:400;}
-.proc-name.done{color:var(--blue);font-weight:500;}
-.proc-line{width:56px;height:2px;background:var(--border2);margin-bottom:16px;}
+.proc-dot.active{background:var(--bg);border:2px solid var(--blue);box-shadow:0 0 0 3px var(--blue-lt);}
+.proc-name{font-size:10px;color:var(--text3);margin-top:4px;}
+.proc-name.done{color:var(--blue);}
+.proc-line{width:48px;height:1.5px;background:var(--border2);margin-bottom:14px;}
 .proc-line.done{background:var(--blue);}
 
 /* Rédaction acte */
@@ -418,10 +422,10 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   cursor:pointer;text-align:center;transition:var(--trans);background:var(--bg2);
 }
 .redac-btn:hover{border-color:var(--blue);background:var(--bg3);}
-.redac-btn-icon{display:flex;align-items:center;justify-content:center;margin-bottom:4px;color:#2563EB;opacity:0.75;}
+.redac-btn-icon{display:flex;align-items:center;justify-content:center;margin-bottom:6px;color:#2563EB;opacity:0.75;}
 .redac-btn:hover .redac-btn-icon{opacity:1;}
-.redac-btn-name{font-size:11px;font-weight:500;color:var(--text);}
-.redac-btn-desc{font-size:10px;color:var(--text3);}
+.redac-btn-name{font-size:10px;font-weight:500;color:var(--text);}
+.redac-btn-desc{font-size:9px;color:var(--text3);}
 
 /* ══ ANALYSE ══════════════════════════════════════════ */
 .analyse-layout{flex:1;display:grid;grid-template-columns:340px 1fr;overflow:hidden;}
@@ -804,6 +808,16 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
       <div class="sb-label">Affaires récentes</div>
       <div id="affaires-sidebar"></div>
       <button class="btn-new-affaire" onclick="creerAffaire()">+ Nouvelle affaire</button>
+    </div>
+    <div style="padding:12px 14px;border-top:0.5px solid #EBEBEB;display:flex;align-items:center;gap:10px;margin-top:auto;">
+      <div style="width:30px;height:30px;border-radius:50%;background:#E5E5E5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#525252;flex-shrink:0;" id="sb-avatar-initiales">M</div>
+      <div style="min-width:0;flex:1;">
+        <div style="font-size:11px;font-weight:500;color:#0A0A0A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="sb-user-nom">Maître</div>
+        <div style="font-size:10px;color:#A3A3A3;">Cabinet Odyxia</div>
+      </div>
+      <div onclick="doLogout()" title="Déconnexion" style="cursor:pointer;flex-shrink:0;padding:4px;border-radius:5px;transition:.2s;" onmouseover="this.style.background='#F0F0F0'" onmouseout="this.style.background='transparent'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" stroke-width="1.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      </div>
     </div>
   </div>
 
@@ -1296,6 +1310,17 @@ async function init() {
   await chargerDocsBib();
   await chargerContexteMemoire();
   setTimeout(initAllResizers, 100);
+  // Profil sidebar
+  try {
+    const info = await apiFetch('/me');
+    if (info && info.nom) {
+      const initiales = info.nom.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+      const el = document.getElementById('sb-avatar-initiales');
+      const nm = document.getElementById('sb-user-nom');
+      if (el) el.textContent = initiales;
+      if (nm) nm.textContent = info.nom;
+    }
+  } catch(e) {}
 }
 
 // ── NAVIGATION ───────────────────────────────────────
@@ -1376,25 +1401,6 @@ async function chargerAffaires() {
   } catch(e) {}
 }
 
-async function supprimerAffaire(id, nom) {
-  if (!window.confirm("Supprimer cette affaire ? Action irréversible.")) return;
-  try {
-    const r = await apiFetch('/dossiers/' + id, 'DELETE');
-    showToast('Affaire supprimée');
-    if (AFFAIRE_ACTIVE?.id === id) {
-      AFFAIRE_ACTIVE = null;
-      document.getElementById('hdr-dossier').style.display = 'none';
-      document.getElementById('aff-body').innerHTML = '<div class="result-empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><div style="font-size:13px;font-weight:500;color:var(--text2);">Aucune affaire sélectionnée</div></div>';
-      document.getElementById('aff-main-title').textContent = 'Sélectionnez une affaire';
-      document.getElementById('btn-aff-upload').style.display = 'none';
-    }
-    await chargerAffaires();
-    await chargerDashboard();
-  } catch(e) {
-    showToast('Erreur suppression : ' + e.message, true);
-  }
-}
-
 async function selectionnerAffaire(a) {
   AFFAIRE_ACTIVE = a;
   document.getElementById('hdr-dossier').style.display = 'flex';
@@ -1438,74 +1444,74 @@ async function chargerCorpsAffaire(a) {
         <span class="aff-section-title">Pièces du dossier</span>
         <span class="badge badge-blue">${docs.length} fichier(s)</span>
       </div>
-      <div class="aff-section-body" id="aff-docs-body" style="min-height:48px;">
+      <div class="aff-section-body" id="aff-docs-body">
         ${docs.length ? docs.map(d => '<div class="doc-row-dash"><div class="doc-icon-sm">PDF</div><div class="doc-name-sm">' + (d.nom||d.filename) + '</div><span class="doc-date-sm">' + (d.created_at ? new Date(d.created_at).toLocaleDateString('fr') : '') + '</span></div>').join('') : '<div style="font-size:11px;color:var(--text3);">Aucune pièce — ajoutez des documents</div>'}
       </div>
     </div>
 
-    <div class="aff-section" style="flex-shrink:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;">
-      <div class="aff-section-hdr" style="flex-shrink:0;">
+    <div class="aff-section">
+      <div class="aff-section-hdr">
         <span class="aff-section-title">Rédiger un acte</span>
       </div>
-      <div class="aff-section-body" style="overflow-y:auto;padding-bottom:24px;">
+      <div class="aff-section-body">
         <div class="redac-grid" style="grid-template-columns:repeat(3,1fr);">
             <div class="redac-btn" onclick="showRedaction('requete')">
-              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
               <div class="redac-btn-name">Requête introductive</div>
               <div class="redac-btn-desc">Saisine du tribunal</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('conclusions')">
-              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg></div>
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg></div>
               <div class="redac-btn-name">Conclusions</div>
               <div class="redac-btn-desc">Mémoire en défense/demande</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('assignation')">
-              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
               <div class="redac-btn-name">Assignation</div>
               <div class="redac-btn-desc">Citation à comparaître</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('mise_en_demeure')">
-              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/></svg></div>
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/></svg></div>
               <div class="redac-btn-name">Mise en demeure</div>
               <div class="redac-btn-desc">Sommation préalable</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('contrat')">
-              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg></div>
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg></div>
               <div class="redac-btn-name">Contrat</div>
               <div class="redac-btn-desc">Rédaction contractuelle</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('rapport')">
-              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg></div>
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg></div>
               <div class="redac-btn-name">Rapport client</div>
               <div class="redac-btn-desc">Compte rendu d'avancement</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('replique')">
-              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg></div>
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg></div>
               <div class="redac-btn-name">Mémoire en réplique</div>
               <div class="redac-btn-desc">Réponse aux conclusions adverses</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('refere')">
-              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
               <div class="redac-btn-name">Requête en référé</div>
               <div class="redac-btn-desc">Procédure d'urgence</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('signification')">
-              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
               <div class="redac-btn-name">Acte de signification</div>
               <div class="redac-btn-desc">Notification officielle</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('jurisprudence')">
-              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.25C17.25 23.15 21 18.25 21 13V7z"/></svg></div>
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.25C17.25 23.15 21 18.25 21 13V7z"/></svg></div>
               <div class="redac-btn-name">Résumé jurisprudence</div>
               <div class="redac-btn-desc">Note de décision CCJA/OHADA</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('protocole')">
-              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><path d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9a12.02 12.02 0 00-.382-3.016z"/></svg></div>
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><path d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9a12.02 12.02 0 00-.382-3.016z"/></svg></div>
               <div class="redac-btn-name">Protocole transactionnel</div>
               <div class="redac-btn-desc">Accord amiable entre parties</div>
             </div>
             <div class="redac-btn" onclick="showRedaction('note_doctrine')">
-              <div class="redac-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
               <div class="redac-btn-name">Note de doctrine</div>
               <div class="redac-btn-desc">Analyse doctrinale OHADA</div>
             </div>
