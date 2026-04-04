@@ -392,16 +392,25 @@ def log_security_event(event_type: str, tenant_id: str = None,
         print(f"[SECURITY] Erreur : {e}")
 
 
-# ─── ROUTES PRINCIPALES ───────────────────────────────────────────────────────
+# ─── ROUTES PUBLIQUES ─────────────────────────────────────────────────────────
 
 @app.route("/")
-def index():
+def landing():
+    return render_template("landing.html")
+
+@app.route("/cgu")
+def cgu():
+    return render_template("cgu.html")
+
+@app.route("/login")
+def login_page():
     return render_template("index.html",
         cabinet_nom=CABINET_NOM,
         cabinet_avocat=CABINET_AVOCAT,
         cabinet_ville=CABINET_VILLE
     )
 
+# ─── ROUTES PRINCIPALES ───────────────────────────────────────────────────────
 
 @app.route("/setup-2fa-page")
 def setup_2fa_page():
@@ -1799,6 +1808,33 @@ def creer_dossier():
         return jsonify({"succes": True, "id": dossier_id, "nom": nom})
     except Exception as e:
         return jsonify({"erreur": str(e)}), 500
+
+
+
+@app.route("/dossiers/<dossier_id>", methods=["DELETE"])
+@jwt_required()
+def supprimer_dossier(dossier_id):
+    try:
+        tenant_id = get_current_tenant_id()
+        # Vérifier que le dossier appartient au tenant
+        check = supabase.table("dossiers").select("id").eq(
+            "id", dossier_id
+        ).eq("tenant_id", tenant_id).execute()
+        if not check.data:
+            return jsonify({"erreur": "Dossier introuvable"}), 404
+        # Supprimer les documents liés
+        supabase.table("documents").delete().eq(
+            "dossier_id", dossier_id
+        ).eq("tenant_id", tenant_id).execute()
+        # Supprimer le dossier
+        supabase.table("dossiers").delete().eq(
+            "id", dossier_id
+        ).eq("tenant_id", tenant_id).execute()
+        audit_log("supprimer_dossier", {"dossier_id": dossier_id})
+        return jsonify({"succes": True})
+    except Exception as e:
+        return jsonify({"erreur": str(e)}), 500
+
 
 @app.route("/dossiers/<dossier_id>", methods=["PUT"])
 @jwt_required()
