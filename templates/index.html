@@ -34,6 +34,8 @@
   --sidebar:  220px;
   --header:   48px;
   --trans:    all .18s ease;
+  --or:       #C9A84C;
+  --or-lt:    #F5E6C0;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:13px;line-height:1.6;height:100vh;overflow:hidden;}
@@ -70,7 +72,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   to{opacity:1;filter:blur(0);}
 }
 .splash-droit {
-  font-family:var(--font);font-size:18px;font-weight:300;color:#0A0A0A;
+  font-family:var(--font);font-size:18px;font-weight:300;color:var(--or);
   opacity:0;transform:translateX(20px);
   animation:droitReveal .8s ease 1.8s forwards;
   letter-spacing:2px;text-transform:uppercase;
@@ -216,6 +218,9 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   font-family:var(--font);
 }
 .btn-new-affaire:hover{background:#1C1C1C;color:#D4D4D4;}
+/* Scroll sidebar affaires récentes */
+#affaires-sidebar{overflow-y:auto;max-height:200px;}
+
 
 /* ══ MAIN ═════════════════════════════════════════════ */
 .main{display:flex;flex-direction:column;overflow:hidden;}
@@ -330,6 +335,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   font-size:11px;padding:5px 12px;border-radius:6px;cursor:pointer;
   font-family:var(--font);transition:var(--trans);border:0.5px solid #E5E5E5;
   background:var(--bg);color:var(--text2);
+  display:inline-flex;align-items:center;gap:5px;
 }
 .btn-sm:hover{background:var(--bg2);}
 .btn-sm.primary{background:#0A0A0A;color:#fff;border-color:#0A0A0A;}
@@ -869,7 +875,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .aff-v3-del:hover{background:#FEE2E2;color:#DC2626;}
 .aff-v3-empty-sidebar{padding:20px 12px;text-align:center;font-size:12px;color:#A3A3A3;line-height:1.6;}
 /* Page affaire */
-.aff-v3-main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#F5F5F5;}
+.aff-v3-main{display:flex;flex-direction:column;overflow:hidden;background:#F5F5F5;}
 .aff-v3-main-hdr{
   padding:12px 16px;background:#fff;border-bottom:0.5px solid #E5E5E5;
   display:flex;align-items:center;gap:10px;flex-shrink:0;
@@ -953,7 +959,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">
-      <div style="font-family:var(--serif);font-size:22px;font-weight:500;color:#0A0A0A;letter-spacing:-0.3px;">Odyxia <span style="font-weight:300;color:#525252;">Droit</span></div>
+      <div style="font-family:var(--serif);font-size:22px;font-weight:500;color:#0A0A0A;letter-spacing:-0.3px;">Odyxia <span style="font-weight:300;color:var(--or);">Droit</span></div>
     </div>
     <label class="login-label">Mot de passe</label>
     <input class="login-input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
@@ -975,7 +981,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   <!-- Header -->
   <div class="hdr">
     <div class="hdr-logo">
-      <div class="hdr-icon" style="background:#3A3A3A;color:#A3A3A3;font-size:10px;">OD</div>
+      <div class="hdr-icon" style="background:#2A2A2A;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" stroke-width="1.5" stroke-linecap="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9 12h6M12 9v6"/></svg></div>
       <div>
         <div class="hdr-avocat" id="hdr-avocat">{{ cabinet_avocat }}</div>
       </div>
@@ -1137,10 +1143,9 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
             <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#A3A3A3" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="10" y1="10" x2="14" y2="14"/></svg>
             <input type="text" id="bib-search" placeholder="Rechercher un document..." oninput="filtrerDocs(this.value)"/>
           </div>
-          <button class="btn-sm" id="btn-carte-mentale" onclick="afficherCarteMentale()" style="display:none;">🗺 Carte mentale</button>
-          <button class="btn-sm" id="btn-rediger-bib" onclick="showRedaction(null)" style="display:none;">Rédiger un acte</button>
-          <button class="btn-sm primary" id="btn-export-bib" onclick="exporterPDF()" style="display:none;">Exporter PDF</button>
-          <button class="btn-sm danger" id="btn-del-bib" onclick="supprimerDocActif()" style="display:none;">🗑 Supprimer</button>
+          <button class="btn-sm" id="btn-carte-mentale" onclick="afficherCarteMentale()" style="display:none;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="7" x2="5" y2="17"/><line x1="12" y1="7" x2="19" y2="17"/><line x1="5" y1="19" x2="19" y2="19"/></svg> Carte mentale</button>
+          <button class="btn-sm" id="btn-rediger-bib" onclick="showRedaction(null)" style="display:none;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg> Rédiger</button>
+          <button class="btn-sm primary" id="btn-export-bib" onclick="exporterPDF()" style="display:none;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exporter</button>
           <input type="file" id="file-input-bib" accept=".pdf" style="display:none" onchange="uploadFichier(this.files[0],null)"/>
         </div>
 
@@ -1193,12 +1198,20 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 <!-- ── AFFAIRES ─────────────────────────────────── -->
     <div class="page" id="page-affaires">
       <div class="aff-v3">
+        <!-- Sidebar liste -->
+        <div class="aff-v3-sidebar">
+          <div class="aff-v3-sidebar-hdr">
+            <span class="aff-v3-sidebar-title">Mes affaires</span>
+            <button onclick="creerAffaire()" style="font-size:11px;padding:4px 10px;border:0.5px solid #E5E5E5;border-radius:6px;background:#0A0A0A;color:#fff;cursor:pointer;font-family:var(--font);">+ Nouvelle</button>
+          </div>
+          <div class="aff-v3-list" id="aff-v3-list"></div>
+        </div>
         <!-- Page affaire -->
         <div class="aff-v3-main">
           <div class="aff-v3-main-hdr">
             <span class="aff-v3-main-title" id="aff-v3-title">Affaires</span>
             <input type="file" id="file-input-aff" accept=".pdf" style="display:none" onchange="uploadFichier(this.files[0], AFFAIRE_ACTIVE?.id)"/>
-            <button class="btn-sm" id="btn-aff-upload" onclick="document.getElementById('file-input-aff').click()" style="display:none;">+ Pièce</button>
+            <button class="btn-sm" id="btn-aff-upload" onclick="document.getElementById('file-input-aff').click()" style="display:none;gap:5px;align-items:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Pièce</button>
           </div>
           <div class="aff-v3-body" id="aff-v3-body">
             <div class="aff-v3-empty">
@@ -1369,7 +1382,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
           </div>
 
           <button class="btn-full" onclick="lancerComparaison()">Analyser le profil juge</button>
-          <div class="save-confirm" id="cmp-save-confirm">✓ Dossier enregistré dans la base documentaire</div>
+          <div class="save-confirm" id="cmp-save-confirm"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Dossier enregistré dans la base documentaire</div>
         </div>
 
         <div class="resizer" id="resizer-comp"></div>
@@ -1387,8 +1400,6 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
       </div>
     </div>
 
-  </div>
-</div>
 
     <!-- ── RÉDACTION ─────────────────────────────────── -->
     <div class="page" id="page-redaction">
@@ -1421,8 +1432,8 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
         <div class="redac-result-col">
           <div class="redac-result-toolbar">
             <span style="font-size:12px;font-weight:500;color:#0A0A0A;flex:1;" id="redac-result-title">Document généré</span>
-            <button class="btn-sm" id="btn-redac-export" onclick="exporterRedaction()" style="display:none;">Exporter PDF</button>
-            <button class="btn-sm" id="btn-redac-copy" onclick="copierRedaction()" style="display:none;">Copier</button>
+            <button class="btn-sm" id="btn-redac-export" onclick="exporterRedaction()" style="display:none;gap:5px;align-items:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exporter</button>
+            <button class="btn-sm" id="btn-redac-copy" onclick="copierRedaction()" style="display:none;gap:5px;align-items:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copier</button>
           </div>
           <div class="redac-result-body" id="redac-result-body">
             <div class="redac-result-empty">
@@ -1441,6 +1452,10 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
       </div>
     </div>
 
+
+  </div>
+</div>
+
     <!-- ══ CHAT FLOTTANT ═══════════════════════════════════ -->
 <div id="chat-fab" onclick="toggleChat()">
   <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5">
@@ -1454,7 +1469,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
     <div class="chat-panel-actions">
       <button class="chat-panel-btn" onclick="toggleHist()">Historique</button>
       <button class="chat-panel-btn" onclick="nouvelleConversation()">+ Nouveau</button>
-      <button class="chat-close" onclick="toggleChat()">×</button>
+      <button class="chat-close" onclick="toggleChat()" style="display:flex;align-items:center;justify-content:center;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
   </div>
 
@@ -1467,7 +1482,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   <div class="mind-panel" id="mind-panel">
     <div class="mind-panel-hdr" onclick="toggleMindPanel()">
       <span class="mind-panel-label">Carte mentale</span>
-      <span id="mind-toggle-lbl" style="font-size:9px;color:#0A0A0A;">Réduire ▴</span>
+      <span id="mind-toggle-lbl" style="font-size:9px;color:#0A0A0A;">Réduire</span>
     </div>
     <div class="mind-panel-body" id="mind-panel-body"></div>
   </div>
@@ -1476,7 +1491,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
     <div class="chat-input-wrap">
       <input id="chat-input" placeholder="Votre question juridique..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();envoyerMessage();}"/>
     </div>
-    <button class="btn-send" onclick="envoyerMessage()">→</button>
+    <button class="btn-send" onclick="envoyerMessage()" style="display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
   </div>
 </div>
 
@@ -1614,7 +1629,7 @@ function renderAffairesList(affaires) {
     row.className = 'aff-v3-row' + (AFFAIRE_ACTIVE?.id === a.id ? ' active' : '');
     const delBtn = document.createElement('button');
     delBtn.className = 'aff-v3-del';
-    delBtn.textContent = '✕';
+    delBtn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
     delBtn.onclick = e => { e.stopPropagation(); supprimerAffaire(a.id, a.nom); };
     const dot  = document.createElement('div'); dot.className = 'aff-v3-dot';
     const info = document.createElement('div'); info.className = 'aff-v3-info';
@@ -1672,13 +1687,13 @@ async function ouvrirDetailAffaire(a) {
 
   const ACTES_12 = [
     {key:'requete_introductive',  name:'Requête introductive',         desc:'Saisine du tribunal'},
-    {key:'conclusions',           name:'Conclusions en défense',       desc:'Argumentation au fond OHADA'},
+    {key:'conclusions_fond',      name:'Conclusions en défense',       desc:'Argumentation au fond OHADA'},
     {key:'injonction_payer',      name:'Injonction de payer',          desc:'Art. 1-21 AUPSRVE OHADA'},
     {key:'mise_en_demeure',       name:'Mise en demeure',              desc:'Sommation préalable'},
     {key:'protocole_transactionnel',name:'Contrat / Pacte actionnaires',desc:'AUSCGIE — rédaction'},
     {key:'saisie_attribution',    name:'Saisie-attribution',           desc:'Art. 153-172 AUPSRVE'},
     {key:'memoire_reponse',       name:'Mémoire en réplique',          desc:'Réponse aux conclusions adverses'},
-    {key:'pourvoi_cassation',     name:'Mémoire ampliatif CCJA',       desc:'Recours en cassation OHADA'},
+    {key:'memoire_ccja',          name:'Mémoire ampliatif CCJA',       desc:'Recours en cassation OHADA'},
     {key:'contestation_saisie',   name:'Contestation de saisie',       desc:'Requête juge execution'},
     {key:'avis_juridique',        name:'Résumé jurisprudence',         desc:'Note de décision CCJA/OHADA'},
     {key:'protocole_transactionnel',name:'Protocole transactionnel',   desc:'Accord amiable entre parties'},
@@ -1687,7 +1702,7 @@ async function ouvrirDetailAffaire(a) {
 
   const docsHtml = docs.length
     ? docs.map(d => '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid #F5F5F5;">'
-        + '<div style="width:28px;height:32px;background:#F5F5F5;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#525252;flex-shrink:0;">PDF</div>'
+        + '<div style="width:28px;height:32px;background:#F5F5F5;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width=\"10\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#A3A3A3\" stroke-width=\"1.5\" stroke-linecap=\"round\"><path d=\"M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z\"/><path d=\"M14 2v6h6\"/></svg></div>'
         + '<div style="flex:1;overflow:hidden;"><div style="font-size:12px;color:#0A0A0A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (d.nom||d.filename) + '</div>'
         + '<div style="font-size:10px;color:#A3A3A3;">' + (d.created_at ? new Date(d.created_at).toLocaleDateString("fr") : "") + '</div></div>'
         + '</div>').join('')
@@ -1733,13 +1748,13 @@ function fermerDetailAffaire() { AFFAIRE_ACTIVE = null; }
 function showRedactionAffaire(type, dossierId) {
   const labels = {
     'requete_introductive':    'Requête introductive',
-    'conclusions':             'Conclusions en défense au fond',
+    'conclusions_fond':        'Conclusions en défense au fond',
     'injonction_payer':        'Requête en injonction de payer',
     'mise_en_demeure':         'Mise en demeure',
     'protocole_transactionnel':'Protocole transactionnel',
     'saisie_attribution':      'Acte de saisie-attribution',
     'memoire_reponse':         'Mémoire en réplique',
-    'pourvoi_cassation':       'Mémoire ampliatif CCJA',
+    'memoire_ccja':            'Mémoire ampliatif CCJA',
     'contestation_saisie':     'Contestation de saisie',
     'avis_juridique':          'Note de jurisprudence CCJA',
     'saisie_immobiliere':      'Commandement de payer',
@@ -1782,7 +1797,7 @@ async function chargerAffaires() {
       const _aid = a.id, _anom = a.nom.replace(/'/g,"&apos;");
       el.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;">'
         + '<div class="aff-item-name">' + a.nom + '</div>'
-        + '<button onclick="event.stopPropagation();supprimerAffaire(\'' + _aid + '\',\'' + _anom + '\')" style="background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;padding:2px 6px;">&#x2715;</button>'
+        + '<button onclick="event.stopPropagation();supprimerAffaire(\'' + _aid + '\',\'' + _anom + '\')" style="background:none;border:none;cursor:pointer;padding:2px 6px;display:flex;align-items:center;color:var(--text3);"><svg width=\"9\" height=\"9\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"/><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"/></svg></button>'
         + '</div>'
         + '<div class="aff-item-meta">' + (a.description || 'Aucune description') + '</div>'
         + '<span class="aff-item-status s-blue">En cours</span>';
@@ -1843,17 +1858,17 @@ async function afficherPageAffaire(a) {
         const date = d.created_at ? new Date(d.created_at).toLocaleDateString('fr') : '';
         const did  = d.id;
         return '<div class="aff-doc-row">'
-          + '<div class="aff-doc-icon">PDF</div>'
+          + '<div class="aff-doc-icon" style="display:flex;align-items:center;justify-content:center;"><svg width=\"10\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#A3A3A3\" stroke-width=\"1.5\" stroke-linecap=\"round\"><path d=\"M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z\"/><path d=\"M14 2v6h6\"/></svg></div>'
           + '<div style="flex:1;min-width:0;"><div style="font-size:12px;color:#0A0A0A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + nom + '</div>'
           + '<div style="font-size:10px;color:#A3A3A3;">' + date + '</div></div>'
-          + '<button data-did="' + did + '" onclick="supprimerDocAffaire(this)" style="border:none;background:none;color:#D4D4D4;cursor:pointer;font-size:12px;padding:4px;" title="Supprimer">✕</button>'
+          + '<button data-did="' + did + '" onclick="supprimerDocAffaire(this)" style="border:none;background:none;color:#D4D4D4;cursor:pointer;padding:4px;display:flex;align-items:center;" title="Supprimer"><svg width=\"9\" height=\"9\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#D4D4D4\" stroke-width=\"2.5\" stroke-linecap=\"round\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"/><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"/></svg></button>'
           + '</div>';
       }).join('')
     : '<div style="font-size:12px;color:#A3A3A3;padding:4px 0;">Aucune pièce — ajoutez un document</div>';
 
   const ACTES = [
     {key:'requete_introductive',  name:'Requête introductive',   desc:'Saisine tribunal'},
-    {key:'conclusions',           name:'Conclusions défense',    desc:'Argumentation fond'},
+    {key:'conclusions_fond',      name:'Conclusions défense',    desc:'Argumentation fond'},
     {key:'injonction_payer',      name:'Injonction de payer',    desc:'Art. 1-21 AUPSRVE'},
     {key:'mise_en_demeure',       name:'Mise en demeure',        desc:'Sommation préalable'},
     {key:'saisie_attribution',    name:'Saisie-attribution',     desc:'Art. 153-172 AUPSRVE'},
@@ -1955,9 +1970,11 @@ function lancerRedactionAffaire(type) {
 }
 
 async function chargerCorpsAffaire(a) {
-  const body = document.getElementById('aff-body');
+  // Redirige vers afficherPageAffaire (aff-body supprimé — on utilise aff-v3-body)
+  await afficherPageAffaire(a);
+  return;
+  const body = document.getElementById('aff-body-legacy');
   if (!body) {
-    // Mode Kanban — pas de aff-body, on affiche juste le nom
     return;
   }
   body.innerHTML = '<div style="text-align:center;padding:20px;"><div class="spinner" style="margin:0 auto;"></div></div>';
@@ -1990,7 +2007,7 @@ async function chargerCorpsAffaire(a) {
         <span class="badge badge-blue">${docs.length} fichier(s)</span>
       </div>
       <div class="aff-section-body" id="aff-docs-body">
-        ${docs.length ? docs.map(d => '<div class="doc-row-dash"><div class="doc-icon-sm">PDF</div><div class="doc-name-sm">' + (d.nom||d.filename) + '</div><span class="doc-date-sm">' + (d.created_at ? new Date(d.created_at).toLocaleDateString('fr') : '') + '</span></div>').join('') : '<div style="font-size:11px;color:var(--text3);">Aucune pièce — ajoutez des documents</div>'}
+        ${docs.length ? docs.map(d => '<div class="doc-row-dash"><div class="doc-icon-sm" style="display:flex;align-items:center;justify-content:center;"><svg width=\"10\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#A3A3A3\" stroke-width=\"1.5\" stroke-linecap=\"round\"><path d=\"M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z\"/><path d=\"M14 2v6h6\"/></svg></div><div class="doc-name-sm">' + (d.nom||d.filename) + '</div><span class="doc-date-sm">' + (d.created_at ? new Date(d.created_at).toLocaleDateString('fr') : '') + '</span></div>').join('') : '<div style="font-size:11px;color:var(--text3);">Aucune pièce — ajoutez des documents</div>'}
       </div>
     </div>
 
@@ -2081,8 +2098,8 @@ async function chargerDocsBib() {
         const locked   = d.metadata && d.metadata.sensible;
         const is_ready = d.status === 'ready';
         const badge    = is_ready ? 'bib-b-ok' : 'bib-b-wait';
-        const lbl      = is_ready ? '✓' : '…';
-        el.innerHTML = '<div class="bib-doc-icon">PDF</div>'
+        const lbl      = is_ready ? '<svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"var(--green)\" stroke-width=\"2.5\" stroke-linecap=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg>' : '<span style="opacity:.5">···</span>';
+        el.innerHTML = '<div class="bib-doc-icon" style="display:flex;align-items:center;justify-content:center;"><svg width=\"13\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#A3A3A3\" stroke-width=\"1.5\" stroke-linecap=\"round\"><path d=\"M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z\"/><path d=\"M14 2v6h6\"/></svg></div>'
           + '<div class="bib-doc-info">'
           + '<div class="bib-doc-name">' + (d.nom || d.filename) + '</div>'
           + '<div class="bib-doc-meta">' + (d.storage_tier || 'hot') + ' · ' + (d.created_at ? new Date(d.created_at).toLocaleDateString('fr') : '') + '</div>'
@@ -2100,7 +2117,7 @@ async function chargerDocsBib() {
       const dashItems = r.slice(0,4).map(d => {
         const nom  = d.nom || d.filename || 'Document';
         const date = d.created_at ? new Date(d.created_at).toLocaleDateString('fr') : '';
-        return '<div class="doc-row-dash"><div class="doc-icon-sm">PDF</div>'
+        return '<div class="doc-row-dash"><div class="doc-icon-sm" style="display:flex;align-items:center;justify-content:center;"><svg width=\"10\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#A3A3A3\" stroke-width=\"1.5\" stroke-linecap=\"round\"><path d=\"M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z\"/><path d=\"M14 2v6h6\"/></svg></div>'
              + '<div class="doc-name-sm">' + nom + '</div>'
              + '<div class="doc-date-sm">' + date + '</div></div>';
       }).join('');
@@ -2118,7 +2135,6 @@ function afficherDocViewer(doc) {
   const _bcm=document.getElementById('btn-carte-mentale'); if(_bcm) _bcm.style.display='inline-flex';
   const _br=document.getElementById('btn-rediger-bib'); if(_br) _br.style.display='inline-flex';
   const _be=document.getElementById('btn-export-bib'); if(_be) _be.style.display='inline-flex';
-  const _bd=document.getElementById('btn-del-bib'); if(_bd) _bd.style.display='inline-flex';
 
   const _nom   = doc.nom || doc.filename || '';
   const _tier  = doc.storage_tier || 'hot';
@@ -2136,7 +2152,7 @@ function afficherDocViewer(doc) {
     + '</div>'
     + '<p>Document charg&eacute;. Utilisez le <strong>chat flottant</strong> pour l\'interroger.</p>'
     + '<div class="mind-map-section" id="mind-map-section" style="display:none;">'
-    + '<div class="mind-map-toggle" onclick="toggleCarteMentaleViewer()">🗺 <span id="mm-viewer-lbl">Afficher la carte mentale</span></div>'
+    + '<div class="mind-map-toggle" onclick="toggleCarteMentaleViewer()"><svg width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"><circle cx=\"9\" cy=\"5\" r=\"2\"/><circle cx=\"18\" cy=\"5\" r=\"2\"/><circle cx=\"9\" cy=\"19\" r=\"2\"/><line x1=\"9\" y1=\"7\" x2=\"9\" y2=\"17\"/><line x1=\"11\" y1=\"5\" x2=\"16\" y2=\"5\"/></svg> <span id="mm-viewer-lbl">Afficher la carte mentale</span></div>'
     + '<div class="mind-map-body" id="mm-viewer-body" style="display:none;"></div>'
     + '</div>'
     + '</div>';
@@ -2280,37 +2296,30 @@ function toggleOpt(id) {
 }
 
 async function supprimerDocById(id, btn) {
-  if (!window.confirm("Supprimer ce document définitivement ?")) return;
+  if (!window.confirm("Supprimer ce document ?")) return;
   try {
     await apiFetch('/supprimer_document', 'DELETE', {id});
     showToast('Document supprimé');
-    const row = btn ? btn.closest('.bib-doc-row') : null;
+    const row = btn.closest('.bib-doc-row');
     if (row) row.remove();
     if (DOC_ACTIF?.id === id) {
       DOC_ACTIF = null;
-      document.getElementById('bib-viewer').innerHTML = '<div class="bib-empty-viewer"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#E5E5E5" stroke-width="1"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg><div style="font-size:13px;font-weight:500;color:#D4D4D4;">Sélectionnez un document</div></div>';
-      ['btn-carte-mentale','btn-rediger-bib','btn-export-bib','btn-del-bib'].forEach(i => { const el = document.getElementById(i); if(el) el.style.display='none'; });
-    }
-    // Mettre à jour le compteur nav
-    const countEl = document.getElementById('nav-bib-count');
-    if (countEl) {
-      const cur = parseInt(countEl.textContent) || 0;
-      countEl.textContent = Math.max(0, cur - 1);
+      document.getElementById('bib-viewer').innerHTML = '<div class="bib-empty-viewer"><div style="font-size:13px;font-weight:500;color:#D4D4D4;">Sélectionnez un document</div></div>';
+      ['btn-carte-mentale','btn-rediger-bib','btn-export-bib'].forEach(i => { const el = document.getElementById(i); if(el) el.style.display='none'; });
     }
   } catch(e) { showToast('Erreur : ' + e.message, true); }
 }
 
 async function supprimerDocActif() {
-  if (!DOC_ACTIF || !confirm('Supprimer ce document définitivement ? Cette action est irréversible.')) return;
-  const id = DOC_ACTIF.id;
+  if (!DOC_ACTIF || !confirm('Supprimer ce document ?')) return;
   try {
-    await apiFetch('/supprimer_document', 'DELETE', {id});
+    await apiFetch('/supprimer_document', 'DELETE', {id: DOC_ACTIF.id});
     showToast('Document supprimé');
     DOC_ACTIF = null;
-    document.getElementById('bib-viewer').innerHTML = '<div class="bib-empty-viewer"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#E5E5E5" stroke-width="1"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg><div style="font-size:13px;font-weight:500;color:#D4D4D4;">Document supprimé</div></div>';
-    ['btn-carte-mentale','btn-rediger-bib','btn-export-bib','btn-del-bib'].forEach(i => { const el=document.getElementById(i); if(el) el.style.display='none'; });
+    document.getElementById('bib-viewer').innerHTML = '<div class="doc-viewer-empty"><div style="font-size:13px;">Document supprimé</div></div>';
+    ['btn-carte-mentale','btn-rediger-bib','btn-export-bib','btn-del-bib'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
     await chargerDocsBib();
-  } catch(e) { showToast('Erreur suppression', true); }
+  } catch(e) { showToast('Erreur', true); }
 }
 
 // ── REDACTION ─────────────────────────────────────────
@@ -2360,7 +2369,7 @@ async function redigerActe(type, faits) {
     const genEl = document.getElementById('bib-generes-list');
     const docEl = document.createElement('div');
     docEl.className = 'doc-item active';
-    docEl.innerHTML = '<div class="doc-icon">GEN</div><div class="doc-name">' + (r.nom||type) + '</div><span class="doc-badge badge-blue">Généré</span>';
+    docEl.innerHTML = '<div class="doc-icon" style="display:flex;align-items:center;justify-content:center;"><svg width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#525252\" stroke-width=\"1.5\" stroke-linecap=\"round\"><path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4z\"/></svg></div><div class="doc-name">' + (r.nom||type) + '</div><span class="doc-badge badge-blue">Généré</span>';
     genEl.appendChild(docEl);
     showToast('Acte rédigé');
   } catch(e) {
@@ -2504,7 +2513,7 @@ async function uploadDecision(file) {
       el.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--bg);border:0.5px solid #E5E5E5;border-radius:5px;';
       el.innerHTML = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="var(--green)" stroke-width="1.5"><path d="M2 2h4v12H2zM6 2h4v12H6z"/></svg>'
         + '<span style="font-size:10px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + file.name + '</span>'
-        + '<span style="font-size:9px;color:var(--green);">✓ ' + (manuscrit ? 'OCR' : 'Indexé') + '</span>';
+        + '<span style="font-size:9px;color:var(--green);display:flex;align-items:center;gap:3px;"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#16A34A\" stroke-width=\"2.5\" stroke-linecap=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg> ' + (manuscrit ? 'OCR' : 'Indexé') + '</span>';
       list.appendChild(el);
       showToast('Décision "' + file.name + '" indexée');
     } else {
@@ -2614,7 +2623,7 @@ function toggleHist() {
 function toggleMindPanel() {
   mindOpen = !mindOpen;
   document.getElementById('mind-panel').classList.toggle('open', mindOpen);
-  document.getElementById('mind-toggle-lbl').textContent = mindOpen ? 'Réduire ▴' : 'Agrandir ▾';
+  document.getElementById('mind-toggle-lbl').textContent = mindOpen ? 'Réduire' : 'Agrandir';
 }
 
 async function envoyerMessage() {
@@ -2863,93 +2872,62 @@ function chargerDashboard() { chargerStats(); chargerAffaires(); }
 
 // ── ONGLET RÉDACTION ─────────────────────────────────
 const TOUS_ACTES = [
-  // ── PROCÉDURE CIVILE ─────────────────────────────────────────────────────
-  {key:'requete_introductive',    nom:'Requête introductive',         desc:'Saisine du tribunal',
+  {key:'requete_introductive',   nom:'Requête introductive',        desc:'Saisine du tribunal',
    champs:['tribunal','demandeur','defendeur','faits','fondements_juridiques','demandes']},
-  {key:'conclusions',             nom:'Conclusions',                  desc:'Défense ou demande',
+  {key:'conclusions',            nom:'Conclusions',                  desc:'Défense ou demande',
    champs:['tribunal','demandeur','defendeur','type_conclusions','faits','arguments','demandes']},
-  {key:'memoire_reponse',         nom:'Mémoire en réponse',           desc:'Réfutation point par point',
-   champs:['arguments_adverses','faits','reponses','demandes_reconventionnelles']},
-  {key:'memoire_audience',        nom:"Mémoire d'audience",           desc:'Synthèse percutante à la barre',
-   champs:['affaire','juridiction','date_audience','points_cles','arguments_adverses']},
-  {key:'note_plaidoirie',         nom:'Note de plaidoirie',           desc:"L'essentiel pour convaincre",
-   champs:['affaire','points_essentiels','jurisprudence_cle','conclusion_souhaitee']},
-  {key:'appel',                   nom:"Appel d'une décision",         desc:"Recours 1ère instance",
-   champs:['juridiction_appel','decision_attaquee','date_decision','appelant','intime','moyens_appel','demandes']},
-  {key:'pourvoi_cassation',       nom:'Pourvoi en cassation',         desc:'CCJA / Cour Suprême',
-   champs:['juridiction_cassation','decision_attaquee','pourvoyant','defenderesse','moyens_cassation']},
-  {key:'assignation_refere',      nom:"Assignation en référé",        desc:"Procédure d'urgence",
-   champs:['tribunal','demandeur','defendeur','urgence','mesures_demandees','fumus_boni_juris']},
-  {key:'exception_incompetence',  nom:"Exception d'incompétence",     desc:'In limine litis · renvoi',
-   champs:['requérant','juridiction_actuelle','juridiction_competente','motif','faits']},
-  {key:'opposition_defaut',       nom:'Opposition à jugement par défaut', desc:'Rétractation · CPC CMR',
-   champs:['requérant','adversaire','reference_jugement','date_signification','moyens','faits']},
-  {key:'demande_exequatur',       nom:'Requête en exequatur',         desc:'Décision / sentence étrangère',
-   champs:['requérant','defendeur','decision','pays_origine','montant','faits']},
-  {key:'sursis_execution',        nom:"Sursis à exécution",           desc:'Urgence + doute sérieux',
-   champs:['requérant','adversaire','decision_attaquee','urgence','moyens','faits']},
-  {key:'protocole_transactionnel',nom:'Protocole transactionnel',     desc:'Accord amiable · chose jugée',
-   champs:['requérant','adversaire','objet','concession_a','concession_b','montant','modalites','faits']},
-  {key:'mise_en_demeure',         nom:'Mise en demeure',              desc:'Sommation préalable formelle',
+  {key:'mise_en_demeure',        nom:'Mise en demeure',              desc:'Sommation préalable',
    champs:['requérant','adversaire','objet','montant','delai','consequences','faits']},
-
-  // ── VOIES D'EXÉCUTION OHADA ──────────────────────────────────────────────
-  {key:'injonction_payer',        nom:'Injonction de payer',          desc:'Art. 1-21 AUPSRVE',
-   champs:['creancier','debiteur','montant','nature_creance','date_exigibilite','pieces','faits']},
-  {key:'opposition_injonction',   nom:'Opposition à injonction',      desc:'Art. 10 AUPSRVE',
-   champs:['debiteur','creancier','reference_ordonnance','montant','moyens','faits']},
-  {key:'saisie_conservatoire',    nom:'Saisie conservatoire',         desc:'Art. 54+ AUPSRVE',
-   champs:['creancier','debiteur','montant','nature_creance','urgence','biens_vises','juridiction','faits']},
-  {key:'saisie_attribution',      nom:'Saisie-attribution',           desc:'Art. 153-172 AUPSRVE',
+  {key:'injonction_payer',       nom:'Injonction de payer',          desc:'Art. 1-21 AUPSRVE',
+   champs:['creancier','debiteur','montant','nature_creance','date_exigibilite','faits']},
+  {key:'saisie_conservatoire',   nom:'Saisie conservatoire',         desc:'Art. 54+ AUPSRVE',
+   champs:['creancier','debiteur','montant','nature_creance','urgence','biens_vises','faits']},
+  {key:'saisie_attribution',     nom:'Saisie-attribution',           desc:'Art. 153-172 AUPSRVE',
    champs:['creancier','debiteur','tiers_saisi','titre_executoire','montant','faits']},
-  {key:'contestation_saisie',     nom:'Contestation de saisie',       desc:"Mainlevée · juge de l'exécution",
+  {key:'contestation_saisie',    nom:'Contestation de saisie',       desc:"Juge de l'exécution",
    champs:['requérant','creancier','nature_saisie','moyens','montant','faits']},
-  {key:'saisie_immobiliere',      nom:'Saisie immobilière',           desc:'Art. 246+ AUPSRVE',
+  {key:'saisie_immobiliere',     nom:'Saisie immobilière',           desc:'Art. 246+ AUPSRVE',
    champs:['creancier','debiteur','titre_executoire','montant','immeuble','titre_foncier','faits']},
-
-  // ── PÉNAL ─────────────────────────────────────────────────────────────────
-  {key:'plainte_penale',          nom:'Plainte pénale',               desc:'Avec constitution PC',
+  {key:'opposition_injonction',  nom:'Opposition à injonction',      desc:'Art. 10 AUPSRVE',
+   champs:['debiteur','creancier','reference_ordonnance','montant','moyens','faits']},
+  {key:'memoire_reponse',        nom:'Mémoire en réponse',           desc:'Réfutation point par point',
+   champs:['arguments_adverses','faits','reponses','demandes_reconventionnelles']},
+  {key:'appel',                  nom:"Appel d'une décision",        desc:"Recours 1ère instance",
+   champs:['juridiction_appel','decision_attaquee','date_decision','appelant','intime','moyens_appel','demandes']},
+  {key:'pourvoi_cassation',      nom:'Pourvoi en cassation',         desc:'CCJA / Cour Suprême',
+   champs:['juridiction_cassation','decision_attaquee','pourvoyant','defenderesse','moyens_cassation']},
+  {key:'assignation_refere',     nom:"Assignation en référé",        desc:"Procédure d'urgence",
+   champs:['tribunal','demandeur','defendeur','urgence','mesures_demandees','fumus_boni_juris']},
+  {key:'protocole_transactionnel',nom:'Protocole transactionnel',    desc:'Accord amiable',
+   champs:['requérant','adversaire','objet','concession_a','concession_b','montant','modalites','faits']},
+  {key:'plainte_penale',         nom:'Plainte pénale',               desc:'Avec constitution PC',
    champs:['plaignant','mis_en_cause','infractions','faits','prejudice','demandes']},
-  {key:'partie_civile',           nom:'Constitution de partie civile',desc:'Préjudice direct · Art. 63+ CPP CMR',
-   champs:['requérant','adversaire','chefs_inculpation','prejudice','montant','faits']},
-  {key:'defense_penale',          nom:'Défense pénale',               desc:'Éléments constitutifs · nullités',
+  {key:'defense_penale',         nom:'Défense pénale',               desc:'Mémoire correctionnel',
    champs:['prevenu','chefs_inculpation','these_defensive','nullites','arguments','faits']},
-  {key:'liberte_provisoire',      nom:"Liberté provisoire",           desc:'Art. 236+ CPP CMR',
-   champs:['inculpe','chefs_inculpation','date_arrestation','lieu_detention','garanties','caution','faits']},
-  {key:'appel_penal',             nom:'Appel pénal',                  desc:'Art. 436+ CPP CMR',
+  {key:'liberte_provisoire',     nom:"Liberté provisoire",           desc:'Art. 236+ CPP CMR',
+   champs:['inculpe','chefs_inculpation','date_arrestation','lieu_detention','garanties','faits']},
+  {key:'appel_penal',            nom:'Appel pénal',                  desc:'Art. 436+ CPP CMR',
    champs:['appellant','intime','decision_attaquee','chefs_inculpation','moyens_appel','faits']},
-
-  // ── DROIT DES SOCIÉTÉS & ARBITRAGE OHADA ────────────────────────────────
-  {key:'dissolution_societe',     nom:'Dissolution société',          desc:"Art. 200+ AUSCGIE OHADA",
-   champs:['requérant','societe','forme_sociale','capital','cause_dissolution','faits']},
-  {key:'responsabilite_dirigeant',nom:'Responsabilité dirigeant',     desc:'Faute gestion · Art. 161+ AUSCGIE',
-   champs:['requérant','adversaire','societe','fautes','prejudice','montant','faits']},
-  {key:'procedure_collective',    nom:'Procédure collective',         desc:'Art. 25+ AUPC 2015',
-   champs:['debiteur','forme_sociale','actif','passif','date_cessation','perspectives','faits']},
-  {key:'verification_creances',   nom:'Déclaration de créances',      desc:'Art. 78+ AUPC 2015 · classement',
-   champs:['creancier','debiteur','montant','nature_creance','suretes','pieces','faits']},
-  {key:'arbitrage_ccja',          nom:'Arbitrage CCJA',               desc:"Règlement CCJA 2017",
-   champs:['requérant','adversaire','contrat','clause_arbitrage','objet','montant','droit_applicable','faits']},
-  {key:'annulation_sentence',     nom:'Annulation sentence arbitrale',desc:'Art. 26 Traité OHADA · CCJA',
-   champs:['requérant','adversaire','reference_sentence','date_sentence','moyens','faits']},
-
-  // ── DROIT SOCIAL, ADMINISTRATIF, FONCIER ────────────────────────────────
-  {key:'licenciement_abusif',     nom:'Licenciement abusif',          desc:'Art. 34+ CT CMR',
+  {key:'licenciement_abusif',    nom:'Licenciement abusif',          desc:'Art. 34+ CT CMR',
    champs:['salarie','employeur','poste','ancienneté','salaire','motif_licenciement','faits']},
-  {key:'transaction_prudhomale',  nom:"Transaction prud'homale",      desc:'Rupture amiable CT CMR',
-   champs:['salarie','employeur','ancienneté','salaire','indemnites_legales','montant','faits']},
-  {key:'recours_exces_pouvoir',   nom:'Recours excès de pouvoir',     desc:'Tribunal Administratif CMR',
+  {key:'recours_exces_pouvoir',  nom:'Recours excès de pouvoir',     desc:'Tribunal Administratif',
    champs:['requérant','adversaire','acte_attaque','date_acte','moyens','faits']},
-  {key:'contestation_fonciere',   nom:'Contestation foncière',        desc:'Ord. 74/1 CMR',
+  {key:'contestation_fonciere',  nom:'Contestation foncière',        desc:'Ord. 74/1 CMR',
    champs:['requérant','adversaire','titre_foncier','localisation','superficie','droit_requérant','faits']},
-  {key:'recours_fiscal',          nom:'Recours fiscal',               desc:'CGI + LPF CMR',
-   champs:['requérant','adversaire','nature_impot','periode','montant','moyens','faits']},
-
-  // ── CONSEILS & OPINIONS ──────────────────────────────────────────────────
-  {key:'avis_juridique',          nom:'Avis juridique',               desc:'Legal opinion OHADA + CMR',
+  {key:'arbitrage_ccja',         nom:'Arbitrage CCJA',               desc:"Règlement CCJA 2017",
+   champs:['requérant','adversaire','contrat','clause_arbitrage','objet','montant','faits']},
+  {key:'avis_juridique',         nom:'Avis juridique',               desc:'Legal opinion OHADA',
    champs:['nom_client','objet_consultation','faits_resumes','analyse_juridique','domaine']},
-  {key:'lettre_consultation',     nom:'Lettre de consultation',       desc:'Synthèse claire pour client',
+  {key:'lettre_consultation',    nom:'Lettre de consultation',       desc:'Synthèse pour client',
    champs:['nom_client','objet_consultation','faits_resumes','analyse_juridique','recommandations']},
+  {key:'recours_fiscal',         nom:'Recours fiscal',               desc:'CGI + LPF CMR',
+   champs:['requérant','adversaire','nature_impot','periode','montant','moyens','faits']},
+  {key:'dissolution_societe',    nom:'Dissolution société',          desc:"Art. 200+ AUSCGIE",
+   champs:['requérant','societe','forme_sociale','capital','cause_dissolution','faits']},
+  {key:'procedure_collective',   nom:'Procédure collective',         desc:'Art. 25+ AUPC 2015',
+   champs:['debiteur','forme_sociale','actif','passif','date_cessation','perspectives','faits']},
+  {key:'transaction_prudhomale', nom:"Transaction prud'homale",     desc:'Rupture amiable CT CMR',
+   champs:['salarie','employeur','ancienneté','salaire','indemnites_legales','montant','faits']},
 ];
 
 const CHAMP_LABELS = {
@@ -2995,24 +2973,6 @@ const CHAMP_LABELS = {
   passif:"Passif exigible (FCFA)", date_cessation:"Date de cessation",
   perspectives:"Perspectives de redressement", indemnites_legales:"Indemnités légales (FCFA)",
   requérant:"Requérant", adversaire:"Partie adverse",
-  // Nouveaux champs
-  affaire:"Affaire / Référence", date_audience:"Date d'audience",
-  points_cles:"Points essentiels à plaider", points_essentiels:"Points essentiels",
-  jurisprudence_cle:"Jurisprudence clé à citer", conclusion_souhaitee:"Conclusion souhaitée",
-  juridiction_actuelle:"Juridiction actuellement saisie",
-  juridiction_competente:"Juridiction compétente selon vous",
-  motif:"Motif d'incompétence",
-  reference_jugement:"Référence du jugement par défaut",
-  date_signification:"Date de signification",
-  decision:"Décision / sentence à rendre exécutoire",
-  pays_origine:"Pays d'origine de la décision",
-  consequences:"Conséquences annoncées", delai:"Délai accordé",
-  fautes:"Fautes de gestion reprochées",
-  suretes:"Sûretés attachées (hypothèque, nantissement…)",
-  reference_sentence:"Référence de la sentence arbitrale",
-  date_sentence:"Date de la sentence",
-  droit_applicable:"Droit applicable au fond",
-  caution:"Caution proposée (FCFA)",
 };
 
 const CHAMPS_TEXTAREA = ['faits','arguments','demandes','moyens','these_defensive',
@@ -3020,9 +2980,7 @@ const CHAMPS_TEXTAREA = ['faits','arguments','demandes','moyens','these_defensiv
   'prejudice','cause_dissolution','perspectives','objet_consultation',
   'faits_resumes','analyse_juridique','recommandations','moyens_appel',
   'concession_a','concession_b','fumus_boni_juris','fondements_juridiques',
-  'demandes_reconventionnelles','chefs_inculpation',
-  'points_cles','points_essentiels','jurisprudence_cle','conclusion_souhaitee',
-  'fautes','suretes','consequences','motif','droit_applicable'];
+  'demandes_reconventionnelles','chefs_inculpation'];
 
 let ACTE_ACTIF = null;
 let REDAC_CONTENU = '';
