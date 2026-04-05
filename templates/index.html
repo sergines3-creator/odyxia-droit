@@ -298,6 +298,8 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 }
 .opt-tag:hover{background:var(--bg2);}
 .opt-tag.active{background:#F5F5F5;border-color:#D4D4D4;color:#0A0A0A;}
+#opt-sensible-bib.active{background:#FEE2E2 !important;border-color:#FCA5A5 !important;color:#DC2626 !important;}
+#opt-sensible-bib.active svg{stroke:#DC2626 !important;}
 .opt-tag input{display:none;}
 .upload-hint{padding:0 14px 8px;font-size:9px;color:var(--text3);line-height:1.5;}
 .docs-group{font-size:9px;font-weight:500;color:var(--text3);padding:6px 14px 3px;letter-spacing:0.5px;text-transform:uppercase;}
@@ -1526,11 +1528,6 @@ function renderKanban(affaires) {
   });
 }
 
-async function supprimerAffaire(id, nom) {
-  if (!confirm('Supprimer "' + nom + '" ?')) return;
-  try { await apiFetch('/dossiers/' + id, 'DELETE'); showToast('Supprimée'); if(AFFAIRE_ACTIVE?.id===id) AFFAIRE_ACTIVE=null; await chargerAffaires(); } catch(e){showToast('Erreur',true);}
-}
-
 async function creerAffaire() {
   const nom = prompt('Nom de la nouvelle affaire :');
   if (!nom || !nom.trim()) return;
@@ -1551,6 +1548,7 @@ async function selectionnerAffaireKanban(a) {
   document.getElementById('hdr-dossier').style.display = 'flex';
   document.getElementById('hdr-dossier-name').textContent = a.nom;
   document.getElementById('btn-aff-upload').style.display = 'inline-flex';
+  await chargerAffaires();
   await ouvrirDetailAffaire(a);
 }
 
@@ -1681,7 +1679,11 @@ async function chargerAffaires() {
 
     // Liste page affaires
     const list = document.getElementById('aff-list');
-    if (list) { list.innerHTML = r.length ? '' : '<div style="padding:16px 14px;font-size:11px;color:#A3A3A3;">Aucune affaire</div>'; }
+    list.innerHTML = '';
+    if (!r.length) {
+      list.innerHTML = '<div style="padding:16px 14px;font-size:11px;color:var(--text3);">Aucune affaire — créez-en une</div>';
+      return;
+    }
     r.forEach(a => {
       const el = document.createElement('div');
       el.className = 'aff-item' + (AFFAIRE_ACTIVE?.id === a.id ? ' active' : '');
@@ -1885,11 +1887,11 @@ function afficherDocViewer(doc) {
   document.querySelectorAll('.doc-item').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('[data-doc-id="' + doc.id + '"]').forEach(el => el.classList.add('active'));
 
-  document.getElementById('bib-doc-title').textContent = doc.nom || doc.filename;
+  const _t=document.getElementById('bib-doc-title'); if(_t) _t.textContent=doc.nom||doc.filename;
   document.getElementById('btn-carte-mentale').style.display = 'inline-flex';
-  const _br=document.getElementById('btn-rediger-bib'); if(_br)_br.style.display='inline-flex';
-  const _be=document.getElementById('btn-export-bib'); if(_be)_be.style.display='inline-flex';
-  const _bd=document.getElementById('btn-del-bib'); if(_bd)_bd.style.display='inline-flex';
+  document.getElementById('btn-rediger-bib').style.display   = 'inline-flex';
+  document.getElementById('btn-export-bib').style.display    = 'inline-flex';
+  document.getElementById('btn-del-bib').style.display       = 'inline-flex';
 
   const _nom   = doc.nom || doc.filename || '';
   const _tier  = doc.storage_tier || 'hot';
@@ -2072,7 +2074,7 @@ async function supprimerDocActif() {
     showToast('Document supprimé');
     DOC_ACTIF = null;
     document.getElementById('bib-viewer').innerHTML = '<div class="doc-viewer-empty"><div style="font-size:13px;">Document supprimé</div></div>';
-    ['btn-carte-mentale','btn-rediger-bib','btn-export-bib','btn-del-bib'].forEach(id => document.getElementById(id).style.display='none');
+    ['btn-carte-mentale','btn-rediger-bib','btn-export-bib','btn-del-bib'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
     await chargerDocsBib();
   } catch(e) { showToast('Erreur', true); }
 }
@@ -2118,7 +2120,7 @@ async function redigerActe(type, faits) {
       + '</div>'
       + '<p>' + html + '</p>'
       + '</div>';
-    document.getElementById('bib-doc-title').textContent = r.nom || type;
+    const _t2=document.getElementById('bib-doc-title'); if(_t2) _t2.textContent=r.nom||type;
     document.getElementById('btn-export-bib').style.display = 'inline-flex';
 
     const genEl = document.getElementById('bib-generes-list');
@@ -2399,9 +2401,10 @@ async function envoyerMessage() {
   convActuelle.messages.push({role:'user', content:q});
 
   try {
-    let q_enrichie = q;
+    const _aujourdhui = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    let q_enrichie = '[Date du jour: ' + _aujourdhui + '] ' + q;
     if (CONTEXTE_MEMOIRE) {
-      q_enrichie = '[Contexte sessions précédentes: ' + CONTEXTE_MEMOIRE + '] ' + q;
+      q_enrichie = '[Date du jour: ' + _aujourdhui + '] [Contexte sessions précédentes: ' + CONTEXTE_MEMOIRE + '] ' + q;
     }
     const body = {question: q_enrichie, session_id:SESSION_ID};
     if (AFFAIRE_ACTIVE) body.dossier_id = AFFAIRE_ACTIVE.id;
@@ -2619,8 +2622,6 @@ function initAllResizers() {
 function showLoading(show) {
   document.getElementById('loading').classList.toggle('show', show);
 }
-
-function chargerDashboard(){chargerStats();chargerAffaires();}
 
 function showToast(msg, err=false) {
   const t = document.getElementById('toast');
