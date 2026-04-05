@@ -781,59 +781,92 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 }
 .bib-upload-btn:hover{background:#F0F0F0;color:#0A0A0A;border-color:#A3A3A3;}
 
-/* ══ AFFAIRES v2 KANBAN ════════════════════════════════ */
-.aff-layout-v2{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.aff-toolbar-v2{
-  padding:10px 16px;background:#FFFFFF;border-bottom:0.5px solid #E5E5E5;
+/* ══ AFFAIRES v3 ══════════════════════════════════════ */
+.aff-v3{flex:1;display:grid;grid-template-columns:260px 1fr;overflow:hidden;}
+.aff-v3-sidebar{
+  background:#FAFAFA;border-right:0.5px solid #E5E5E5;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.aff-v3-sidebar-hdr{
+  padding:10px 12px;border-bottom:0.5px solid #E5E5E5;
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.aff-v3-sidebar-title{font-size:11px;font-weight:500;color:#0A0A0A;}
+.aff-v3-list{flex:1;overflow-y:auto;}
+.aff-v3-row{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border-bottom:0.5px solid #F0F0F0;cursor:pointer;transition:.15s;
+  border-left:2px solid transparent;
+}
+.aff-v3-row:hover{background:#F0F0F0;}
+.aff-v3-row:hover .aff-v3-del{display:flex;}
+.aff-v3-row.active{background:#F0F0F0;border-left-color:#0A0A0A;}
+.aff-v3-dot{width:7px;height:7px;border-radius:50%;background:#D4D4D4;flex-shrink:0;}
+.aff-v3-row.active .aff-v3-dot{background:#0A0A0A;}
+.aff-v3-info{flex:1;min-width:0;}
+.aff-v3-nom{font-size:12px;font-weight:500;color:#0A0A0A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.aff-v3-meta{font-size:10px;color:#A3A3A3;margin-top:1px;}
+.aff-v3-del{display:none;width:18px;height:18px;align-items:center;justify-content:center;border-radius:3px;font-size:10px;color:#A3A3A3;cursor:pointer;border:none;background:none;flex-shrink:0;}
+.aff-v3-del:hover{background:#FEE2E2;color:#DC2626;}
+.aff-v3-empty-sidebar{padding:20px 12px;text-align:center;font-size:12px;color:#A3A3A3;line-height:1.6;}
+/* Page affaire */
+.aff-v3-main{display:flex;flex-direction:column;overflow:hidden;background:#F5F5F5;}
+.aff-v3-main-hdr{
+  padding:12px 16px;background:#fff;border-bottom:0.5px solid #E5E5E5;
   display:flex;align-items:center;gap:10px;flex-shrink:0;
 }
-.aff-toolbar-title{font-size:13px;font-weight:500;color:#0A0A0A;flex:1;}
-.aff-kanban{flex:1;display:flex;gap:12px;padding:16px;overflow-x:auto;background:#F2F2F2;}
-.aff-kanban::-webkit-scrollbar{height:4px;}
-.kanban-col{width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:0;}
-.kanban-col-hdr{
+.aff-v3-main-title{font-size:13px;font-weight:500;color:#0A0A0A;flex:1;}
+.aff-v3-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.aff-v3-empty{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;color:#D4D4D4;gap:10px;text-align:center;padding:40px;
+}
+.aff-card{background:#fff;border:0.5px solid #E5E5E5;border-radius:10px;overflow:hidden;}
+.aff-card-hdr{
+  padding:9px 14px;border-bottom:0.5px solid #F0F0F0;background:#FAFAFA;
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 4px;margin-bottom:10px;
 }
-.kanban-col-title{font-size:11px;font-weight:600;color:#6B6B6B;text-transform:uppercase;letter-spacing:0.6px;}
-.kanban-col-count{font-size:10px;background:#E5E5E5;color:#525252;padding:1px 7px;border-radius:10px;}
-.kanban-cards{display:flex;flex-direction:column;gap:8px;}
-.kanban-card{
-  background:#FFFFFF;border:0.5px solid #E8E8E8;border-radius:10px;
-  padding:12px 14px;cursor:pointer;transition:.15s;
+.aff-card-title{font-size:11px;font-weight:600;color:#525252;text-transform:uppercase;letter-spacing:0.4px;}
+.aff-card-body{padding:14px;}
+.aff-field{margin-bottom:12px;}
+.aff-field:last-child{margin-bottom:0;}
+.aff-field label{display:block;font-size:10px;font-weight:500;color:#A3A3A3;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:5px;}
+.aff-field input,.aff-field textarea,.aff-field select{
+  width:100%;border:0.5px solid #E5E5E5;border-radius:7px;
+  padding:8px 11px;font-size:12px;font-family:var(--font);color:#0A0A0A;
+  background:#FAFAFA;outline:none;transition:.15s;
 }
-.kanban-card:hover{border-color:#A3A3A3;}
-.kanban-card.sel{border-color:#0A0A0A;}
-.kc-nom{font-size:13px;font-weight:500;color:#0A0A0A;margin-bottom:3px;line-height:1.3;}
-.kc-desc{font-size:11px;color:#A3A3A3;margin-bottom:10px;line-height:1.4;}
-.kc-footer{display:flex;align-items:center;justify-content:space-between;}
-.kc-pieces{display:flex;align-items:center;gap:4px;font-size:11px;color:#A3A3A3;}
-.kc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.kc-dot-b{background:#525252;}
-.kc-dot-g{background:#16A34A;}
-.kc-dot-y{background:#F59E0B;}
-.kc-action{
-  font-size:11px;padding:4px 10px;border:0.5px solid #E5E5E5;
-  border-radius:5px;background:#fff;color:#0A0A0A;cursor:pointer;
-  font-family:var(--font);transition:.15s;white-space:nowrap;
+.aff-field input:focus,.aff-field textarea:focus,.aff-field select:focus{border-color:#0A0A0A;background:#fff;}
+.aff-field textarea{min-height:80px;resize:vertical;line-height:1.6;}
+.aff-field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.aff-etape-bar{display:flex;gap:4px;margin-top:6px;}
+.aff-etape-btn{
+  flex:1;padding:6px 4px;border:0.5px solid #E5E5E5;border-radius:6px;
+  font-size:10px;text-align:center;cursor:pointer;transition:.15s;background:#fff;color:#A3A3A3;
+  font-family:var(--font);
 }
-.kc-action:hover{background:#0A0A0A;color:#fff;border-color:#0A0A0A;}
-.kc-del{
-  font-size:11px;padding:4px 8px;border:none;background:none;
-  color:#D4D4D4;cursor:pointer;font-family:var(--font);transition:.15s;
-  border-radius:4px;
+.aff-etape-btn:hover{border-color:#A3A3A3;color:#0A0A0A;}
+.aff-etape-btn.active{background:#0A0A0A;color:#fff;border-color:#0A0A0A;}
+.aff-save-btn{
+  width:100%;padding:9px;background:#0A0A0A;color:#fff;border:none;
+  border-radius:7px;font-size:12px;font-weight:500;font-family:var(--font);
+  cursor:pointer;transition:.15s;margin-top:4px;
 }
-.kc-del:hover{background:#FEE2E2;color:#DC2626;}
-.kanban-empty{
-  background:#fff;border:0.5px dashed #E5E5E5;border-radius:10px;
-  padding:20px;text-align:center;font-size:11px;color:#D4D4D4;
+.aff-save-btn:hover{background:#333;}
+.aff-doc-row{
+  display:flex;align-items:center;gap:9px;padding:8px 0;
+  border-bottom:0.5px solid #F5F5F5;
 }
-.kanban-add{
-  margin-top:8px;padding:8px;border:0.5px dashed #E0E0E0;border-radius:8px;
-  font-size:11px;color:#A3A3A3;text-align:center;cursor:pointer;background:transparent;
-  font-family:var(--font);transition:.15s;width:100%;
+.aff-doc-row:last-child{border:none;}
+.aff-doc-icon{width:28px;height:32px;background:#F5F5F5;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#525252;flex-shrink:0;}
+.aff-acte-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+.aff-acte-btn{
+  padding:9px 8px;border:0.5px solid #E5E5E5;border-radius:8px;
+  cursor:pointer;transition:.15s;background:#FAFAFA;text-align:center;
 }
-.kanban-add:hover{background:#F0F0F0;color:#0A0A0A;}
+.aff-acte-btn:hover{border-color:#0A0A0A;background:#F0F0F0;}
+.aff-acte-name{font-size:11px;font-weight:500;color:#0A0A0A;margin-bottom:2px;}
+.aff-acte-desc{font-size:9px;color:#A3A3A3;}
 </style>
 </head>
 <body>
@@ -1092,69 +1125,32 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
 <!-- ── AFFAIRES ─────────────────────────────────── -->
     <div class="page" id="page-affaires">
-      <div class="aff-layout-v2">
-        <div class="aff-toolbar-v2">
-          <span class="aff-toolbar-title" id="aff-main-title">Mes affaires</span>
-          <input type="file" id="file-input-aff" accept=".pdf" style="display:none" onchange="uploadFichier(this.files[0], AFFAIRE_ACTIVE?.id)"/>
-          <button class="btn-sm primary" id="btn-aff-upload" onclick="document.getElementById('file-input-aff').click()" style="display:none;">+ Pièce</button>
-          <button class="btn-sm primary" onclick="creerAffaire()">+ Nouvelle affaire</button>
+      <div class="aff-v3">
+        <!-- Sidebar liste -->
+        <div class="aff-v3-sidebar">
+          <div class="aff-v3-sidebar-hdr">
+            <span class="aff-v3-sidebar-title">Mes affaires</span>
+            <button onclick="creerAffaire()" style="font-size:11px;padding:4px 10px;border:0.5px solid #E5E5E5;border-radius:6px;background:#0A0A0A;color:#fff;cursor:pointer;font-family:var(--font);">+ Nouvelle</button>
+          </div>
+          <div class="aff-v3-list" id="aff-v3-list"></div>
         </div>
-        <div style="flex:1;display:flex;overflow:hidden;">
-        <div class="aff-kanban" id="aff-kanban" style="flex:1;">
-          <div class="kanban-col" id="col-saisine">
-            <div class="kanban-col-hdr">
-              <span class="kanban-col-title">Saisine</span>
-              <span class="kanban-col-count" id="cnt-saisine">0</span>
-            </div>
-            <div class="kanban-cards" id="cards-saisine"></div>
-            <div class="kanban-empty" id="empty-saisine">Aucune affaire</div>
+        <!-- Page affaire -->
+        <div class="aff-v3-main">
+          <div class="aff-v3-main-hdr">
+            <span class="aff-v3-main-title" id="aff-v3-title">Affaires</span>
+            <input type="file" id="file-input-aff" accept=".pdf" style="display:none" onchange="uploadFichier(this.files[0], AFFAIRE_ACTIVE?.id)"/>
+            <button class="btn-sm" id="btn-aff-upload" onclick="document.getElementById('file-input-aff').click()" style="display:none;">+ Pièce</button>
           </div>
-          <div class="kanban-col" id="col-instruction">
-            <div class="kanban-col-hdr">
-              <span class="kanban-col-title">Instruction</span>
-              <span class="kanban-col-count" id="cnt-instruction">0</span>
+          <div class="aff-v3-body" id="aff-v3-body">
+            <div class="aff-v3-empty">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#E5E5E5" stroke-width="1"><path d="M2 4h12v10H2zM5 4V2h6v2"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+              <div style="font-size:13px;font-weight:500;color:#D4D4D4;">Sélectionnez une affaire</div>
+              <div style="font-size:12px;color:#E5E5E5;max-width:200px;line-height:1.6;">ou créez-en une nouvelle</div>
             </div>
-            <div class="kanban-cards" id="cards-instruction"></div>
-            <div class="kanban-empty" id="empty-instruction">Aucune affaire</div>
-          </div>
-          <div class="kanban-col" id="col-audience">
-            <div class="kanban-col-hdr">
-              <span class="kanban-col-title">Audience</span>
-              <span class="kanban-col-count" id="cnt-audience">0</span>
-            </div>
-            <div class="kanban-cards" id="cards-audience"></div>
-            <div class="kanban-empty" id="empty-audience">Aucune affaire</div>
-          </div>
-          <div class="kanban-col" id="col-delibere">
-            <div class="kanban-col-hdr">
-              <span class="kanban-col-title">Délibéré</span>
-              <span class="kanban-col-count" id="cnt-delibere">0</span>
-            </div>
-            <div class="kanban-cards" id="cards-delibere"></div>
-            <div class="kanban-empty" id="empty-delibere">Aucune affaire</div>
-          </div>
-          <div class="kanban-col" id="col-cloture">
-            <div class="kanban-col-hdr">
-              <span class="kanban-col-title">Clôture</span>
-              <span class="kanban-col-count" id="cnt-cloture">0</span>
-            </div>
-            <div class="kanban-cards" id="cards-cloture"></div>
-            <div class="kanban-empty" id="empty-cloture">Aucune affaire</div>
           </div>
         </div>
       </div>
     </div>
-
-        <!-- Panel détail affaire -->
-        <div id="aff-detail-panel" style="width:0;flex-shrink:0;overflow:hidden;transition:width .3s ease;border-left:0.5px solid #E5E5E5;background:#FFFFFF;display:flex;flex-direction:column;">
-          <div style="padding:12px 16px;border-bottom:0.5px solid #E5E5E5;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#FAFAFA;">
-            <span style="font-size:13px;font-weight:500;color:#0A0A0A;" id="detail-nom">—</span>
-            <button onclick="fermerDetailAffaire()" style="background:none;border:none;cursor:pointer;font-size:18px;color:#A3A3A3;line-height:1;">&times;</button>
-          </div>
-          <div id="detail-body" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px;"></div>
-        </div>
-
-</div>
 
     <!-- ── ANALYSE ──────────────────────────────────── -->
     <div class="page" id="page-analyse">
@@ -1486,45 +1482,37 @@ async function chargerStats() {
 }
 
 // ── AFFAIRES KANBAN ──────────────────────────────────
-const ETAPES_MAP = ['saisine','instruction','audience','delibere','cloture'];
-const ETAPES_ACTIONS = ['Instruire','Continuer','Préparer audience','Attendre','Clôturer'];
+const ETAPES_LABELS = ['Saisine','Instruction','Audience','Délibéré','Clôture'];
 
 function renderKanban(affaires) {
-  ETAPES_MAP.forEach(etape => {
-    document.getElementById('cards-' + etape).innerHTML = '';
-    document.getElementById('cnt-' + etape).textContent = '0';
-    document.getElementById('empty-' + etape).style.display = 'block';
-  });
+  // Compatibilité — plus de kanban, on utilise renderAffairesList
+  renderAffairesList(affaires);
+}
 
-  const counts = {};
-  ETAPES_MAP.forEach(e => counts[e] = 0);
-
+function renderAffairesList(affaires) {
+  const list = document.getElementById('aff-v3-list');
+  if (!list) return;
+  list.innerHTML = '';
+  if (!affaires.length) {
+    list.innerHTML = '<div class="aff-v3-empty-sidebar">Aucune affaire.<br>Créez-en une.</div>';
+    return;
+  }
   affaires.forEach(a => {
-    const etapeIdx = Math.min(a.etape_index || 0, ETAPES_MAP.length - 1);
-    const etape    = ETAPES_MAP[etapeIdx];
-    const action   = ETAPES_ACTIONS[etapeIdx];
-    counts[etape]++;
-
-    const dotCls = etapeIdx === 0 ? 'kc-dot-g' : etapeIdx <= 2 ? 'kc-dot-b' : 'kc-dot-y';
-    const card = document.createElement('div');
-    card.className = 'kanban-card' + (AFFAIRE_ACTIVE?.id === a.id ? ' sel' : '');
-    card.innerHTML =
-      '<div class="kc-nom">' + a.nom + '</div>'
-      + '<div class="kc-desc">' + (a.description || 'Aucune description') + '</div>'
-      + '<div class="kc-footer">'
-      + '<div class="kc-pieces"><div class="kc-dot ' + dotCls + '"></div>' + (a.nb_docs || 0) + ' pièce(s)</div>'
-      + '<div style="display:flex;gap:6px;">'
-      + '<button class="kc-del" onclick="event.stopPropagation();supprimerAffaire(\"' + a.id + '\",\"' + a.nom.replace(/"/g,"&quot;") + '\")">✕</button>'
-      + '<button class="kc-action" onclick="event.stopPropagation();selectionnerAffaire(' + JSON.stringify(a) + ')">' + action + ' →</button>'
-      + '</div>'
-      + '</div>';
-    card.onclick = () => selectionnerAffaireKanban(a);
-    document.getElementById('cards-' + etape).appendChild(card);
-    document.getElementById('empty-' + etape).style.display = 'none';
-  });
-
-  ETAPES_MAP.forEach(e => {
-    document.getElementById('cnt-' + e).textContent = counts[e];
+    const etapeIdx = Math.min(a.etape_index || 0, ETAPES_LABELS.length - 1);
+    const row = document.createElement('div');
+    row.className = 'aff-v3-row' + (AFFAIRE_ACTIVE?.id === a.id ? ' active' : '');
+    const delBtn = document.createElement('button');
+    delBtn.className = 'aff-v3-del';
+    delBtn.textContent = '✕';
+    delBtn.onclick = e => { e.stopPropagation(); supprimerAffaire(a.id, a.nom); };
+    const dot  = document.createElement('div'); dot.className = 'aff-v3-dot';
+    const info = document.createElement('div'); info.className = 'aff-v3-info';
+    info.innerHTML = '<div class="aff-v3-nom">' + a.nom + '</div><div class="aff-v3-meta">' + ETAPES_LABELS[etapeIdx] + '</div>';
+    row.appendChild(dot);
+    row.appendChild(info);
+    row.appendChild(delBtn);
+    row.onclick = () => selectionnerAffaire(a);
+    list.appendChild(row);
   });
 }
 
@@ -1554,11 +1542,7 @@ async function creerAffaire() {
 }
 
 async function selectionnerAffaireKanban(a) {
-  AFFAIRE_ACTIVE = a;
-  document.getElementById('hdr-dossier').style.display = 'flex';
-  document.getElementById('hdr-dossier-name').textContent = a.nom;
-  document.getElementById('btn-aff-upload').style.display = 'inline-flex';
-  await ouvrirDetailAffaire(a);
+  await selectionnerAffaire(a);
 }
 
 async function ouvrirDetailAffaire(a) {
@@ -1598,13 +1582,7 @@ async function ouvrirDetailAffaire(a) {
         + '</div>').join('')
     : '<div style="font-size:12px;color:#A3A3A3;padding:8px 0;">Aucune pièce — ajoutez un document.</div>';
 
-  const actesHtml = ACTES_12.map(act => {
-    const akey = act.key, aid = a.id;
-    return '<div onclick="showRedactionAffaire(\"' + akey + '\",\"' + aid + '\")" style="padding:8px 10px;border:0.5px solid #E5E5E5;border-radius:7px;cursor:pointer;background:#FAFAFA;transition:.15s;">'
-      + '<div style="font-size:12px;font-weight:500;color:#0A0A0A;">' + act.name + '</div>'
-      + '<div style="font-size:10px;color:#A3A3A3;">' + act.desc + '</div>'
-      + '</div>';
-  }).join('');
+
 
   const etapes = ['Saisine','Instruction','Audience','Délibéré','Clôture'];
   const etapeIdx = Math.min(a.etape_index || 0, etapes.length - 1);
@@ -1639,11 +1617,7 @@ function ajouterPieceAffaire() {
   if (inp) inp.click();
 }
 
-function fermerDetailAffaire() {
-  const panel = document.getElementById('aff-detail-panel');
-  if (panel) panel.style.width = '0';
-  AFFAIRE_ACTIVE = null;
-}
+function fermerDetailAffaire() { AFFAIRE_ACTIVE = null; }
 
 function showRedactionAffaire(type, dossierId) {
   const labels = {
@@ -1726,12 +1700,147 @@ async function selectionnerAffaire(a) {
   AFFAIRE_ACTIVE = a;
   document.getElementById('hdr-dossier').style.display = 'flex';
   document.getElementById('hdr-dossier-name').textContent = a.nom;
-  document.getElementById('aff-main-title').textContent = a.nom;
-  document.getElementById('btn-aff-upload').style.display = 'inline-flex';
-  document.querySelectorAll('.aff-item').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.sb-affaire').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.aff-v3-row').forEach(el => el.classList.remove('active'));
+  // Marquer la ligne active
+  const rows = document.querySelectorAll('.aff-v3-row');
+  rows.forEach(r => { if(r.querySelector('.aff-v3-nom')?.textContent === a.nom) r.classList.add('active'); });
+  const btn = document.getElementById('btn-aff-upload');
+  if (btn) btn.style.display = 'inline-flex';
   showPage('affaires');
-  await chargerCorpsAffaire(a);
+  await afficherPageAffaire(a);
+}
+
+async function afficherPageAffaire(a) {
+  const body  = document.getElementById('aff-v3-body');
+  const title = document.getElementById('aff-v3-title');
+  if (!body) return;
+  if (title) title.textContent = a.nom;
+
+  // Charger les documents de l'affaire
+  let docs = [];
+  try { docs = await apiFetch('/liste_documents?dossier_id=' + a.id) || []; } catch(e) {}
+
+  const etapeIdx = Math.min(a.etape_index || 0, ETAPES_LABELS.length - 1);
+  const etapeBtns = ETAPES_LABELS.map((e, i) =>
+    '<button class="aff-etape-btn' + (i === etapeIdx ? ' active' : '') + '" onclick="changerEtape(' + i + ')">' + e + '</button>'
+  ).join('');
+
+  const docsHtml = docs.length
+    ? docs.map(d => {
+        const nom  = (d.nom||d.filename||'').replace(/"/g,'&quot;');
+        const date = d.created_at ? new Date(d.created_at).toLocaleDateString('fr') : '';
+        const did  = d.id;
+        return '<div class="aff-doc-row">'
+          + '<div class="aff-doc-icon">PDF</div>'
+          + '<div style="flex:1;min-width:0;"><div style="font-size:12px;color:#0A0A0A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + nom + '</div>'
+          + '<div style="font-size:10px;color:#A3A3A3;">' + date + '</div></div>'
+          + '<button data-did="' + did + '" onclick="supprimerDocAffaire(this)" style="border:none;background:none;color:#D4D4D4;cursor:pointer;font-size:12px;padding:4px;" title="Supprimer">✕</button>'
+          + '</div>';
+      }).join('')
+    : '<div style="font-size:12px;color:#A3A3A3;padding:4px 0;">Aucune pièce — ajoutez un document</div>';
+
+  const ACTES = [
+    {key:'requete_introductive',  name:'Requête introductive',   desc:'Saisine tribunal'},
+    {key:'conclusions_fond',      name:'Conclusions défense',    desc:'Argumentation fond'},
+    {key:'injonction_payer',      name:'Injonction de payer',    desc:'Art. 1-21 AUPSRVE'},
+    {key:'mise_en_demeure',       name:'Mise en demeure',        desc:'Sommation préalable'},
+    {key:'saisie_attribution',    name:'Saisie-attribution',     desc:'Art. 153-172 AUPSRVE'},
+    {key:'memoire_reponse',       name:'Mémoire en réplique',    desc:'Réponse conclusions'},
+    {key:'contestation_saisie',   name:'Contestation saisie',    desc:'Juge exécution'},
+    {key:'protocole_transactionnel',name:'Protocole transact.', desc:'Accord amiable'},
+    {key:'assignation_refere',    name:'Référé urgence',         desc:'Procédure urgente'},
+    {key:'appel',                 name:'Appel',                  desc:'Recours décision'},
+    {key:'pourvoi_cassation',     name:'Pourvoi cassation',      desc:'CCJA / Cour Suprême'},
+    {key:'avis_juridique',        name:'Avis juridique',         desc:'Legal opinion'},
+  ];
+  const actesHtml = ACTES.map(ac => {
+    const k = ac.key, n = ac.name, ds = ac.desc;
+    return '<div class="aff-acte-btn" data-acte="' + k + '" onclick="lancerRedactionAffaire(this.dataset.acte)">'
+      + '<div class="aff-acte-name">' + n + '</div>'
+      + '<div class="aff-acte-desc">' + ds + '</div>'
+      + '</div>';
+  }).join('');
+
+  const _etapeBtns = ETAPES_LABELS.map((e, i) =>
+    '<button class="aff-etape-btn' + (i === etapeIdx ? ' active' : '') + '" onclick="changerEtape(' + i + ')">' + e + '</button>'
+  ).join('');
+
+  const _aff_demandeur  = (a.demandeur||'').replace(/"/g,'&quot;');
+  const _aff_defendeur  = (a.defendeur||'').replace(/"/g,'&quot;');
+  const _aff_juridiction= (a.juridiction||'').replace(/"/g,'&quot;');
+  const _aff_numero     = (a.numero_role||'').replace(/"/g,'&quot;');
+  const _aff_faits      = (a.description||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  body.innerHTML =
+    '<div class="aff-card">'
+    + '<div class="aff-card-hdr"><span class="aff-card-title">Informations générales</span>'
+    + '<button onclick="sauvegarderAffaire()" style="font-size:11px;padding:4px 12px;background:#0A0A0A;color:#fff;border:none;border-radius:6px;cursor:pointer;">Enregistrer</button>'
+    + '</div>'
+    + '<div class="aff-card-body">'
+    + '<div class="aff-field-row">'
+    + '<div class="aff-field"><label>Partie demanderesse</label><input id="aff-demandeur" value="' + _aff_demandeur + '" placeholder="Nom ou dénomination"/></div>'
+    + '<div class="aff-field"><label>Partie défenderesse</label><input id="aff-defendeur" value="' + _aff_defendeur + '" placeholder="Nom ou dénomination"/></div>'
+    + '</div>'
+    + '<div class="aff-field-row">'
+    + '<div class="aff-field"><label>Juridiction</label><input id="aff-juridiction" value="' + _aff_juridiction + '" placeholder="Ex : TGI Douala"/></div>'
+    + '<div class="aff-field"><label>Numéro de rôle</label><input id="aff-numero" value="' + _aff_numero + '" placeholder="Ex : 123/CIV/2025"/></div>'
+    + '</div>'
+    + '<div class="aff-field"><label>Exposé des faits</label><textarea id="aff-faits" placeholder="Décrivez les faits...">' + _aff_faits + '</textarea></div>'
+    + '<div class="aff-field"><label>Étape procédurale</label><div class="aff-etape-bar" id="aff-etape-bar">' + _etapeBtns + '</div></div>'
+    + '</div></div>'
+
+    + '<div class="aff-card">'
+    + '<div class="aff-card-hdr"><span class="aff-card-title">Pièces (' + docs.length + ')</span>'
+    + '<button onclick="ajouterPieceAffaire()" style="font-size:10px;padding:3px 9px;border:0.5px solid #E5E5E5;border-radius:5px;background:#fff;color:#525252;cursor:pointer;">+ Ajouter</button>'
+    + '</div>'
+    + '<div class="aff-card-body" id="aff-docs-body">' + docsHtml + '</div>'
+    + '</div>'
+
+    + '<div class="aff-card">'
+    + '<div class="aff-card-hdr"><span class="aff-card-title">Rédiger un acte</span></div>'
+    + '<div class="aff-card-body"><div class="aff-acte-grid">' + actesHtml + '</div></div>'
+    + '</div>';
+
+    // Stocker etapeIdx courant
+  window._affEtapeIdx = etapeIdx;
+}
+
+function changerEtape(idx) {
+  window._affEtapeIdx = idx;
+  document.querySelectorAll('.aff-etape-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+}
+
+async function sauvegarderAffaire() {
+  if (!AFFAIRE_ACTIVE) return;
+  const demandeur  = document.getElementById('aff-demandeur')?.value || '';
+  const defendeur  = document.getElementById('aff-defendeur')?.value || '';
+  const juridiction= document.getElementById('aff-juridiction')?.value || '';
+  const numero     = document.getElementById('aff-numero')?.value || '';
+  const faits      = document.getElementById('aff-faits')?.value || '';
+  const etapeIdx   = window._affEtapeIdx || 0;
+  try {
+    await apiFetch('/dossiers/' + AFFAIRE_ACTIVE.id, 'PUT', {
+      nom: AFFAIRE_ACTIVE.nom,
+      description: faits,
+      etape_index: etapeIdx,
+      demandeur, defendeur, juridiction, numero_role: numero
+    });
+    showToast('Affaire enregistrée');
+    AFFAIRE_ACTIVE = {...AFFAIRE_ACTIVE, description:faits, etape_index:etapeIdx, demandeur, defendeur, juridiction, numero_role:numero};
+    await chargerAffaires();
+  } catch(e) { showToast('Erreur enregistrement', true); }
+}
+
+function lancerRedactionAffaire(type) {
+  const faits = document.getElementById('aff-faits')?.value || '';
+  const dem   = document.getElementById('aff-demandeur')?.value || '';
+  const def   = document.getElementById('aff-defendeur')?.value || '';
+  if (!faits && !dem) {
+    showToast("Renseignez d'abord les informations de l'affaire", true);
+    return;
+  }
+  redigerActe(type, faits || (dem + ' c/ ' + def));
 }
 
 async function chargerCorpsAffaire(a) {
@@ -2632,6 +2741,12 @@ function showLoading(show) {
 }
 
 function chargerDashboard() { chargerStats(); chargerAffaires(); }
+
+function supprimerDocAffaire(btn) {
+  const did = btn.getAttribute('data-did');
+  if (!did || !confirm('Supprimer ce document ?')) return;
+  supprimerDocById(did, btn);
+}
 
 function showToast(msg, err=false) {
   const t = document.getElementById('toast');
