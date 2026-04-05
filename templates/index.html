@@ -1576,18 +1576,18 @@ async function ouvrirDetailAffaire(a) {
   try { docs = await apiFetch('/liste_documents?dossier_id=' + a.id) || []; } catch(e) {}
 
   const ACTES_12 = [
-    {key:'requete',           name:'Requête introductive',         desc:'Saisine du tribunal'},
-    {key:'conclusions_fond',  name:'Conclusions en défense',       desc:'Argumentation au fond OHADA'},
-    {key:'injonction_payer',  name:'Injonction de payer',          desc:'Art. 1-21 AUPSRVE OHADA'},
-    {key:'mise_en_demeure',   name:'Mise en demeure',              desc:'Sommation préalable'},
-    {key:'contrat',           name:'Contrat / Pacte actionnaires', desc:'AUSCGIE — rédaction'},
-    {key:'saisie_attribution',name:'Saisie-attribution',           desc:'Art. 153-172 AUPSRVE'},
-    {key:'replique',          name:'Mémoire en réplique',          desc:'Réponse aux conclusions adverses'},
-    {key:'memoire_ccja',      name:'Mémoire ampliatif CCJA',       desc:'Recours en cassation OHADA'},
-    {key:'contestation_saisie',name:'Contestation de saisie',      desc:'Requête juge execution'},
-    {key:'jurisprudence',     name:'Résumé jurisprudence',         desc:'Note de décision CCJA/OHADA'},
-    {key:'protocole',         name:'Protocole transactionnel',     desc:'Accord amiable entre parties'},
-    {key:'commandement_payer',name:'Commandement de payer',        desc:'Préalable saisie immobilière'},
+    {key:'requete_introductive',  name:'Requête introductive',         desc:'Saisine du tribunal'},
+    {key:'conclusions_fond',      name:'Conclusions en défense',       desc:'Argumentation au fond OHADA'},
+    {key:'injonction_payer',      name:'Injonction de payer',          desc:'Art. 1-21 AUPSRVE OHADA'},
+    {key:'mise_en_demeure',       name:'Mise en demeure',              desc:'Sommation préalable'},
+    {key:'protocole_transactionnel',name:'Contrat / Pacte actionnaires',desc:'AUSCGIE — rédaction'},
+    {key:'saisie_attribution',    name:'Saisie-attribution',           desc:'Art. 153-172 AUPSRVE'},
+    {key:'memoire_reponse',       name:'Mémoire en réplique',          desc:'Réponse aux conclusions adverses'},
+    {key:'memoire_ccja',          name:'Mémoire ampliatif CCJA',       desc:'Recours en cassation OHADA'},
+    {key:'contestation_saisie',   name:'Contestation de saisie',       desc:'Requête juge execution'},
+    {key:'avis_juridique',        name:'Résumé jurisprudence',         desc:'Note de décision CCJA/OHADA'},
+    {key:'protocole_transactionnel',name:'Protocole transactionnel',   desc:'Accord amiable entre parties'},
+    {key:'saisie_immobiliere',    name:'Commandement de payer',        desc:'Préalable saisie immobilière'},
   ];
 
   const docsHtml = docs.length
@@ -1647,18 +1647,17 @@ function fermerDetailAffaire() {
 
 function showRedactionAffaire(type, dossierId) {
   const labels = {
-    'requete':            'Requête introductive',
-    'conclusions_fond':   'Conclusions en défense au fond',
-    'injonction_payer':   'Requête en injonction de payer',
-    'mise_en_demeure':    'Mise en demeure',
-    'contrat':            'Contrat / Pacte actionnaires',
-    'saisie_attribution': 'Acte de saisie-attribution',
-    'replique':           'Mémoire en réplique',
-    'memoire_ccja':       'Mémoire ampliatif CCJA',
-    'contestation_saisie':'Contestation de saisie',
-    'jurisprudence':      'Note de jurisprudence CCJA',
-    'protocole':          'Protocole transactionnel',
-    'commandement_payer': 'Commandement de payer',
+    'requete_introductive':    'Requête introductive',
+    'conclusions_fond':        'Conclusions en défense au fond',
+    'injonction_payer':        'Requête en injonction de payer',
+    'mise_en_demeure':         'Mise en demeure',
+    'protocole_transactionnel':'Protocole transactionnel',
+    'saisie_attribution':      'Acte de saisie-attribution',
+    'memoire_reponse':         'Mémoire en réplique',
+    'memoire_ccja':            'Mémoire ampliatif CCJA',
+    'contestation_saisie':     'Contestation de saisie',
+    'avis_juridique':          'Note de jurisprudence CCJA',
+    'saisie_immobiliere':      'Commandement de payer',
   };
   const nom = labels[type] || type;
   const faits = prompt('Décrivez les faits pour : ' + nom);
@@ -1896,10 +1895,9 @@ function afficherDocViewer(doc) {
   document.querySelectorAll('[data-doc-id="' + doc.id + '"]').forEach(el => el.classList.add('active'));
 
   const _t=document.getElementById('bib-doc-title'); if(_t) _t.textContent=doc.nom||doc.filename;
-  document.getElementById('btn-carte-mentale').style.display = 'inline-flex';
-  document.getElementById('btn-rediger-bib').style.display   = 'inline-flex';
-  document.getElementById('btn-export-bib').style.display    = 'inline-flex';
-  document.getElementById('btn-del-bib').style.display       = 'inline-flex';
+  const _bcm=document.getElementById('btn-carte-mentale'); if(_bcm) _bcm.style.display='inline-flex';
+  const _br=document.getElementById('btn-rediger-bib'); if(_br) _br.style.display='inline-flex';
+  const _be=document.getElementById('btn-export-bib'); if(_be) _be.style.display='inline-flex';
 
   const _nom   = doc.nom || doc.filename || '';
   const _tier  = doc.storage_tier || 'hot';
@@ -2580,7 +2578,9 @@ async function apiFetch(url, method='GET', body=null) {
     showToast('Session expirée — reconnectez-vous', true);
     throw new Error('Session expirée');
   }
-  return await r.json();
+  const text = await r.text();
+  if (!text || !text.trim()) return null;
+  try { return JSON.parse(text); } catch(e) { console.error('JSON parse error:', text.slice(0,200)); return null; }
 }
 
 
