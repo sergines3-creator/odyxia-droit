@@ -781,8 +781,67 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 }
 .bib-upload-btn:hover{background:#F0F0F0;color:#0A0A0A;border-color:#A3A3A3;}
 
+/* ══ RÉDACTION ════════════════════════════════════════ */
+.redac-layout{flex:1;display:grid;grid-template-columns:300px 1fr;overflow:hidden;}
+.redac-form-col{
+  background:#FAFAFA;border-right:0.5px solid #E5E5E5;
+  display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;
+  padding:16px;gap:12px;
+}
+.redac-result-col{
+  flex:1;display:flex;flex-direction:column;overflow:hidden;background:#F5F5F5;
+}
+.redac-result-toolbar{
+  padding:10px 16px;background:#fff;border-bottom:0.5px solid #E5E5E5;
+  display:flex;align-items:center;gap:8px;flex-shrink:0;
+}
+.redac-result-body{
+  flex:1;overflow-y:auto;padding:20px;
+}
+.redac-result-empty{
+  height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;color:#D4D4D4;gap:12px;text-align:center;
+}
+.redac-section-title{
+  font-size:10px;font-weight:600;color:#A3A3A3;
+  text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;
+}
+.redac-acte-list{display:flex;flex-direction:column;gap:4px;}
+.redac-acte-item{
+  display:flex;align-items:center;gap:10px;padding:8px 10px;
+  border:0.5px solid #E5E5E5;border-radius:7px;cursor:pointer;
+  transition:.15s;background:#fff;
+}
+.redac-acte-item:hover{border-color:#0A0A0A;background:#F5F5F5;}
+.redac-acte-item.active{border-color:#0A0A0A;background:#0A0A0A;}
+.redac-acte-item.active .redac-acte-nom{color:#fff;}
+.redac-acte-item.active .redac-acte-desc{color:#A3A3A3;}
+.redac-acte-nom{font-size:12px;font-weight:500;color:#0A0A0A;}
+.redac-acte-desc{font-size:10px;color:#A3A3A3;margin-top:1px;}
+.redac-champs{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.redac-champ{display:flex;flex-direction:column;gap:4px;}
+.redac-champ label{font-size:10px;font-weight:500;color:#A3A3A3;text-transform:uppercase;letter-spacing:0.4px;}
+.redac-champ input,.redac-champ textarea,.redac-champ select{
+  border:0.5px solid #E5E5E5;border-radius:7px;padding:8px 11px;
+  font-size:12px;font-family:var(--font);color:#0A0A0A;
+  background:#fff;outline:none;transition:.15s;width:100%;
+}
+.redac-champ input:focus,.redac-champ textarea:focus{border-color:#0A0A0A;}
+.redac-champ textarea{min-height:90px;resize:vertical;line-height:1.6;}
+.redac-doc-content{
+  background:#fff;border:0.5px solid #E5E5E5;border-radius:10px;
+  padding:28px 32px;max-width:740px;margin:0 auto;
+  font-size:13px;line-height:1.8;color:#0A0A0A;
+}
+.redac-doc-content h1{font-family:var(--serif);font-size:18px;font-weight:500;color:#0A0A0A;margin:0 0 20px;padding-bottom:12px;border-bottom:0.5px solid #E5E5E5;text-align:center;}
+.redac-doc-content h2{font-size:13px;font-weight:600;color:#0A0A0A;margin:20px 0 8px;text-transform:uppercase;letter-spacing:0.3px;}
+.redac-doc-content h3{font-size:13px;font-weight:500;color:#0A0A0A;margin:16px 0 6px;}
+.redac-doc-content p{margin-bottom:10px;}
+.redac-doc-content strong{font-weight:600;}
+.redac-doc-content hr{border:none;border-top:0.5px solid #E5E5E5;margin:16px 0;}
+
 /* ══ AFFAIRES v3 ══════════════════════════════════════ */
-.aff-v3{flex:1;display:grid;grid-template-columns:260px 1fr;overflow:hidden;}
+.aff-v3{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .aff-v3-sidebar{
   background:#FAFAFA;border-right:0.5px solid #E5E5E5;
   display:flex;flex-direction:column;overflow:hidden;
@@ -810,7 +869,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .aff-v3-del:hover{background:#FEE2E2;color:#DC2626;}
 .aff-v3-empty-sidebar{padding:20px 12px;text-align:center;font-size:12px;color:#A3A3A3;line-height:1.6;}
 /* Page affaire */
-.aff-v3-main{display:flex;flex-direction:column;overflow:hidden;background:#F5F5F5;}
+.aff-v3-main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#F5F5F5;}
 .aff-v3-main-hdr{
   padding:12px 16px;background:#fff;border-bottom:0.5px solid #E5E5E5;
   display:flex;align-items:center;gap:10px;flex-shrink:0;
@@ -981,6 +1040,13 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
         </svg>
         Comparaison
       </div>
+
+      <div class="nav-item" onclick="showPage('redaction')" id="nav-redaction">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M11 2.5a2 2 0 113 3L5.5 14 2 15l1-3.5z"/>
+        </svg>
+        Rédaction
+      </div>
     </div>
 
     <div class="sb-sep"></div>
@@ -1074,6 +1140,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
           <button class="btn-sm" id="btn-carte-mentale" onclick="afficherCarteMentale()" style="display:none;">🗺 Carte mentale</button>
           <button class="btn-sm" id="btn-rediger-bib" onclick="showRedaction(null)" style="display:none;">Rédiger un acte</button>
           <button class="btn-sm primary" id="btn-export-bib" onclick="exporterPDF()" style="display:none;">Exporter PDF</button>
+          <button class="btn-sm danger" id="btn-del-bib" onclick="supprimerDocActif()" style="display:none;">🗑 Supprimer</button>
           <input type="file" id="file-input-bib" accept=".pdf" style="display:none" onchange="uploadFichier(this.files[0],null)"/>
         </div>
 
@@ -1126,14 +1193,6 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 <!-- ── AFFAIRES ─────────────────────────────────── -->
     <div class="page" id="page-affaires">
       <div class="aff-v3">
-        <!-- Sidebar liste -->
-        <div class="aff-v3-sidebar">
-          <div class="aff-v3-sidebar-hdr">
-            <span class="aff-v3-sidebar-title">Mes affaires</span>
-            <button onclick="creerAffaire()" style="font-size:11px;padding:4px 10px;border:0.5px solid #E5E5E5;border-radius:6px;background:#0A0A0A;color:#fff;cursor:pointer;font-family:var(--font);">+ Nouvelle</button>
-          </div>
-          <div class="aff-v3-list" id="aff-v3-list"></div>
-        </div>
         <!-- Page affaire -->
         <div class="aff-v3-main">
           <div class="aff-v3-main-hdr">
@@ -1331,7 +1390,58 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   </div>
 </div>
 
-<!-- ══ CHAT FLOTTANT ═══════════════════════════════════ -->
+    <!-- ── RÉDACTION ─────────────────────────────────── -->
+    <div class="page" id="page-redaction">
+      <div class="redac-layout">
+
+        <!-- Colonne gauche : choix acte + champs -->
+        <div class="redac-form-col" id="redac-form-col">
+
+          <div>
+            <div class="redac-section-title">Choisir un acte</div>
+            <div class="redac-acte-list" id="redac-acte-list">
+              <!-- rempli par JS -->
+            </div>
+          </div>
+
+          <div id="redac-champs-zone" style="display:none;">
+            <div style="height:0.5px;background:#E5E5E5;margin:4px 0 12px;"></div>
+            <div class="redac-section-title" id="redac-champs-title">Champs</div>
+            <div class="redac-champs" id="redac-champs"></div>
+            <button onclick="lancerRedaction()" style="
+              margin-top:12px;width:100%;padding:10px;background:#0A0A0A;color:#fff;
+              border:none;border-radius:7px;font-size:13px;font-weight:500;
+              font-family:var(--font);cursor:pointer;transition:.15s;
+            ">Générer le document</button>
+          </div>
+
+        </div>
+
+        <!-- Colonne droite : résultat -->
+        <div class="redac-result-col">
+          <div class="redac-result-toolbar">
+            <span style="font-size:12px;font-weight:500;color:#0A0A0A;flex:1;" id="redac-result-title">Document généré</span>
+            <button class="btn-sm" id="btn-redac-export" onclick="exporterRedaction()" style="display:none;">Exporter PDF</button>
+            <button class="btn-sm" id="btn-redac-copy" onclick="copierRedaction()" style="display:none;">Copier</button>
+          </div>
+          <div class="redac-result-body" id="redac-result-body">
+            <div class="redac-result-empty">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#E5E5E5" stroke-width="1">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/>
+              </svg>
+              <div style="font-size:13px;font-weight:500;color:#D4D4D4;">Choisissez un acte</div>
+              <div style="font-size:12px;color:#E5E5E5;max-width:220px;line-height:1.6;">
+                Sélectionnez un type d'acte, remplissez les champs et cliquez sur Générer.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ CHAT FLOTTANT ═══════════════════════════════════ -->
 <div id="chat-fab" onclick="toggleChat()">
   <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5">
     <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
@@ -1455,6 +1565,7 @@ async function init() {
   await chargerDocsBib();
   await chargerContexteMemoire();
   setTimeout(initAllResizers, 100);
+  initRedaction();
 }
 
 // ── NAVIGATION ───────────────────────────────────────
@@ -2007,6 +2118,7 @@ function afficherDocViewer(doc) {
   const _bcm=document.getElementById('btn-carte-mentale'); if(_bcm) _bcm.style.display='inline-flex';
   const _br=document.getElementById('btn-rediger-bib'); if(_br) _br.style.display='inline-flex';
   const _be=document.getElementById('btn-export-bib'); if(_be) _be.style.display='inline-flex';
+  const _bd=document.getElementById('btn-del-bib'); if(_bd) _bd.style.display='inline-flex';
 
   const _nom   = doc.nom || doc.filename || '';
   const _tier  = doc.storage_tier || 'hot';
@@ -2168,30 +2280,37 @@ function toggleOpt(id) {
 }
 
 async function supprimerDocById(id, btn) {
-  if (!window.confirm("Supprimer ce document ?")) return;
+  if (!window.confirm("Supprimer ce document définitivement ?")) return;
   try {
     await apiFetch('/supprimer_document', 'DELETE', {id});
     showToast('Document supprimé');
-    const row = btn.closest('.bib-doc-row');
+    const row = btn ? btn.closest('.bib-doc-row') : null;
     if (row) row.remove();
     if (DOC_ACTIF?.id === id) {
       DOC_ACTIF = null;
-      document.getElementById('bib-viewer').innerHTML = '<div class="bib-empty-viewer"><div style="font-size:13px;font-weight:500;color:#D4D4D4;">Sélectionnez un document</div></div>';
-      ['btn-carte-mentale','btn-rediger-bib','btn-export-bib'].forEach(i => { const el = document.getElementById(i); if(el) el.style.display='none'; });
+      document.getElementById('bib-viewer').innerHTML = '<div class="bib-empty-viewer"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#E5E5E5" stroke-width="1"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg><div style="font-size:13px;font-weight:500;color:#D4D4D4;">Sélectionnez un document</div></div>';
+      ['btn-carte-mentale','btn-rediger-bib','btn-export-bib','btn-del-bib'].forEach(i => { const el = document.getElementById(i); if(el) el.style.display='none'; });
+    }
+    // Mettre à jour le compteur nav
+    const countEl = document.getElementById('nav-bib-count');
+    if (countEl) {
+      const cur = parseInt(countEl.textContent) || 0;
+      countEl.textContent = Math.max(0, cur - 1);
     }
   } catch(e) { showToast('Erreur : ' + e.message, true); }
 }
 
 async function supprimerDocActif() {
-  if (!DOC_ACTIF || !confirm('Supprimer ce document ?')) return;
+  if (!DOC_ACTIF || !confirm('Supprimer ce document définitivement ? Cette action est irréversible.')) return;
+  const id = DOC_ACTIF.id;
   try {
-    await apiFetch('/supprimer_document', 'DELETE', {id: DOC_ACTIF.id});
+    await apiFetch('/supprimer_document', 'DELETE', {id});
     showToast('Document supprimé');
     DOC_ACTIF = null;
-    document.getElementById('bib-viewer').innerHTML = '<div class="doc-viewer-empty"><div style="font-size:13px;">Document supprimé</div></div>';
-    ['btn-carte-mentale','btn-rediger-bib','btn-export-bib','btn-del-bib'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
+    document.getElementById('bib-viewer').innerHTML = '<div class="bib-empty-viewer"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#E5E5E5" stroke-width="1"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg><div style="font-size:13px;font-weight:500;color:#D4D4D4;">Document supprimé</div></div>';
+    ['btn-carte-mentale','btn-rediger-bib','btn-export-bib','btn-del-bib'].forEach(i => { const el=document.getElementById(i); if(el) el.style.display='none'; });
     await chargerDocsBib();
-  } catch(e) { showToast('Erreur', true); }
+  } catch(e) { showToast('Erreur suppression', true); }
 }
 
 // ── REDACTION ─────────────────────────────────────────
@@ -2741,6 +2860,236 @@ function showLoading(show) {
 }
 
 function chargerDashboard() { chargerStats(); chargerAffaires(); }
+
+// ── ONGLET RÉDACTION ─────────────────────────────────
+const TOUS_ACTES = [
+  {key:'requete_introductive',   nom:'Requête introductive',        desc:'Saisine du tribunal',
+   champs:['tribunal','demandeur','defendeur','faits','fondements_juridiques','demandes']},
+  {key:'conclusions',            nom:'Conclusions',                  desc:'Défense ou demande',
+   champs:['tribunal','demandeur','defendeur','type_conclusions','faits','arguments','demandes']},
+  {key:'mise_en_demeure',        nom:'Mise en demeure',              desc:'Sommation préalable',
+   champs:['requérant','adversaire','objet','montant','delai','consequences','faits']},
+  {key:'injonction_payer',       nom:'Injonction de payer',          desc:'Art. 1-21 AUPSRVE',
+   champs:['creancier','debiteur','montant','nature_creance','date_exigibilite','faits']},
+  {key:'saisie_conservatoire',   nom:'Saisie conservatoire',         desc:'Art. 54+ AUPSRVE',
+   champs:['creancier','debiteur','montant','nature_creance','urgence','biens_vises','faits']},
+  {key:'saisie_attribution',     nom:'Saisie-attribution',           desc:'Art. 153-172 AUPSRVE',
+   champs:['creancier','debiteur','tiers_saisi','titre_executoire','montant','faits']},
+  {key:'contestation_saisie',    nom:'Contestation de saisie',       desc:"Juge de l'exécution",
+   champs:['requérant','creancier','nature_saisie','moyens','montant','faits']},
+  {key:'saisie_immobiliere',     nom:'Saisie immobilière',           desc:'Art. 246+ AUPSRVE',
+   champs:['creancier','debiteur','titre_executoire','montant','immeuble','titre_foncier','faits']},
+  {key:'opposition_injonction',  nom:'Opposition à injonction',      desc:'Art. 10 AUPSRVE',
+   champs:['debiteur','creancier','reference_ordonnance','montant','moyens','faits']},
+  {key:'memoire_reponse',        nom:'Mémoire en réponse',           desc:'Réfutation point par point',
+   champs:['arguments_adverses','faits','reponses','demandes_reconventionnelles']},
+  {key:'appel',                  nom:"Appel d'une décision",        desc:"Recours 1ère instance",
+   champs:['juridiction_appel','decision_attaquee','date_decision','appelant','intime','moyens_appel','demandes']},
+  {key:'pourvoi_cassation',      nom:'Pourvoi en cassation',         desc:'CCJA / Cour Suprême',
+   champs:['juridiction_cassation','decision_attaquee','pourvoyant','defenderesse','moyens_cassation']},
+  {key:'assignation_refere',     nom:"Assignation en référé",        desc:"Procédure d'urgence",
+   champs:['tribunal','demandeur','defendeur','urgence','mesures_demandees','fumus_boni_juris']},
+  {key:'protocole_transactionnel',nom:'Protocole transactionnel',    desc:'Accord amiable',
+   champs:['requérant','adversaire','objet','concession_a','concession_b','montant','modalites','faits']},
+  {key:'plainte_penale',         nom:'Plainte pénale',               desc:'Avec constitution PC',
+   champs:['plaignant','mis_en_cause','infractions','faits','prejudice','demandes']},
+  {key:'defense_penale',         nom:'Défense pénale',               desc:'Mémoire correctionnel',
+   champs:['prevenu','chefs_inculpation','these_defensive','nullites','arguments','faits']},
+  {key:'liberte_provisoire',     nom:"Liberté provisoire",           desc:'Art. 236+ CPP CMR',
+   champs:['inculpe','chefs_inculpation','date_arrestation','lieu_detention','garanties','faits']},
+  {key:'appel_penal',            nom:'Appel pénal',                  desc:'Art. 436+ CPP CMR',
+   champs:['appellant','intime','decision_attaquee','chefs_inculpation','moyens_appel','faits']},
+  {key:'licenciement_abusif',    nom:'Licenciement abusif',          desc:'Art. 34+ CT CMR',
+   champs:['salarie','employeur','poste','ancienneté','salaire','motif_licenciement','faits']},
+  {key:'recours_exces_pouvoir',  nom:'Recours excès de pouvoir',     desc:'Tribunal Administratif',
+   champs:['requérant','adversaire','acte_attaque','date_acte','moyens','faits']},
+  {key:'contestation_fonciere',  nom:'Contestation foncière',        desc:'Ord. 74/1 CMR',
+   champs:['requérant','adversaire','titre_foncier','localisation','superficie','droit_requérant','faits']},
+  {key:'arbitrage_ccja',         nom:'Arbitrage CCJA',               desc:"Règlement CCJA 2017",
+   champs:['requérant','adversaire','contrat','clause_arbitrage','objet','montant','faits']},
+  {key:'avis_juridique',         nom:'Avis juridique',               desc:'Legal opinion OHADA',
+   champs:['nom_client','objet_consultation','faits_resumes','analyse_juridique','domaine']},
+  {key:'lettre_consultation',    nom:'Lettre de consultation',       desc:'Synthèse pour client',
+   champs:['nom_client','objet_consultation','faits_resumes','analyse_juridique','recommandations']},
+  {key:'recours_fiscal',         nom:'Recours fiscal',               desc:'CGI + LPF CMR',
+   champs:['requérant','adversaire','nature_impot','periode','montant','moyens','faits']},
+  {key:'dissolution_societe',    nom:'Dissolution société',          desc:"Art. 200+ AUSCGIE",
+   champs:['requérant','societe','forme_sociale','capital','cause_dissolution','faits']},
+  {key:'procedure_collective',   nom:'Procédure collective',         desc:'Art. 25+ AUPC 2015',
+   champs:['debiteur','forme_sociale','actif','passif','date_cessation','perspectives','faits']},
+  {key:'transaction_prudhomale', nom:"Transaction prud'homale",     desc:'Rupture amiable CT CMR',
+   champs:['salarie','employeur','ancienneté','salaire','indemnites_legales','montant','faits']},
+];
+
+const CHAMP_LABELS = {
+  tribunal:"Tribunal / Juridiction", demandeur:"Demandeur", defendeur:"Défendeur",
+  faits:"Exposé des faits", fondements_juridiques:"Fondements juridiques",
+  demandes:"Demandes", arguments:"Arguments", type_conclusions:"Type de conclusions",
+  creancier:"Créancier", debiteur:"Débiteur", montant:"Montant (FCFA)",
+  nature_creance:"Nature de la créance", date_exigibilite:"Date d'exigibilité",
+  pieces:"Pièces disponibles", urgence:"Circonstances d'urgence",
+  biens_vises:"Biens visés", tiers_saisi:"Tiers saisi (banque/employeur)",
+  titre_executoire:"Titre exécutoire", immeuble:"Description immeuble",
+  titre_foncier:"Titre foncier n°", reference_ordonnance:"Référence ordonnance",
+  moyens:"Moyens / Arguments", nature_saisie:"Nature de la saisie",
+  arguments_adverses:"Arguments adverses", reponses:"Nos réponses",
+  demandes_reconventionnelles:"Demandes reconventionnelles",
+  juridiction_appel:"Cour d'appel", decision_attaquee:"Décision attaquée",
+  date_decision:"Date de la décision", appelant:"Appelant", intime:"Intimé",
+  moyens_appel:"Moyens d'appel", juridiction_cassation:"Juridiction (CCJA)",
+  pourvoyant:"Pourvoyant", defenderesse:"Partie défenderesse",
+  moyens_cassation:"Moyens de cassation", mesures_demandees:"Mesures demandées",
+  fumus_boni_juris:"Fumus boni juris", concession_a:"Concession Partie A",
+  concession_b:"Concession Partie B", modalites:"Modalités de paiement",
+  objet:"Objet du différend", plaignant:"Plaignant",
+  mis_en_cause:"Mis en cause", infractions:"Infractions visées",
+  prejudice:"Description du préjudice", prevenu:"Prévenu",
+  chefs_inculpation:"Chefs d'inculpation", these_defensive:"Thèse défensive",
+  nullites:"Nullités de procédure", inculpe:"Inculpé(e)",
+  date_arrestation:"Date d'arrestation", lieu_detention:"Lieu de détention",
+  garanties:"Garanties de représentation", appellant:"Appelant",
+  salarie:"Salarié", employeur:"Employeur", poste:"Poste occupé",
+  ancienneté:"Ancienneté", salaire:"Salaire mensuel (FCFA)",
+  motif_licenciement:"Motif de licenciement invoqué",
+  acte_attaque:"Acte administratif attaqué", date_acte:"Date de l'acte",
+  localisation:"Localisation du terrain", superficie:"Superficie",
+  droit_requérant:"Fondement du droit", contrat:"Contrat litigieux",
+  clause_arbitrage:"Clause compromissoire", nom_client:"Nom du client",
+  objet_consultation:"Question juridique", faits_resumes:"Faits résumés",
+  analyse_juridique:"Analyse / Contexte", domaine:"Domaine de droit",
+  recommandations:"Recommandations", nature_impot:"Nature de l'impôt",
+  periode:"Période fiscale", societe:"Société visée",
+  forme_sociale:"Forme sociale", capital:"Capital (FCFA)",
+  cause_dissolution:"Cause de dissolution", actif:"Actif disponible (FCFA)",
+  passif:"Passif exigible (FCFA)", date_cessation:"Date de cessation",
+  perspectives:"Perspectives de redressement", indemnites_legales:"Indemnités légales (FCFA)",
+  requérant:"Requérant", adversaire:"Partie adverse",
+};
+
+const CHAMPS_TEXTAREA = ['faits','arguments','demandes','moyens','these_defensive',
+  'nullites','garanties','moyens_cassation','arguments_adverses','reponses',
+  'prejudice','cause_dissolution','perspectives','objet_consultation',
+  'faits_resumes','analyse_juridique','recommandations','moyens_appel',
+  'concession_a','concession_b','fumus_boni_juris','fondements_juridiques',
+  'demandes_reconventionnelles','chefs_inculpation'];
+
+let ACTE_ACTIF = null;
+let REDAC_CONTENU = '';
+
+function initRedaction() {
+  const list = document.getElementById('redac-acte-list');
+  if (!list) return;
+  list.innerHTML = '';
+  TOUS_ACTES.forEach(acte => {
+    const el = document.createElement('div');
+    el.className = 'redac-acte-item';
+    el.innerHTML = '<div><div class="redac-acte-nom">' + acte.nom + '</div>'
+      + '<div class="redac-acte-desc">' + acte.desc + '</div></div>';
+    el.onclick = () => selectionnerActe(acte, el);
+    list.appendChild(el);
+  });
+}
+
+function selectionnerActe(acte, el) {
+  document.querySelectorAll('.redac-acte-item').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  ACTE_ACTIF = acte;
+  const zone = document.getElementById('redac-champs-zone');
+  const title = document.getElementById('redac-champs-title');
+  const champs = document.getElementById('redac-champs');
+  if (!zone || !champs) return;
+  zone.style.display = 'block';
+  title.textContent = acte.nom;
+  champs.innerHTML = '';
+  acte.champs.forEach(key => {
+    const label = CHAMP_LABELS[key] || key;
+    const isTA  = CHAMPS_TEXTAREA.includes(key);
+    const div = document.createElement('div');
+    div.className = 'redac-champ';
+    div.innerHTML = '<label>' + label + '</label>'
+      + (isTA
+        ? '<textarea id="rc-' + key + '" placeholder="' + label + '..."></textarea>'
+        : '<input type="text" id="rc-' + key + '" placeholder="' + label + '..."/>');
+    champs.appendChild(div);
+  });
+  // Pré-remplir avec l'affaire active si disponible
+  if (AFFAIRE_ACTIVE) {
+    const map = {
+      demandeur: AFFAIRE_ACTIVE.demandeur, defendeur: AFFAIRE_ACTIVE.defendeur,
+      faits: AFFAIRE_ACTIVE.description, juridiction: AFFAIRE_ACTIVE.juridiction,
+      requérant: AFFAIRE_ACTIVE.demandeur, adversaire: AFFAIRE_ACTIVE.defendeur,
+      tribunal: AFFAIRE_ACTIVE.juridiction,
+    };
+    Object.entries(map).forEach(([k,v]) => {
+      const el2 = document.getElementById('rc-' + k);
+      if (el2 && v) el2.value = v;
+    });
+  }
+}
+
+async function lancerRedaction() {
+  if (!ACTE_ACTIF) { showToast('Choisissez un acte', true); return; }
+  const donnees = {};
+  ACTE_ACTIF.champs.forEach(key => {
+    const el = document.getElementById('rc-' + key);
+    if (el) donnees[key] = el.value.trim();
+  });
+  const faitsKey = ACTE_ACTIF.champs.find(k => ['faits','faits_resumes'].includes(k));
+  if (faitsKey && !donnees[faitsKey]) {
+    showToast('Renseignez au minimum les faits', true); return;
+  }
+  showLoading(true);
+  const body = document.getElementById('redac-result-body');
+  body.innerHTML = '<div class="redac-result-empty"><div class="spinner"></div></div>';
+  try {
+    const r = await apiFetch('/rediger', 'POST', {
+      type: ACTE_ACTIF.key,
+      donnees,
+      session_id: SESSION_ID
+    });
+    showLoading(false);
+    if (!r || !r.document) { showToast('Erreur génération', true); return; }
+    REDAC_CONTENU = r.document;
+    document.getElementById('redac-result-title').textContent = r.nom || ACTE_ACTIF.nom;
+    document.getElementById('btn-redac-export').style.display = 'inline-flex';
+    document.getElementById('btn-redac-copy').style.display = 'inline-flex';
+    const html2 = r.document
+      .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+      .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+      .replace(/^# (.+)$/gm,'<h1>$1</h1>')
+      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g,'<em>$1</em>')
+      .replace(/^---+$/gm,'<hr/>')
+      .replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br/>');
+    body.innerHTML = '<div class="redac-doc-content"><p>' + html2 + '</p></div>';
+    showToast('Document généré');
+  } catch(e) {
+    showLoading(false);
+    showToast('Erreur : ' + e.message, true);
+  }
+}
+
+async function exporterRedaction() {
+  if (!REDAC_CONTENU) return;
+  try {
+    const r = await fetch('/export_pdf', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},
+      body: JSON.stringify({contenu: REDAC_CONTENU, nom: ACTE_ACTIF?.nom || 'Document'})
+    });
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = (ACTE_ACTIF?.nom || 'document').replace(/ /g,'_') + '.pdf';
+    a.click();
+    showToast('PDF exporté');
+  } catch(e) { showToast('Erreur export', true); }
+}
+
+function copierRedaction() {
+  if (!REDAC_CONTENU) return;
+  navigator.clipboard.writeText(REDAC_CONTENU).then(() => showToast('Copié')).catch(() => showToast('Erreur copie', true));
+}
 
 function supprimerDocAffaire(btn) {
   const did = btn.getAttribute('data-did');
