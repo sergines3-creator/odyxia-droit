@@ -2886,20 +2886,6 @@ def get_me():
         return jsonify({"nom": CABINET_AVOCAT}), 200
 
 
-@app.route("/me", methods=["GET"])
-@jwt_required()
-def get_me():
-    try:
-        user_id   = get_current_user_id()
-        result = supabase.table("users").select(
-            "full_name, email, role"
-        ).eq("id", user_id).execute()
-        if result.data:
-            u = result.data[0]
-            return jsonify({"nom": u.get("full_name", CABINET_AVOCAT), "email": u.get("email",""), "role": u.get("role","owner")})
-        return jsonify({"nom": CABINET_AVOCAT})
-    except Exception:
-        return jsonify({"nom": CABINET_AVOCAT}), 200
 
 
 @app.route("/health", methods=["GET"])
