@@ -1528,6 +1528,16 @@ function renderKanban(affaires) {
   });
 }
 
+async function supprimerAffaire(id, nom) {
+  if (!confirm('Supprimer "' + nom + '" ?')) return;
+  try {
+    await apiFetch('/dossiers/' + id, 'DELETE');
+    showToast('"' + nom + '" supprimée');
+    if (AFFAIRE_ACTIVE && AFFAIRE_ACTIVE.id === id) { AFFAIRE_ACTIVE = null; fermerDetailAffaire(); }
+    await chargerAffaires();
+  } catch(e) { showToast('Erreur suppression', true); }
+}
+
 async function creerAffaire() {
   const nom = prompt('Nom de la nouvelle affaire :');
   if (!nom || !nom.trim()) return;
@@ -1548,7 +1558,6 @@ async function selectionnerAffaireKanban(a) {
   document.getElementById('hdr-dossier').style.display = 'flex';
   document.getElementById('hdr-dossier-name').textContent = a.nom;
   document.getElementById('btn-aff-upload').style.display = 'inline-flex';
-  await chargerAffaires();
   await ouvrirDetailAffaire(a);
 }
 
@@ -1679,11 +1688,10 @@ async function chargerAffaires() {
 
     // Liste page affaires
     const list = document.getElementById('aff-list');
-    list.innerHTML = '';
-    if (!r.length) {
-      list.innerHTML = '<div style="padding:16px 14px;font-size:11px;color:var(--text3);">Aucune affaire — créez-en une</div>';
-      return;
+    if (list) {
+      list.innerHTML = r.length ? '' : '<div style="padding:16px 14px;font-size:11px;color:var(--text3);">Aucune affaire</div>';
     }
+    if (!r.length) { /* pas d'affaires — kanban géré via renderKanban */ }
     r.forEach(a => {
       const el = document.createElement('div');
       el.className = 'aff-item' + (AFFAIRE_ACTIVE?.id === a.id ? ' active' : '');
@@ -2622,6 +2630,8 @@ function initAllResizers() {
 function showLoading(show) {
   document.getElementById('loading').classList.toggle('show', show);
 }
+
+function chargerDashboard() { chargerStats(); chargerAffaires(); }
 
 function showToast(msg, err=false) {
   const t = document.getElementById('toast');
