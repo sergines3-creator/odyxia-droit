@@ -714,12 +714,15 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
 .bib-doc-list{flex:1;overflow-y:auto;}
 .bib-doc-row{
-  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  display:flex;align-items:center;gap:10px;padding:9px 12px;
   border-bottom:0.5px solid #F0F0F0;cursor:pointer;transition:.15s;
   border-left:2px solid transparent;
 }
 .bib-doc-row:hover{background:#F0F0F0;}
+.bib-doc-row:hover .bib-doc-del{display:flex;}
 .bib-doc-row.active{background:#F0F0F0;border-left-color:#0A0A0A;}
+.bib-doc-del{display:none;margin-left:auto;width:20px;height:20px;align-items:center;justify-content:center;border-radius:4px;font-size:11px;color:#A3A3A3;flex-shrink:0;cursor:pointer;border:none;background:none;}
+.bib-doc-del:hover{background:#FEE2E2;color:#DC2626;}
 .bib-doc-icon{
   width:32px;height:38px;background:#fff;border:0.5px solid #E5E5E5;
   border-radius:5px;display:flex;align-items:center;justify-content:center;
@@ -1033,16 +1036,9 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
             <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#A3A3A3" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="10" y1="10" x2="14" y2="14"/></svg>
             <input type="text" id="bib-search" placeholder="Rechercher un document..." oninput="filtrerDocs(this.value)"/>
           </div>
-          <button class="btn-sm" id="btn-carte-mentale" onclick="afficherCarteMentale()" style="display:none;">Carte mentale</button>
+          <button class="btn-sm" id="btn-carte-mentale" onclick="afficherCarteMentale()" style="display:none;">🗺 Carte mentale</button>
           <button class="btn-sm" id="btn-rediger-bib" onclick="showRedaction(null)" style="display:none;">Rédiger un acte</button>
           <button class="btn-sm primary" id="btn-export-bib" onclick="exporterPDF()" style="display:none;">Exporter PDF</button>
-          <button class="btn-sm danger" id="btn-del-bib" onclick="supprimerDocActif()" style="display:none;">Supprimer</button>
-          <label style="cursor:pointer;" onclick="document.getElementById('file-input-bib').click()">
-            <div class="btn-sm" style="display:flex;align-items:center;gap:6px;background:#525252;color:#fff;border-color:#525252;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-              Upload PDF
-            </div>
-          </label>
           <input type="file" id="file-input-bib" accept=".pdf" style="display:none" onchange="uploadFichier(this.files[0],null)"/>
         </div>
 
@@ -1050,18 +1046,27 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
         <div class="bib-body">
           <!-- Liste gauche -->
           <div class="bib-list-col">
-            <!-- Options upload -->
-            <div class="upload-opts" style="padding:8px 12px;gap:6px;">
-              <label class="opt-tag" id="opt-sensible-bib">
-                <input type="checkbox" id="chk-sensible-bib" onchange="toggleOpt('opt-sensible-bib')"/>
-                <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="10" height="8" rx="1"/><path d="M5 7V5a3 3 0 016 0v2"/></svg>
-                Chiffré
-              </label>
-              <label class="opt-tag" id="opt-manuscrit-bib">
-                <input type="checkbox" id="chk-manuscrit-bib" onchange="toggleOpt('opt-manuscrit-bib')"/>
-                <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-9 2 2-9 9H3v-2z"/></svg>
-                Manuscrit
-              </label>
+            <!-- Zone upload dans sidebar -->
+            <div style="padding:10px 12px;border-bottom:0.5px solid #F0F0F0;">
+              <div style="border:1px dashed #D4D4D4;border-radius:8px;padding:12px;text-align:center;cursor:pointer;background:#FAFAFA;transition:.15s;" 
+                onclick="document.getElementById('file-input-bib').click()"
+                onmouseover="this.style.background='#F0F0F0'" onmouseout="this.style.background='#FAFAFA'">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" stroke-width="1.5" style="display:block;margin:0 auto 6px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                <div style="font-size:11px;font-weight:500;color:#525252;">Uploader un PDF</div>
+                <div style="font-size:10px;color:#A3A3A3;margin-top:2px;">Glisser ou cliquer</div>
+              </div>
+              <div style="display:flex;gap:6px;margin-top:8px;">
+                <label class="opt-tag" id="opt-sensible-bib" style="flex:1;justify-content:center;">
+                  <input type="checkbox" id="chk-sensible-bib" onchange="toggleOpt('opt-sensible-bib')"/>
+                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="10" height="8" rx="1"/><path d="M5 7V5a3 3 0 016 0v2"/></svg>
+                  Chiffré
+                </label>
+                <label class="opt-tag" id="opt-manuscrit-bib" style="flex:1;justify-content:center;">
+                  <input type="checkbox" id="chk-manuscrit-bib" onchange="toggleOpt('opt-manuscrit-bib')"/>
+                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-9 2 2-9 9H3v-2z"/></svg>
+                  Manuscrit
+                </label>
+              </div>
             </div>
 
             <div class="bib-doc-list" id="bib-docs-list"></div>
@@ -1092,7 +1097,8 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
           <button class="btn-sm primary" id="btn-aff-upload" onclick="document.getElementById('file-input-aff').click()" style="display:none;">+ Pièce</button>
           <button class="btn-sm primary" onclick="creerAffaire()">+ Nouvelle affaire</button>
         </div>
-        <div class="aff-kanban" id="aff-kanban">
+        <div style="flex:1;display:flex;overflow:hidden;">
+        <div class="aff-kanban" id="aff-kanban" style="flex:1;">
           <div class="kanban-col" id="col-saisine">
             <div class="kanban-col-hdr">
               <span class="kanban-col-title">Saisine</span>
@@ -1136,6 +1142,15 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
         </div>
       </div>
     </div>
+
+        <!-- Panel détail affaire -->
+        <div id="aff-detail-panel" style="width:0;flex-shrink:0;overflow:hidden;transition:width .3s ease;border-left:0.5px solid #E5E5E5;background:#FFFFFF;display:flex;flex-direction:column;">
+          <div style="padding:12px 16px;border-bottom:0.5px solid #E5E5E5;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#FAFAFA;">
+            <span style="font-size:13px;font-weight:500;color:#0A0A0A;" id="detail-nom">—</span>
+            <button onclick="fermerDetailAffaire()" style="background:none;border:none;cursor:pointer;font-size:18px;color:#A3A3A3;line-height:1;">&times;</button>
+          </div>
+          <div id="detail-body" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px;"></div>
+        </div>
 
 <!-- ── ANALYSE ──────────────────────────────────── -->
     <div class="page" id="page-analyse">
@@ -1529,8 +1544,113 @@ async function selectionnerAffaireKanban(a) {
   document.getElementById('hdr-dossier').style.display = 'flex';
   document.getElementById('hdr-dossier-name').textContent = a.nom;
   document.getElementById('btn-aff-upload').style.display = 'inline-flex';
-  showPage('affaires');
   await chargerAffaires();
+  await ouvrirDetailAffaire(a);
+}
+
+async function ouvrirDetailAffaire(a) {
+  const panel = document.getElementById('aff-detail-panel');
+  const body  = document.getElementById('detail-body');
+  const nom   = document.getElementById('detail-nom');
+  if (!panel || !body) return;
+
+  nom.textContent = a.nom;
+  panel.style.width = '360px';
+  body.innerHTML = '<div style="text-align:center;padding:20px;"><div class="spinner" style="margin:0 auto;"></div></div>';
+
+  // Charger les pièces
+  let docs = [];
+  try { docs = await apiFetch('/liste_documents?dossier_id=' + a.id) || []; } catch(e) {}
+
+  const ACTES_12 = [
+    {key:'requete',           name:'Requête introductive',         desc:'Saisine du tribunal'},
+    {key:'conclusions_fond',  name:'Conclusions en défense',       desc:'Argumentation au fond OHADA'},
+    {key:'injonction_payer',  name:'Injonction de payer',          desc:'Art. 1-21 AUPSRVE OHADA'},
+    {key:'mise_en_demeure',   name:'Mise en demeure',              desc:'Sommation préalable'},
+    {key:'contrat',           name:'Contrat / Pacte actionnaires', desc:'AUSCGIE — rédaction'},
+    {key:'saisie_attribution',name:'Saisie-attribution',           desc:'Art. 153-172 AUPSRVE'},
+    {key:'replique',          name:'Mémoire en réplique',          desc:'Réponse aux conclusions adverses'},
+    {key:'memoire_ccja',      name:'Mémoire ampliatif CCJA',       desc:'Recours en cassation OHADA'},
+    {key:'contestation_saisie',name:'Contestation de saisie',      desc:'Requête juge execution'},
+    {key:'jurisprudence',     name:'Résumé jurisprudence',         desc:'Note de décision CCJA/OHADA'},
+    {key:'protocole',         name:'Protocole transactionnel',     desc:'Accord amiable entre parties'},
+    {key:'commandement_payer',name:'Commandement de payer',        desc:'Préalable saisie immobilière'},
+  ];
+
+  const docsHtml = docs.length
+    ? docs.map(d => '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid #F5F5F5;">'
+        + '<div style="width:28px;height:32px;background:#F5F5F5;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#525252;flex-shrink:0;">PDF</div>'
+        + '<div style="flex:1;overflow:hidden;"><div style="font-size:12px;color:#0A0A0A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (d.nom||d.filename) + '</div>'
+        + '<div style="font-size:10px;color:#A3A3A3;">' + (d.created_at ? new Date(d.created_at).toLocaleDateString("fr") : "") + '</div></div>'
+        + '</div>').join('')
+    : '<div style="font-size:12px;color:#A3A3A3;padding:8px 0;">Aucune pièce — ajoutez un document.</div>';
+
+  const actesHtml = ACTES_12.map(act => {
+    const akey = act.key, aid = a.id;
+    return '<div onclick="showRedactionAffaire(\"' + akey + '\",\"' + aid + '\")" style="padding:8px 10px;border:0.5px solid #E5E5E5;border-radius:7px;cursor:pointer;background:#FAFAFA;transition:.15s;">'
+      + '<div style="font-size:12px;font-weight:500;color:#0A0A0A;">' + act.name + '</div>'
+      + '<div style="font-size:10px;color:#A3A3A3;">' + act.desc + '</div>'
+      + '</div>';
+  }).join('');
+
+  const etapes = ['Saisine','Instruction','Audience','Délibéré','Clôture'];
+  const etapeIdx = Math.min(a.etape_index || 0, etapes.length - 1);
+  const procHtml = etapes.map((e, i) =>
+    '<div style="display:flex;align-items:center;gap:6px;font-size:11px;">'
+    + '<div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:' + (i < etapeIdx ? '#0A0A0A' : i === etapeIdx ? '#525252' : '#E5E5E5') + ';"></div>'
+    + '<span style="color:' + (i <= etapeIdx ? '#0A0A0A' : '#A3A3A3') + ';font-weight:' + (i === etapeIdx ? '500' : '400') + ';">' + e + '</span>'
+    + (i === etapeIdx ? '<span style="font-size:9px;background:#F0F0F0;color:#525252;padding:1px 6px;border-radius:10px;margin-left:4px;">En cours</span>' : '')
+    + '</div>'
+  ).join('');
+
+  body.innerHTML =
+    '<div>'
+    + '<div style="font-size:10px;font-weight:600;color:#A3A3A3;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Suivi procédural</div>'
+    + '<div style="display:flex;flex-direction:column;gap:7px;">' + procHtml + '</div>'
+    + '</div>'
+    + '<div style="border-top:0.5px solid #E5E5E5;padding-top:12px;">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">'
+    + '<div style="font-size:10px;font-weight:600;color:#A3A3A3;text-transform:uppercase;letter-spacing:0.5px;">Pièces (' + docs.length + ')</div>'
+    + '<button onclick="ajouterPieceAffaire()" style="font-size:10px;padding:3px 8px;border:0.5px solid #E5E5E5;border-radius:5px;background:#fff;color:#525252;cursor:pointer;">+ Ajouter</button>'
+    + '</div>'
+    + docsHtml
+    + '</div>'
+    + '<div style="border-top:0.5px solid #E5E5E5;padding-top:12px;">'
+    + '<div style="font-size:10px;font-weight:600;color:#A3A3A3;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Rédiger un acte (12)</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">' + actesHtml + '</div>'
+    + '</div>';
+}
+
+function ajouterPieceAffaire() {
+  const inp = document.getElementById('file-input-aff');
+  if (inp) inp.click();
+}
+
+function fermerDetailAffaire() {
+  const panel = document.getElementById('aff-detail-panel');
+  if (panel) panel.style.width = '0';
+  AFFAIRE_ACTIVE = null;
+}
+
+function showRedactionAffaire(type, dossierId) {
+  const labels = {
+    'requete':            'Requête introductive',
+    'conclusions_fond':   'Conclusions en défense au fond',
+    'injonction_payer':   'Requête en injonction de payer',
+    'mise_en_demeure':    'Mise en demeure',
+    'contrat':            'Contrat / Pacte actionnaires',
+    'saisie_attribution': 'Acte de saisie-attribution',
+    'replique':           'Mémoire en réplique',
+    'memoire_ccja':       'Mémoire ampliatif CCJA',
+    'contestation_saisie':'Contestation de saisie',
+    'jurisprudence':      'Note de jurisprudence CCJA',
+    'protocole':          'Protocole transactionnel',
+    'commandement_payer': 'Commandement de payer',
+  };
+  const nom = labels[type] || type;
+  const faits = prompt('Décrivez les faits pour : ' + nom);
+  if (!faits) return;
+  redigerActe(type, faits);
 }
 
 async function chargerAffaires() {
@@ -1736,7 +1856,8 @@ async function chargerDocsBib() {
           + '<div class="bib-doc-name">' + (d.nom || d.filename) + '</div>'
           + '<div class="bib-doc-meta">' + (d.storage_tier || 'hot') + ' · ' + (d.created_at ? new Date(d.created_at).toLocaleDateString('fr') : '') + '</div>'
           + '</div>'
-          + '<span class="bib-doc-badge ' + badge + '">' + lbl + '</span>';
+          + '<span class="bib-doc-badge ' + badge + '">' + lbl + '</span>'
+          + '<button class="bib-doc-del" onclick="event.stopPropagation();supprimerDocById(\"' + d.id + '\",this)" title="Supprimer">&#x2715;</button>';
         el.onclick = () => afficherDocViewer(d);
         list.appendChild(el);
       });
@@ -1925,6 +2046,21 @@ function handleDrop(e, ctx) {
 
 function toggleOpt(id) {
   document.getElementById(id).classList.toggle('active');
+}
+
+async function supprimerDocById(id, btn) {
+  if (!window.confirm("Supprimer ce document ?")) return;
+  try {
+    await apiFetch('/supprimer_document', 'DELETE', {id});
+    showToast('Document supprimé');
+    const row = btn.closest('.bib-doc-row');
+    if (row) row.remove();
+    if (DOC_ACTIF?.id === id) {
+      DOC_ACTIF = null;
+      document.getElementById('bib-viewer').innerHTML = '<div class="bib-empty-viewer"><div style="font-size:13px;font-weight:500;color:#D4D4D4;">Sélectionnez un document</div></div>';
+      ['btn-carte-mentale','btn-rediger-bib','btn-export-bib'].forEach(i => { const el = document.getElementById(i); if(el) el.style.display='none'; });
+    }
+  } catch(e) { showToast('Erreur : ' + e.message, true); }
 }
 
 async function supprimerDocActif() {
