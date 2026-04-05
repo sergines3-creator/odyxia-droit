@@ -49,6 +49,7 @@ from prompts import (
     lister_types_documents,
     PROMPTS_REDACTION
 )
+from prompt_injection import analyser_injection, analyser_dict, REPONSE_BLOQUEE, SEUIL_ALERTE
 
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
 SUPABASE_URL   = os.environ.get("SUPABASE_URL")
@@ -701,6 +702,20 @@ def question():
 
         if not q:
             return jsonify({"erreur": "Question vide"}), 400
+        
+        inj = analyser_injection(q, champ="question")
+        if inj.bloque:
+            log_security_event(
+                "prompt_injection_bloquee", tenant_id, get_current_user_id(),
+                {"score": inj.score, "patterns": inj.patterns,
+                 "champ": "question", "extrait": q[:120]}
+            )
+            return jsonify(REPONSE_BLOQUEE), 400
+        if inj.score >= SEUIL_ALERTE:
+            log_security_event(
+                "prompt_injection_alerte", tenant_id, get_current_user_id(),
+                {"score": inj.score, "patterns": inj.patterns, "champ": "question"}
+            )
 
         system_prompt, messages, sources, historique_session = \
             _preparer_contexte_chat(q, session_id, tenant_id, dossier_id)
@@ -739,6 +754,19 @@ def question_stream():
 
         if not q:
             return jsonify({"erreur": "Question vide"}), 400
+        inj = analyser_injection(q, champ="question_stream")
+        if inj.bloque:
+            log_security_event(
+                "prompt_injection_bloquee", tenant_id, get_current_user_id(),
+                {"score": inj.score, "patterns": inj.patterns,
+                 "champ": "question_stream", "extrait": q[:120]}
+            )
+            return jsonify(REPONSE_BLOQUEE), 400
+        if inj.score >= SEUIL_ALERTE:
+            log_security_event(
+                "prompt_injection_alerte", tenant_id, get_current_user_id(),
+                {"score": inj.score, "patterns": inj.patterns}
+            )
 
         system_prompt, messages, sources, historique_session = \
             _preparer_contexte_chat(q, session_id, tenant_id, dossier_id)
@@ -1713,6 +1741,23 @@ def rediger():
         donnees    = data.get("donnees", {})
         tenant_id  = get_current_tenant_id()
 
+        inj_faits = analyser_injection(
+            donnees.get("faits", "") or donnees.get("objet", ""), champ="faits"
+        )
+        inj_dict  = analyser_dict(donnees)
+        inj = inj_faits if inj_faits.bloque else inj_dict
+        if inj.bloque:
+            log_security_event(
+                "prompt_injection_bloquee", tenant_id, get_current_user_id(),
+                {"score": inj.score, "patterns": inj.patterns, "champ": inj.champ}
+            )
+            return jsonify(REPONSE_BLOQUEE), 400
+        if inj.score >= SEUIL_ALERTE:
+            log_security_event(
+                "prompt_injection_alerte", tenant_id, get_current_user_id(),
+                {"score": inj.score, "patterns": inj.patterns}
+            )
+
         if type_doc not in PROMPTS_REDACTION:
             return jsonify({"erreur": f"Type inconnu : {type_doc}"}), 400
 
@@ -2185,6 +2230,22 @@ def comparaison_analyser():
         antecedents   = data.get("antecedents", "")
         decisions_ids = data.get("decisions_ids", [])
         tenant_id_cmp = get_current_tenant_id()
+
+        for _val, _nom in [
+            (juge,         "juge"),
+            (affaire,      "affaire"),
+            (arguments_def,"arguments_defense"),
+            (antecedents,  "antecedents"),
+        ]:
+            if _val:
+                inj = analyser_injection(_val, champ=_nom)
+                if inj.bloque:
+                    log_security_event(
+                        "prompt_injection_bloquee", tenant_id_cmp,
+                        get_current_user_id(),
+                        {"score": inj.score, "patterns": inj.patterns, "champ": _nom}
+                    )
+                    return jsonify(REPONSE_BLOQUEE), 400
 
         # Récupérer chunks des décisions uploadées de ce juge
         contexte_decisions = ""
