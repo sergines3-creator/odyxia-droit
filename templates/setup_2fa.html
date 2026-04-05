@@ -3,361 +3,417 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Odyxia Droit — Configuration 2FA</title>
+<title>Odyxia Droit — Double authentification</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  --bg:      #F8FAFC;
-  --surface: #FFFFFF;
-  --border:  #E2E8F0;
-  --border2: #DBEAFE;
-  --blue:    #2563EB;
-  --blue-lt: #EFF6FF;
-  --blue-md: #BFDBFE;
   --navy:    #0F172A;
   --text:    #0F172A;
   --text2:   #64748B;
   --text3:   #94A3B8;
-  --green:   #16A34A;
-  --green-lt:#DCFCE7;
-  --red:     #DC2626;
-  --red-lt:  #FEE2E2;
-  --radius:  8px;
+  --border:  #E2E8F0;
+  --border2: #F0F0F0;
+  --bg:      #FFFFFF;
+  --bg2:     #F8FAFC;
+  --gray-lt: #F5F5F5;
+  --gray-md: #E5E5E5;
   --font:    'DM Sans', system-ui, sans-serif;
+  --serif:   'Cormorant Garamond', Georgia, serif;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
-body{
-  font-family:var(--font);background:var(--bg);color:var(--text);
-  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
-}
-.card{
-  background:var(--surface);border:0.5px solid var(--border2);
-  border-radius:16px;padding:36px;width:100%;max-width:460px;
-}
-.header{text-align:center;margin-bottom:28px;}
-.logo{
-  display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;
-}
-.logo-icon{
-  width:36px;height:36px;background:var(--blue);border-radius:9px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:600;color:#fff;letter-spacing:-0.3px;
-}
-.logo-name{font-size:20px;font-weight:600;color:var(--navy);}
-.subtitle{font-size:12px;color:var(--text2);line-height:1.6;}
-
-.section-label{
-  font-size:9px;font-weight:600;text-transform:uppercase;
-  letter-spacing:0.8px;color:var(--text3);margin-bottom:12px;
-}
-.step{
-  background:var(--bg);border:0.5px solid var(--border2);
-  border-radius:var(--radius);padding:16px;margin-bottom:12px;
-}
-.step-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.step-num{
-  width:24px;height:24px;border-radius:50%;background:var(--blue);
-  color:#fff;font-size:11px;font-weight:600;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.step-title{font-size:13px;font-weight:500;color:var(--text);}
-.step-desc{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px;}
-
-.app-badges{display:flex;gap:6px;flex-wrap:wrap;}
-.badge{
-  padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;
-  border:0.5px solid var(--border);background:var(--surface);color:var(--text2);
-}
-.badge.recommended{
-  background:var(--blue-lt);border-color:var(--blue-md);color:#1D4ED8;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--bg2);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
 }
 
-.qr-container{text-align:center;padding:12px 0;}
-.qr-box{
-  display:inline-block;padding:14px;background:#fff;
-  border:0.5px solid var(--border2);border-radius:var(--radius);margin-bottom:10px;
+.card {
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  padding: 40px 36px;
+  box-shadow: 0 4px 32px rgba(15,23,42,.06);
 }
-.qr-box img{width:160px;height:160px;display:block;}
-.qr-loading{
-  width:160px;height:160px;display:flex;align-items:center;
-  justify-content:center;color:var(--text3);font-size:12px;
-}
-.secret-box{
-  background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius);
-  padding:9px 14px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);
-  text-align:center;letter-spacing:2px;word-break:break-all;margin-top:8px;
-  cursor:pointer;transition:.2s;
-}
-.secret-box:hover{border-color:var(--blue);background:var(--blue-lt);}
-.secret-label{font-size:10px;color:var(--text3);text-align:center;margin-top:4px;}
 
-.code-input{
-  width:100%;padding:12px;border:0.5px solid var(--border2);border-radius:var(--radius);
-  font-size:20px;font-family:'DM Mono',monospace;font-weight:600;text-align:center;
-  letter-spacing:8px;color:var(--text);background:var(--surface);outline:none;
-  transition:.2s;margin-bottom:10px;
+/* ── EN-TÊTE ── */
+.card-header {
+  text-align: center;
+  margin-bottom: 32px;
 }
-.code-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-lt);}
-.code-input::placeholder{color:var(--border);letter-spacing:4px;font-size:16px;}
+.logo-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.logo-name {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 500;
+  color: var(--navy);
+  letter-spacing: 0.3px;
+}
+.logo-droit {
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text2);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.card-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.card-sub {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+}
 
-.btn{
-  width:100%;padding:11px;border-radius:var(--radius);border:none;
-  font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;transition:.2s;
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
 }
-.btn-blue{background:var(--blue);color:#fff;}
-.btn-blue:hover{background:#1D4ED8;}
-.btn-blue:disabled{background:var(--border);color:var(--text3);cursor:not-allowed;}
 
-.feedback{
-  display:none;padding:10px 14px;border-radius:var(--radius);
-  font-size:12px;line-height:1.5;margin-top:10px;
+/* ── ÉTAPE ── */
+.step {
+  background: var(--bg);
+  border: 0.5px solid var(--border2);
+  border-radius: 12px;
+  padding: 20px 20px 20px 16px;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
 }
-.feedback.success{
-  display:flex;align-items:flex-start;gap:8px;
-  background:var(--green-lt);border:0.5px solid #86EFAC;color:#166534;
+.step-num {
+  width: 26px;
+  height: 26px;
+  background: #0A0A0A;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FFFFFF;
+  flex-shrink: 0;
+  margin-top: 1px;
 }
-.feedback.error{
-  display:flex;align-items:flex-start;gap:8px;
-  background:var(--red-lt);border:0.5px solid #FCA5A5;color:#991B1B;
+.step-body { flex: 1; }
+.step-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+  margin-bottom: 8px;
 }
-.feedback-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+.step-desc {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.65;
+  margin-bottom: 12px;
+}
+.step-desc:last-child { margin-bottom: 0; }
 
-.divider{height:0.5px;background:var(--border2);margin:20px 0;}
-
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
-.info-card{
-  background:var(--bg);border:0.5px solid var(--border2);
-  border-radius:var(--radius);padding:10px 12px;
+/* ── BADGES APPLIS ── */
+.app-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 10px;
 }
-.info-card-title{font-size:10px;font-weight:600;color:var(--blue);margin-bottom:4px;}
-.info-card-text {font-size:11px;color:var(--text2);line-height:1.5;}
-
-.back-link{
-  display:block;text-align:center;margin-top:20px;
-  font-size:12px;color:var(--text3);text-decoration:none;transition:.2s;
+.app-badge {
+  padding: 5px 13px;
+  border: 0.5px solid var(--border);
+  border-radius: 20px;
+  font-size: 11px;
+  color: var(--text2);
+  background: var(--bg);
+  font-weight: 400;
 }
-.back-link:hover{color:var(--blue);}
-
-.spinner{
-  display:inline-block;width:14px;height:14px;
-  border:2px solid rgba(255,255,255,.3);border-top-color:#fff;
-  border-radius:50%;animation:spin .7s linear infinite;
-  vertical-align:middle;margin-right:6px;
+.app-badge.recommended {
+  background: var(--gray-lt);
+  border-color: var(--gray-md);
+  color: var(--navy);
+  font-weight: 500;
 }
-@keyframes spin{to{transform:rotate(360deg)}}
 
-.copy-toast{
-  position:fixed;bottom:20px;left:50%;
-  transform:translateX(-50%) translateY(40px);
-  background:var(--navy);color:#fff;padding:8px 18px;
-  border-radius:20px;font-size:12px;font-weight:500;
-  opacity:0;transition:.3s;pointer-events:none;z-index:999;
+/* ── QR CODE ── */
+.qr-zone {
+  background: var(--gray-lt);
+  border: 0.5px solid var(--border2);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  margin-top: 12px;
 }
-.copy-toast.visible{opacity:1;transform:translateX(-50%) translateY(0);}
+.qr-zone img {
+  width: 140px;
+  height: 140px;
+  border-radius: 6px;
+}
+.qr-loading {
+  width: 140px;
+  height: 140px;
+  background: var(--gray-md);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--text3);
+  margin: 0 auto;
+}
+
+/* ── SECRET ── */
+.secret-box {
+  background: var(--gray-lt);
+  border: 0.5px solid var(--border2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 13px;
+  color: var(--navy);
+  letter-spacing: 1.5px;
+  word-break: break-all;
+  text-align: center;
+  margin-top: 10px;
+}
+.secret-label {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 6px;
+  text-align: center;
+}
+
+/* ── CHAMP CODE ── */
+.input-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  display: block;
+}
+.input-code {
+  width: 100%;
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 20px;
+  font-family: 'DM Mono', 'Courier New', monospace;
+  color: var(--navy);
+  background: var(--bg);
+  outline: none;
+  text-align: center;
+  letter-spacing: 6px;
+  transition: border-color .15s;
+}
+.input-code:focus { border-color: #A3A3A3; }
+.input-code::placeholder { letter-spacing: 3px; font-size: 14px; color: var(--text3); }
+
+/* ── BTN ── */
+.btn-primary {
+  width: 100%;
+  background: #0A0A0A;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 11px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background .15s;
+  margin-top: 12px;
+}
+.btn-primary:hover { background: #2A2A2A; }
+.btn-primary:disabled { background: var(--gray-md); color: var(--text3); cursor: not-allowed; }
+
+/* ── ERREUR / SUCCÈS ── */
+.msg {
+  font-size: 11px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-top: 10px;
+  display: none;
+  text-align: center;
+}
+.msg.error   { background: #FEE2E2; color: #DC2626; border: 0.5px solid #FECACA; }
+.msg.success { background: #DCFCE7; color: #16A34A; border: 0.5px solid #86EFAC; }
+.msg.show    { display: block; }
+
+/* ── SEPARATOR ── */
+.sep {
+  height: 0.5px;
+  background: var(--border2);
+  margin: 20px 0;
+}
 </style>
 </head>
 <body>
 
 <div class="card">
 
-  <div class="header">
-    <div class="logo">
-      <div class="logo-icon">OD</div>
-      <div class="logo-name">Odyxia</div>
+  <!-- EN-TÊTE -->
+  <div class="card-header">
+    <div class="logo-row">
+      <span class="logo-name">Odyxia</span>
+      <span class="logo-droit">Droit</span>
     </div>
-    <div class="subtitle">Configuration de la double authentification<br>Protégez votre accès avec un code à usage unique</div>
+    <div class="card-title">Configuration de la double authentification</div>
+    <div class="card-sub">Protégez votre accès avec un code à usage unique</div>
   </div>
 
   <div class="section-label">Configuration</div>
 
+  <!-- ÉTAPE 1 -->
   <div class="step">
-    <div class="step-header">
-      <div class="step-num">1</div>
+    <div class="step-num">1</div>
+    <div class="step-body">
       <div class="step-title">Installez une application d'authentification</div>
-    </div>
-    <div class="step-desc">
-      Téléchargez l'une de ces applications sur votre smartphone. Elles génèrent des codes à 6 chiffres renouvelés toutes les 30 secondes.
-    </div>
-    <div class="app-badges">
-      <span class="badge recommended">Authy (recommandé)</span>
-      <span class="badge">Google Authenticator</span>
-      <span class="badge">Microsoft Authenticator</span>
+      <div class="step-desc">Téléchargez l'une de ces applications sur votre smartphone. Elles génèrent des codes à 6 chiffres renouvelés toutes les 30 secondes.</div>
+      <div class="app-badges">
+        <span class="app-badge recommended">Authy (recommandé)</span>
+        <span class="app-badge">Google Authenticator</span>
+        <span class="app-badge">Microsoft Authenticator</span>
+      </div>
     </div>
   </div>
 
+  <!-- ÉTAPE 2 -->
   <div class="step">
-    <div class="step-header">
-      <div class="step-num">2</div>
+    <div class="step-num">2</div>
+    <div class="step-body">
       <div class="step-title">Scannez le QR code</div>
-    </div>
-    <div class="step-desc">
-      Ouvrez votre application, appuyez sur "Ajouter un compte" puis scannez ce QR code.
-    </div>
-    <div class="qr-container">
-      <div class="qr-box" id="qrBox">
-        <div class="qr-loading" id="qrLoading">Chargement...</div>
-        <img id="qrImg" src="" alt="QR Code 2FA" style="display:none;"/>
+      <div class="step-desc">Ouvrez votre application, appuyez sur "Ajouter un compte" puis scannez ce QR code.</div>
+      <div class="qr-zone">
+        <div id="qr-img-wrap">
+          <div class="qr-loading" id="qr-loading">Chargement…</div>
+          <img id="qr-img" src="" alt="QR Code 2FA" style="display:none;"/>
+        </div>
       </div>
-      <div class="step-desc" style="margin-bottom:4px;">Ou entrez manuellement la clé secrète :</div>
-      <div class="secret-box" id="secretBox" onclick="copierSecret()" title="Cliquer pour copier">
-        <span id="secretText">Chargement...</span>
-      </div>
-      <div class="secret-label">Cliquez sur la clé pour la copier</div>
+      <div class="secret-box" id="secret-box" style="display:none;"></div>
+      <div class="secret-label" id="secret-label" style="display:none;">Saisie manuelle si le scan échoue</div>
     </div>
   </div>
 
+  <!-- ÉTAPE 3 -->
   <div class="step">
-    <div class="step-header">
-      <div class="step-num">3</div>
-      <div class="step-title">Vérifiez la configuration</div>
-    </div>
-    <div class="step-desc">
-      Entrez le code à 6 chiffres affiché dans votre application pour confirmer que tout fonctionne.
-    </div>
-    <input
-      type="text" class="code-input" id="codeInput"
-      placeholder="000000" maxlength="6" inputmode="numeric"
-      autocomplete="one-time-code"
-      oninput="this.value=this.value.replace(/[^0-9]/g,'');checkLength()"
-      onkeydown="if(event.key==='Enter')verifierCode()"
-    />
-    <button class="btn btn-blue" id="verifyBtn" onclick="verifierCode()" disabled>
-      Vérifier le code
-    </button>
-    <div class="feedback" id="feedbackSuccess">
-      <span class="feedback-icon">✓</span>
-      <div>
-        <strong>Double authentification activée.</strong><br>
-        À chaque connexion, entrez votre mot de passe puis ce code à 6 chiffres.
-        En cas de perte de votre téléphone, contactez votre administrateur.
-      </div>
-    </div>
-    <div class="feedback" id="feedbackError">
-      <span class="feedback-icon">✗</span>
-      <div id="feedbackErrorText">Code incorrect. Vérifiez que l'heure de votre téléphone est synchronisée.</div>
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <div class="step-title">Vérifiez le code</div>
+      <div class="step-desc">Entrez le code à 6 chiffres affiché dans votre application pour confirmer la configuration.</div>
+      <label class="input-label" for="totp-code">Code de vérification</label>
+      <input
+        id="totp-code"
+        class="input-code"
+        type="text"
+        inputmode="numeric"
+        maxlength="6"
+        placeholder="000000"
+        autocomplete="one-time-code"
+      />
+      <div class="msg" id="msg-verify"></div>
+      <button class="btn-primary" id="btn-verify" onclick="verifierCode()">Confirmer et activer</button>
     </div>
   </div>
-
-  <div class="divider"></div>
-
-  <div class="section-label">À savoir</div>
-  <div class="info-grid">
-    <div class="info-card">
-      <div class="info-card-title">Renouvellement</div>
-      <div class="info-card-text">Le code change toutes les 30 secondes. Entrez-le rapidement.</div>
-    </div>
-    <div class="info-card">
-      <div class="info-card-title">Sauvegarde</div>
-      <div class="info-card-text">Notez la clé secrète dans un endroit sûr en cas de perte du téléphone.</div>
-    </div>
-    <div class="info-card">
-      <div class="info-card-title">Sécurité</div>
-      <div class="info-card-text">Même si votre mot de passe est compromis, l'accès reste protégé.</div>
-    </div>
-    <div class="info-card">
-      <div class="info-card-title">Support</div>
-      <div class="info-card-text">En cas de problème, contactez votre administrateur pour réinitialiser.</div>
-    </div>
-  </div>
-
-  <a href="/" class="back-link">← Retour à la connexion</a>
 
 </div>
 
-<div class="copy-toast" id="copyToast">Clé copiée !</div>
-
 <script>
-let secretKey = "";
-
-async function chargerQRCode() {
+// ── Charger le QR code ──────────────────────────────────────────────────────
+async function chargerQR() {
   try {
-    const res  = await fetch("/setup-2fa");
-    const data = await res.json();
-    if (data.erreur) {
-      document.getElementById("qrLoading").textContent = "Erreur : " + data.erreur;
-      document.getElementById("secretText").textContent = "Non disponible";
-      return;
+    const r = await fetch('/setup-2fa');
+    const data = await r.json();
+    if (data.qr_code) {
+      const img = document.getElementById('qr-img');
+      img.src = data.qr_code;
+      img.style.display = 'block';
+      document.getElementById('qr-loading').style.display = 'none';
     }
-    const img = document.getElementById("qrImg");
-    img.src = data.qr_code;
-    img.onload = () => {
-      document.getElementById("qrLoading").style.display = "none";
-      img.style.display = "block";
-    };
-    secretKey = data.secret || "";
-    const formatted = secretKey.match(/.{1,4}/g)?.join(" ") || secretKey;
-    document.getElementById("secretText").textContent = formatted;
+    if (data.secret) {
+      const box = document.getElementById('secret-box');
+      box.textContent = data.secret;
+      box.style.display = 'block';
+      document.getElementById('secret-label').style.display = 'block';
+    }
   } catch(e) {
-    document.getElementById("qrLoading").textContent = "Impossible de charger le QR code.";
-    document.getElementById("secretText").textContent = "Erreur de connexion";
+    document.getElementById('qr-loading').textContent = 'Erreur de chargement';
   }
 }
 
-function checkLength() {
-  const val = document.getElementById("codeInput").value;
-  document.getElementById("verifyBtn").disabled = val.length !== 6;
-  if (val.length > 0) document.getElementById("feedbackError").style.display = "none";
-}
-
+// ── Vérifier le code ────────────────────────────────────────────────────────
 async function verifierCode() {
-  const code = document.getElementById("codeInput").value.trim();
-  if (code.length !== 6) return;
-  const btn = document.getElementById("verifyBtn");
+  const code  = document.getElementById('totp-code').value.trim();
+  const msg   = document.getElementById('msg-verify');
+  const btn   = document.getElementById('btn-verify');
+
+  msg.className = 'msg';
+  msg.textContent = '';
+
+  if (code.length !== 6 || !/^\d{6}$/.test(code)) {
+    msg.textContent = 'Entrez un code à 6 chiffres.';
+    msg.className = 'msg error show';
+    return;
+  }
+
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Vérification...';
-  document.getElementById("feedbackSuccess").style.display = "none";
-  document.getElementById("feedbackError").style.display   = "none";
+  btn.textContent = 'Vérification…';
+
   try {
-    const res  = await fetch("/login", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({password:"__test_2fa__", code_2fa: code})
+    const r = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: '', code_2fa: code })
     });
-    const data = await res.json();
-    if (data.token ||
-        (data.erreur && !data.erreur.toLowerCase().includes("2fa") &&
-                        !data.erreur.toLowerCase().includes("code") &&
-                        !data.erreur.toLowerCase().includes("authy"))) {
-      document.getElementById("feedbackSuccess").style.display = "flex";
-      btn.innerHTML = "✓ Code vérifié";
-      btn.style.background = "#16A34A";
-      document.getElementById("codeInput").style.borderColor = "#16A34A";
+    const data = await r.json();
+
+    if (data.token || r.ok) {
+      msg.textContent = '✓ Double authentification configurée avec succès.';
+      msg.className = 'msg success show';
+      btn.textContent = 'Configuré ✓';
+      setTimeout(() => { window.location.href = '/login'; }, 1800);
     } else {
-      document.getElementById("feedbackError").style.display = "flex";
+      msg.textContent = data.erreur || 'Code incorrect — réessayez.';
+      msg.className = 'msg error show';
       btn.disabled = false;
-      btn.innerHTML = "Vérifier le code";
-      document.getElementById("codeInput").value = "";
-      document.getElementById("codeInput").focus();
+      btn.textContent = 'Confirmer et activer';
     }
   } catch(e) {
-    document.getElementById("feedbackErrorText").textContent = "Erreur de connexion — réessayez.";
-    document.getElementById("feedbackError").style.display = "flex";
+    msg.textContent = 'Erreur réseau — réessayez.';
+    msg.className = 'msg error show';
     btn.disabled = false;
-    btn.innerHTML = "Vérifier le code";
+    btn.textContent = 'Confirmer et activer';
   }
 }
 
-function copierSecret() {
-  if (!secretKey) return;
-  navigator.clipboard.writeText(secretKey).then(() => showToast()).catch(() => {
-    const el = document.createElement("textarea");
-    el.value = secretKey;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand("copy");
-    document.body.removeChild(el);
-    showToast();
-  });
-}
+// Valider à la saisie des 6 chiffres
+document.getElementById('totp-code').addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g, '').slice(0, 6);
+  if (this.value.length === 6) verifierCode();
+});
 
-function showToast() {
-  const t = document.getElementById("copyToast");
-  t.classList.add("visible");
-  setTimeout(() => t.classList.remove("visible"), 2000);
-}
-
-window.addEventListener("DOMContentLoaded", chargerQRCode);
+chargerQR();
 </script>
 </body>
 </html>
