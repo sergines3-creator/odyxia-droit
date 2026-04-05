@@ -75,7 +75,7 @@ Talisman(app,
     content_security_policy=False
 )
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "Odyxia-JWT-2026!")
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=8)
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
 jwt_manager = JWTManager(app)
 
 limiter = Limiter(
@@ -1713,8 +1713,37 @@ def rediger():
         donnees    = data.get("donnees", {})
         tenant_id  = get_current_tenant_id()
 
-        if type_doc not in PROMPTS_REDACTION:
+        # Nouveaux actes voies d'exécution OHADA
+        TYPES_OHADA_EXTRA = {
+            "conclusions_fond":     "Conclusions en défense au fond",
+            "injonction_payer":     "Requête en injonction de payer OHADA",
+            "saisie_attribution":   "Acte de saisie-attribution de créances",
+            "memoire_ccja":         "Mémoire ampliatif CCJA",
+            "contestation_saisie":  "Contestation de saisie — juge de l'exécution",
+            "commandement_payer":   "Commandement de payer",
+        }
+        if type_doc not in PROMPTS_REDACTION and type_doc not in TYPES_OHADA_EXTRA:
             return jsonify({"erreur": f"Type inconnu : {type_doc}"}), 400
+        if type_doc in TYPES_OHADA_EXTRA and type_doc not in PROMPTS_REDACTION:
+            # Utiliser un prompt générique enrichi pour les actes OHADA extra
+            nom_acte = TYPES_OHADA_EXTRA[type_doc]
+            prompt_ohada = f"""Tu es un avocat spécialisé en droit OHADA et camerounais.
+Rédige un {nom_acte} professionnel et complet basé sur ces faits :
+{donnees.get('faits', '')}
+Contexte documentaire : {contexte or 'Aucun document indexé'}
+Respecte les formes procédurales OHADA et la jurisprudence CCJA applicable.
+Utilise un style juridique formel et structuré."""
+            response = client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=4000,
+                messages=[{{"role": "user", "content": prompt_ohada}}]
+            )
+            return jsonify({{
+                "document": response.content[0].text,
+                "type":     type_doc,
+                "nom":      nom_acte,
+                "sources":  list(set(sources))
+            }})
 
         chunks  = rechercher_chunks(
             donnees.get("faits", "") or donnees.get("points_cles", "") or type_doc,
@@ -1776,7 +1805,7 @@ def liste_dossiers():
     try:
         tenant_id = get_current_tenant_id()
         result = supabase.table("dossiers").select(
-            "id, nom, description, created_at, status"
+            "id, nom, description, created_at, status, etape_index"
         ).eq("tenant_id", tenant_id).order("nom").execute()
         return jsonify(result.data)
     except Exception as e:
@@ -1797,12 +1826,13 @@ def creer_dossier():
 
         dossier_id = str(uuid.uuid4())
         supabase.table("dossiers").insert({
-            "id":          dossier_id,
-            "tenant_id":   tenant_id,
-            "created_by":  user_id,
-            "nom":         nom,
-            "description": data.get("description", ""),
-            "created_at":  datetime.now().isoformat()
+            "id":           dossier_id,
+            "tenant_id":    tenant_id,
+            "created_by":   user_id,
+            "nom":          nom,
+            "description":  data.get("description", ""),
+            "etape_index":  0,
+            "created_at":   datetime.now().isoformat()
         }).execute()
 
         return jsonify({"succes": True, "id": dossier_id, "nom": nom})
@@ -2833,6 +2863,44 @@ def rapport_client():
 
 
 # ─── HEALTH CHECK ─────────────────────────────────────────────────────────────
+
+@app.route("/me", methods=["GET"])
+@jwt_required()
+def get_me():
+    """Retourne les infos de l'utilisateur connecté."""
+    try:
+        user_id   = get_current_user_id()
+        tenant_id = get_current_tenant_id()
+        result = supabase.table("users").select(
+            "full_name, email, role"
+        ).eq("id", user_id).execute()
+        if result.data:
+            u = result.data[0]
+            return jsonify({
+                "nom":   u.get("full_name", CABINET_AVOCAT),
+                "email": u.get("email", ""),
+                "role":  u.get("role", "owner"),
+            })
+        return jsonify({"nom": CABINET_AVOCAT, "email": "", "role": "owner"})
+    except Exception as e:
+        return jsonify({"nom": CABINET_AVOCAT}), 200
+
+
+@app.route("/me", methods=["GET"])
+@jwt_required()
+def get_me():
+    try:
+        user_id   = get_current_user_id()
+        result = supabase.table("users").select(
+            "full_name, email, role"
+        ).eq("id", user_id).execute()
+        if result.data:
+            u = result.data[0]
+            return jsonify({"nom": u.get("full_name", CABINET_AVOCAT), "email": u.get("email",""), "role": u.get("role","owner")})
+        return jsonify({"nom": CABINET_AVOCAT})
+    except Exception:
+        return jsonify({"nom": CABINET_AVOCAT}), 200
+
 
 @app.route("/health", methods=["GET"])
 def health():
