@@ -576,9 +576,10 @@ def login():
             return jsonify({"erreur": "Identifiants incorrects"}), 401
 
         # 2FA TOTP si configuré
-        if TOTP_SECRET:
-            if not code_2fa:
-                return jsonify({"require_2fa": True}), 200
+        if not code_2fa:
+            return jsonify({"require_2fa": True}), 200
+        if not verifier_totp(code_2fa):
+            return jsonify({"erreur": "Code 2FA incorrect ou expire"}), 401
             if not verifier_totp(code_2fa):
                 log_security_event("login_failed", details={"reason": "2fa_echec"})
                 try:
@@ -689,6 +690,49 @@ def logout():
         return jsonify({"succes": True})
     except Exception as e:
         log_erreur("LOGOUT", e)
+        return jsonify({"erreur": str(e)}), 500
+    
+@app.route("/profil", methods=["GET"])
+@jwt_required()
+def get_profil():
+    try:
+        user_id   = get_current_user_id()
+        tenant_id = get_current_tenant_id()
+        r = supabase.table("users").select(
+            "full_name, display_name, email"
+        ).eq("id", user_id).execute()
+        if not r.data:
+            return jsonify({"display_name": "Maître", "full_name": "Maître"})
+        u = r.data[0]
+        display = u.get("display_name") or ("Maître " + (u.get("full_name") or ""))
+        return jsonify({
+            "display_name": display,
+            "full_name":    u.get("full_name", ""),
+            "email":        u.get("email", "")
+        })
+    except Exception as e:
+        log_erreur("GET_PROFIL", e)
+        return jsonify({"display_name": "Maître"}), 500
+
+
+@app.route("/profil", methods=["PUT"])
+@jwt_required()
+@limiter.limit("10 per minute")
+def update_profil():
+    try:
+        user_id      = get_current_user_id()
+        data         = request.json
+        display_name = data.get("display_name", "").strip()
+        if not display_name:
+            return jsonify({"erreur": "Nom requis"}), 400
+        supabase.table("users").update({
+            "display_name": display_name
+        }).eq("id", user_id).execute()
+        log_audit_event("PROFIL_UPDATED", get_current_tenant_id(), user_id,
+                        {"display_name": display_name})
+        return jsonify({"succes": True, "display_name": display_name})
+    except Exception as e:
+        log_erreur("UPDATE_PROFIL", e)
         return jsonify({"erreur": str(e)}), 500
 
 
