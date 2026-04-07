@@ -552,60 +552,79 @@ def setup_2fa():
 @limiter.limit("10 per minute")
 def login():
     try:
-        import bcrypt, hashlib
+        import hashlib
         data     = request.json
-        password = data.get("password", "").encode()
-        hash_s   = os.environ.get("CABINET_PASSWORD", "").encode()
+        email    = data.get("email", "").strip().lower()
+        password = data.get("password", "")
+        code_2fa = data.get("code_2fa", "").strip()
 
-        if bcrypt.checkpw(password, hash_s):
-            if TOTP_SECRET:
-                code_2fa = data.get("code_2fa", "").strip()
-                if not code_2fa:
-                    return jsonify({"require_2fa": True}), 200
-                if not verifier_totp(code_2fa):
-                    log_security_event("login_failed", details={"reason": "2fa_echec"})
-                    try:
-                        log_audit(ACTION_LOGIN_ECHEC, {"status": "2fa_echec"}, succes=False)
-                    except Exception:
-                        pass
-                    return jsonify({"erreur": "Code 2FA incorrect ou expire"}), 401
+        if not email or not password:
+            return jsonify({"erreur": "Email et mot de passe requis"}), 400
 
-            identity     = os.environ.get("DEFAULT_USER_ID", "solo_user")
-            tenant_id    = os.environ.get("DEFAULT_TENANT_ID", "")
-            access_token = create_access_token(identity=identity)
-            refresh_tok  = create_refresh_token(identity=identity)
-
-            token_hash = hashlib.sha256(refresh_tok.encode()).hexdigest()
-            expires_at = datetime.utcnow() + timedelta(days=30)
-            try:
-                supabase.table("refresh_tokens").insert({
-                    "user_id":    identity,
-                    "tenant_id":  tenant_id,
-                    "token_hash": token_hash,
-                    "expires_at": expires_at.isoformat(),
-                    "user_agent": request.headers.get("User-Agent","")[:200],
-                    "ip_address": request.remote_addr
-                }).execute()
-            except Exception as ex:
-                log_erreur("REFRESH_TOKEN_STORE", ex)
-
-            log_security_event("login_success", details={"mode": "password"})
-            try:
-                log_audit(ACTION_LOGIN, {"status": "succes"}, succes=True)
-            except Exception:
-                pass
-            return jsonify({
-                "token":         access_token,
-                "refresh_token": refresh_tok,
-                "expires_in":    900
+        # Authentification via Supabase Auth
+        try:
+            auth_response = supabase.auth.sign_in_with_password({
+                "email":    email,
+                "password": password
             })
-        else:
-            log_security_event("login_failed", details={"reason": "wrong_password"})
-            try:
-                log_audit(ACTION_LOGIN_ECHEC, {"status": "echec"}, succes=False)
-            except Exception:
-                pass
-            return jsonify({"erreur": "Mot de passe incorrect"}), 401
+            user_id = auth_response.user.id if auth_response.user else None
+            if not user_id:
+                log_security_event("login_failed", details={"reason": "supabase_auth_echec"})
+                return jsonify({"erreur": "Identifiants incorrects"}), 401
+        except Exception as e:
+            log_security_event("login_failed", details={"reason": "supabase_auth_echec"})
+            return jsonify({"erreur": "Identifiants incorrects"}), 401
+
+        # 2FA TOTP si configuré
+        if TOTP_SECRET:
+            if not code_2fa:
+                return jsonify({"require_2fa": True}), 200
+            if not verifier_totp(code_2fa):
+                log_security_event("login_failed", details={"reason": "2fa_echec"})
+                try:
+                    log_audit(ACTION_LOGIN_ECHEC, {"status": "2fa_echec"}, succes=False)
+                except Exception:
+                    pass
+                return jsonify({"erreur": "Code 2FA incorrect ou expire"}), 401
+
+        # Récupérer le tenant_id depuis la table users
+        try:
+            user_row = supabase.table("users").select("tenant_id").eq(
+                "id", user_id).execute()
+            tenant_id = user_row.data[0]["tenant_id"] if user_row.data else os.environ.get("DEFAULT_TENANT_ID", "")
+        except Exception:
+            tenant_id = os.environ.get("DEFAULT_TENANT_ID", "")
+
+        # Créer les tokens JWT
+        access_token = create_access_token(identity=user_id)
+        refresh_tok  = create_refresh_token(identity=user_id)
+
+        token_hash = hashlib.sha256(refresh_tok.encode()).hexdigest()
+        expires_at = datetime.utcnow() + timedelta(days=30)
+        try:
+            supabase.table("refresh_tokens").insert({
+                "user_id":    user_id,
+                "tenant_id":  tenant_id,
+                "token_hash": token_hash,
+                "expires_at": expires_at.isoformat(),
+                "user_agent": request.headers.get("User-Agent", "")[:200],
+                "ip_address": request.remote_addr
+            }).execute()
+        except Exception as ex:
+            log_erreur("REFRESH_TOKEN_STORE", ex)
+
+        log_security_event("login_success", tenant_id, user_id, {"mode": "supabase_auth"})
+        try:
+            log_audit(ACTION_LOGIN, {"status": "succes"}, succes=True)
+        except Exception:
+            pass
+
+        return jsonify({
+            "token":         access_token,
+            "refresh_token": refresh_tok,
+            "expires_in":    900
+        })
+
     except Exception as e:
         log_erreur("LOGIN", e)
         return jsonify({"erreur": str(e)}), 500
