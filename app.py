@@ -561,7 +561,6 @@ def login():
         if not email or not password:
             return jsonify({"erreur": "Email et mot de passe requis"}), 400
 
-        # Authentification via Supabase Auth
         try:
             auth_response = supabase.auth.sign_in_with_password({
                 "email":    email,
@@ -571,32 +570,27 @@ def login():
             if not user_id:
                 log_security_event("login_failed", details={"reason": "supabase_auth_echec"})
                 return jsonify({"erreur": "Identifiants incorrects"}), 401
-        except Exception as e:
+        except Exception:
             log_security_event("login_failed", details={"reason": "supabase_auth_echec"})
             return jsonify({"erreur": "Identifiants incorrects"}), 401
 
-        # 2FA TOTP si configuré
         if not code_2fa:
             return jsonify({"require_2fa": True}), 200
-        if not verifier_totp(code_2fa):
-            return jsonify({"erreur": "Code 2FA incorrect ou expire"}), 401
-            if not verifier_totp(code_2fa):
-                log_security_event("login_failed", details={"reason": "2fa_echec"})
-                try:
-                    log_audit(ACTION_LOGIN_ECHEC, {"status": "2fa_echec"}, succes=False)
-                except Exception:
-                    pass
-                return jsonify({"erreur": "Code 2FA incorrect ou expire"}), 401
 
-        # Récupérer le tenant_id depuis la table users
+        if not verifier_totp(code_2fa):
+            log_security_event("login_failed", details={"reason": "2fa_echec"})
+            try:
+                log_audit(ACTION_LOGIN_ECHEC, {"status": "2fa_echec"}, succes=False)
+            except Exception:
+                pass
+            return jsonify({"erreur": "Code 2FA incorrect ou expire"}), 401
+
         try:
-            user_row = supabase.table("users").select("tenant_id").eq(
-                "id", user_id).execute()
+            user_row  = supabase.table("users").select("tenant_id").eq("id", user_id).execute()
             tenant_id = user_row.data[0]["tenant_id"] if user_row.data else os.environ.get("DEFAULT_TENANT_ID", "")
         except Exception:
             tenant_id = os.environ.get("DEFAULT_TENANT_ID", "")
 
-        # Créer les tokens JWT
         access_token = create_access_token(identity=user_id)
         refresh_tok  = create_refresh_token(identity=user_id)
 
