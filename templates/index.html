@@ -926,6 +926,136 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .aff-acte-btn:hover{border-color:#0A0A0A;background:#F0F0F0;}
 .aff-acte-name{font-size:11px;font-weight:500;color:#0A0A0A;margin-bottom:2px;}
 .aff-acte-desc{font-size:9px;color:#A3A3A3;}
+/* ══ ONBOARDING ══════════════════════════════════════ */
+#splash-onboard {
+  position:fixed;inset:0;background:rgba(10,10,10,.75);
+  z-index:1500;display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+#splash-onboard.show { display:flex; }
+.onboard-card {
+  background:#fff;border-radius:16px;width:480px;max-width:94vw;
+  overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.3);
+  animation:onboardIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes onboardIn {
+  from{opacity:0;transform:scale(.92) translateY(12px)}
+  to{opacity:1;transform:scale(1) translateY(0)}
+}
+.onboard-hdr {
+  background:#0A0A0A;padding:28px 32px 24px;
+}
+.onboard-logo {
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;
+}
+.onboard-logo-icon {
+  width:36px;height:36px;background:#1C1C1C;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+}
+.onboard-logo-text {
+  font-family:var(--serif);font-size:20px;font-weight:500;color:#fff;
+}
+.onboard-logo-text span { color:var(--or);font-weight:300; }
+.onboard-title {
+  font-size:22px;font-weight:500;color:#fff;
+  font-family:var(--serif);margin-bottom:6px;
+}
+.onboard-subtitle { font-size:13px;color:#6B6B6B;line-height:1.5; }
+.onboard-body { padding:24px 32px; }
+.onboard-steps { display:flex;flex-direction:column;gap:10px;margin-bottom:24px; }
+.onboard-step {
+  display:flex;align-items:center;gap:14px;padding:12px 14px;
+  border:0.5px solid #E5E5E5;border-radius:10px;
+  cursor:pointer;transition:.2s;background:#FAFAFA;
+}
+.onboard-step:hover { border-color:#0A0A0A;background:#F5F5F5; }
+.onboard-step.done { border-color:#D4D4D4;background:#F9F9F9;opacity:.6; }
+.onboard-step-num {
+  width:28px;height:28px;border-radius:50%;background:#0A0A0A;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:600;color:#fff;flex-shrink:0;
+}
+.onboard-step.done .onboard-step-num {
+  background:#16A34A;
+}
+.onboard-step-info { flex:1; }
+.onboard-step-title { font-size:13px;font-weight:500;color:#0A0A0A;margin-bottom:2px; }
+.onboard-step.done .onboard-step-title { color:#A3A3A3; }
+.onboard-step-desc { font-size:11px;color:#A3A3A3; }
+.onboard-step-arrow {
+  color:#D4D4D4;font-size:16px;flex-shrink:0;
+}
+.onboard-step:hover .onboard-step-arrow { color:#0A0A0A; }
+.onboard-step.done .onboard-step-arrow { display:none; }
+.onboard-actions {
+  display:flex;align-items:center;justify-content:space-between;
+}
+.onboard-skip {
+  font-size:12px;color:#A3A3A3;cursor:pointer;background:none;border:none;
+  font-family:var(--font);transition:.15s;text-decoration:underline;
+}
+.onboard-skip:hover { color:#525252; }
+.onboard-start {
+  background:#0A0A0A;color:#fff;border:none;border-radius:8px;
+  padding:10px 24px;font-size:13px;font-weight:500;font-family:var(--font);
+  cursor:pointer;transition:.15s;display:flex;align-items:center;gap:7px;
+}
+.onboard-start:hover { background:#333; }
+
+/* Checklist dashboard */
+#dash-onboard-block {
+  background:#fff;border:0.5px solid #E5E5E5;border-radius:var(--r-lg);
+  overflow:hidden;margin-bottom:20px;display:none;
+}
+#dash-onboard-block.show { display:block; }
+.dash-ob-hdr {
+  padding:10px 16px;background:#0A0A0A;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.dash-ob-title {
+  font-size:12px;font-weight:500;color:#fff;
+  display:flex;align-items:center;gap:8px;
+}
+.dash-ob-progress {
+  font-size:10px;color:#6B6B6B;
+}
+.dash-ob-close {
+  background:none;border:none;cursor:pointer;color:#6B6B6B;
+  display:flex;align-items:center;font-size:18px;padding:0 2px;
+}
+.dash-ob-close:hover { color:#fff; }
+.dash-ob-body {
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+}
+.dash-ob-step {
+  padding:14px 12px;border-right:0.5px solid #F0F0F0;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  cursor:pointer;transition:.15s;text-align:center;
+}
+.dash-ob-step:last-child { border-right:none; }
+.dash-ob-step:hover { background:#F8F8F8; }
+.dash-ob-step.done { opacity:.5;cursor:default; }
+.dash-ob-step.done:hover { background:transparent; }
+.dash-ob-icon {
+  width:36px;height:36px;border-radius:50%;background:#F5F5F5;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  border:1.5px solid #E5E5E5;
+}
+.dash-ob-step.done .dash-ob-icon {
+  background:#DCFCE7;border-color:#86EFAC;
+}
+.dash-ob-step-title {
+  font-size:11px;font-weight:500;color:#0A0A0A;line-height:1.4;
+}
+.dash-ob-step.done .dash-ob-step-title { color:#A3A3A3; }
+.dash-ob-step-desc { font-size:10px;color:#A3A3A3;line-height:1.4; }
+.dash-ob-bar-wrap {
+  height:3px;background:#F0F0F0;
+}
+.dash-ob-bar {
+  height:100%;background:#0A0A0A;transition:width .4s ease;
+}
+
 </style>
 </head>
 <body>
@@ -1064,6 +1194,53 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
     <!-- ── TABLEAU DE BORD ──────────────────────────── -->
     <div class="page active" id="page-dashboard">
       <div class="dash-layout">
+        <!-- Bloc onboarding checklist -->
+        <div id="dash-onboard-block">
+          <div class="dash-ob-hdr">
+            <div class="dash-ob-title">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--or)" stroke-width="1.5" stroke-linecap="round"><path d="M12 2L3 7v6c0 5 4 9.3 9 10 5-.7 9-5 9-10V7L12 2z"/></svg>
+              Démarrage guidé
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span class="dash-ob-progress" id="ob-progress-text">0 / 4 étapes</span>
+              <button class="dash-ob-close" onclick="masquerBlocOnboard()" title="Masquer">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="dash-ob-bar-wrap"><div class="dash-ob-bar" id="ob-progress-bar" style="width:0%"></div></div>
+          <div class="dash-ob-body">
+            <div class="dash-ob-step" id="dob-affaire" onclick="onboardAction('affaire')">
+              <div class="dash-ob-icon" id="dob-icon-affaire">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="1.5" stroke-linecap="round"><path d="M2 4h12v10H2zM5 4V2h6v2"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+              </div>
+              <div class="dash-ob-step-title">Créer une affaire</div>
+              <div class="dash-ob-step-desc">Organisez vos dossiers</div>
+            </div>
+            <div class="dash-ob-step" id="dob-document" onclick="onboardAction('document')">
+              <div class="dash-ob-icon" id="dob-icon-document">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+              </div>
+              <div class="dash-ob-step-title">Uploader un PDF</div>
+              <div class="dash-ob-step-desc">Indexez vos documents</div>
+            </div>
+            <div class="dash-ob-step" id="dob-chat" onclick="onboardAction('chat')">
+              <div class="dash-ob-icon" id="dob-icon-chat">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="1.5" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              </div>
+              <div class="dash-ob-step-title">Utiliser le chat</div>
+              <div class="dash-ob-step-desc">Interrogez vos documents</div>
+            </div>
+            <div class="dash-ob-step" id="dob-acte" onclick="onboardAction('acte')">
+              <div class="dash-ob-icon" id="dob-icon-acte">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="1.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg>
+              </div>
+              <div class="dash-ob-step-title">Générer un acte</div>
+              <div class="dash-ob-step-desc">38 actes OHADA/CMR</div>
+            </div>
+          </div>
+        </div>
+
         <div class="dash-welcome">
           <h1 id="dash-greeting">Bonjour, Maître</h1>
           <p id="dash-date">Chargement...</p>
@@ -1448,6 +1625,66 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
       </div>
     </div>
 
+<!-- ══ SPLASH ONBOARDING (premier login) ══════════════ -->
+<div id="splash-onboard">
+  <div class="onboard-card">
+    <div class="onboard-hdr">
+      <div class="onboard-logo">
+        <div class="onboard-logo-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--or)" stroke-width="1.5" stroke-linecap="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9 12h6M12 9v6"/></svg>
+        </div>
+        <div class="onboard-logo-text">Odyxia <span>Droit</span></div>
+      </div>
+      <div class="onboard-title">Bienvenue, Maître</div>
+      <div class="onboard-subtitle">Votre assistant juridique OHADA est prêt. Suivez ces 4 étapes pour démarrer.</div>
+    </div>
+    <div class="onboard-body">
+      <div class="onboard-steps">
+        <div class="onboard-step" onclick="onboardAction('affaire')">
+          <div class="onboard-step-num" id="ob-num-1">1</div>
+          <div class="onboard-step-info">
+            <div class="onboard-step-title">Créer votre première affaire</div>
+            <div class="onboard-step-desc">Organisez vos dossiers clients et suivez chaque procédure</div>
+          </div>
+          <span class="onboard-step-arrow">›</span>
+        </div>
+        <div class="onboard-step" onclick="onboardAction('document')">
+          <div class="onboard-step-num" id="ob-num-2">2</div>
+          <div class="onboard-step-info">
+            <div class="onboard-step-title">Uploader un document PDF</div>
+            <div class="onboard-step-desc">Contrats, jugements, pièces — indexés et interrogeables</div>
+          </div>
+          <span class="onboard-step-arrow">›</span>
+        </div>
+        <div class="onboard-step" onclick="onboardAction('chat')">
+          <div class="onboard-step-num" id="ob-num-3">3</div>
+          <div class="onboard-step-info">
+            <div class="onboard-step-title">Poser une question au chat</div>
+            <div class="onboard-step-desc">Interrogez vos documents en langage naturel</div>
+          </div>
+          <span class="onboard-step-arrow">›</span>
+        </div>
+        <div class="onboard-step" onclick="onboardAction('acte')">
+          <div class="onboard-step-num" id="ob-num-4">4</div>
+          <div class="onboard-step-info">
+            <div class="onboard-step-title">Générer votre premier acte</div>
+            <div class="onboard-step-desc">38 actes OHADA/CMR prêts à rédiger en 30 secondes</div>
+          </div>
+          <span class="onboard-step-arrow">›</span>
+        </div>
+      </div>
+      <div class="onboard-actions">
+        <button class="onboard-skip" onclick="fermerSplashOnboard()">Ignorer pour l'instant</button>
+        <button class="onboard-start" onclick="onboardAction('affaire')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          Commencer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
     <!-- ══ CHAT FLOTTANT ═══════════════════════════════════ -->
 <div id="chat-fab" onclick="toggleChat()">
   <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5">
@@ -1592,6 +1829,8 @@ async function init() {
   await chargerContexteMemoire();
   setTimeout(initAllResizers, 100);
   initRedaction();
+  rafraichirOnboard();
+  setTimeout(afficherSplashOnboard, 800);
 }
 
 // ── NAVIGATION ───────────────────────────────────────
@@ -1670,6 +1909,7 @@ async function creerAffaire() {
     const r = await apiFetch('/dossiers', 'POST', {nom: nom.trim(), description: ''});
     if (r.succes || r.id) {
       showToast('"' + nom.trim() + '" créée');
+      _hookOnboardAffaire();
       await chargerAffaires();
       await chargerDashboard();
     } else {
@@ -2279,6 +2519,7 @@ async function uploadFichier(file, dossierId) {
     if (d.succes) {
       const chunks = d.chunks || 0;
       showToast('"' + file.name + '" indexé — ' + chunks + ' passage' + (chunks > 1 ? 's' : '') + ' extraits');
+      if (!dossierId) _hookOnboardDocument();
       await chargerDocsBib();
       if (dossierId && AFFAIRE_ACTIVE) await chargerCorpsAffaire(AFFAIRE_ACTIVE);
     } else {
@@ -2651,6 +2892,7 @@ async function envoyerMessage() {
     sauvegarderHist();
   }
   convActuelle.messages.push({role:'user', content:q});
+  _hookOnboardChat();
 
   try {
     const _aujourdhui = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
@@ -3134,6 +3376,7 @@ async function lancerRedaction() {
       .replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br/>');
     body.innerHTML = '<div class="redac-doc-content"><p>' + html2 + '</p></div>';
     showToast('Document généré');
+    _hookOnboardActe();
   } catch(e) {
     showLoading(false);
     showToast('Erreur : ' + e.message, true);
@@ -3167,6 +3410,125 @@ function supprimerDocAffaire(btn) {
   if (!did || !confirm('Supprimer ce document ?')) return;
   supprimerDocById(did, btn);
 }
+
+// ── ONBOARDING ────────────────────────────────────────
+const OB_STEPS = ['affaire', 'document', 'chat', 'acte'];
+const OB_KEY   = 'od_onboard';  // localStorage key
+
+function lireEtatOnboard() {
+  try { return JSON.parse(localStorage.getItem(OB_KEY) || '{}'); } catch { return {}; }
+}
+
+function sauverEtatOnboard(etat) {
+  localStorage.setItem(OB_KEY, JSON.stringify(etat));
+}
+
+function marquerEtapeOnboard(step) {
+  const etat = lireEtatOnboard();
+  etat[step] = true;
+  sauverEtatOnboard(etat);
+  rafraichirOnboard();
+}
+
+function rafraichirOnboard() {
+  const etat    = lireEtatOnboard();
+  const done    = OB_STEPS.filter(s => etat[s]).length;
+  const total   = OB_STEPS.length;
+  const pct     = Math.round(done / total * 100);
+  const complet = done === total;
+
+  // Barre de progression
+  const bar = document.getElementById('ob-progress-bar');
+  const txt = document.getElementById('ob-progress-text');
+  if (bar) bar.style.width = pct + '%';
+  if (txt) txt.textContent = done + ' / ' + total + ' étapes';
+
+  // Étapes checklist dashboard
+  OB_STEPS.forEach(s => {
+    const step = document.getElementById('dob-' + s);
+    const icon = document.getElementById('dob-icon-' + s);
+    if (!step) return;
+    if (etat[s]) {
+      step.classList.add('done');
+      if (icon) icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    } else {
+      step.classList.remove('done');
+    }
+  });
+
+  // Splash — marquer étapes faites
+  OB_STEPS.forEach((s, i) => {
+    const num = document.getElementById('ob-num-' + (i+1));
+    const step = num?.closest('.onboard-step');
+    if (!num) return;
+    if (etat[s]) {
+      step?.classList.add('done');
+      num.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    }
+  });
+
+  // Masquer le bloc si tout est fait
+  const bloc = document.getElementById('dash-onboard-block');
+  if (complet) {
+    if (bloc) bloc.classList.remove('show');
+    sauverEtatOnboard({...etat, _complet: true});
+  } else {
+    const masque = lireEtatOnboard()._masque;
+    if (bloc && !masque) bloc.classList.add('show');
+  }
+}
+
+function afficherSplashOnboard() {
+  const etat = lireEtatOnboard();
+  if (etat._complet) return;                  // Tout fait — ne plus afficher
+  const premierLogin = !etat._splash_vu;
+  if (premierLogin) {
+    etat._splash_vu = true;
+    sauverEtatOnboard(etat);
+    document.getElementById('splash-onboard').classList.add('show');
+  }
+}
+
+function fermerSplashOnboard() {
+  document.getElementById('splash-onboard').classList.remove('show');
+}
+
+function masquerBlocOnboard() {
+  const etat = lireEtatOnboard();
+  etat._masque = true;
+  sauverEtatOnboard(etat);
+  document.getElementById('dash-onboard-block').classList.remove('show');
+}
+
+function onboardAction(step) {
+  fermerSplashOnboard();
+  marquerEtapeOnboard(step);
+  switch(step) {
+    case 'affaire':
+      creerAffaire();
+      break;
+    case 'document':
+      showPage('bibliotheque');
+      setTimeout(() => document.getElementById('file-input-bib')?.click(), 300);
+      break;
+    case 'chat':
+      showPage('dashboard');
+      setTimeout(() => {
+        if (!chatOpen) toggleChat();
+        document.getElementById('chat-input')?.focus();
+      }, 300);
+      break;
+    case 'acte':
+      showPage('redaction');
+      break;
+  }
+}
+
+// Hooks pour marquer automatiquement les étapes
+function _hookOnboardAffaire() { marquerEtapeOnboard('affaire'); }
+function _hookOnboardDocument() { marquerEtapeOnboard('document'); }
+function _hookOnboardChat()     { marquerEtapeOnboard('chat'); }
+function _hookOnboardActe()     { marquerEtapeOnboard('acte'); }
 
 function showToast(msg, err=false) {
   const t = document.getElementById('toast');

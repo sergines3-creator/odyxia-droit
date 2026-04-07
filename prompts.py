@@ -2314,5 +2314,112 @@ PROMPTS_REDACTION.update({
     },
 })
 
+# ─────────────────────────────────────────────────────────────────────────────
+# PRÉDICTION JURIDICTIONNELLE — Extraction & Anonymisation
+# ─────────────────────────────────────────────────────────────────────────────
+
+def prompt_extraction_jurisprudence(texte: str, nom_fichier: str) -> str:
+    """
+    Extrait les métadonnées structurées d'un jugement ou arrêt
+    pour alimenter la base de prédiction juridictionnelle.
+    Anonymise simultanément les noms des parties.
+    """
+    return f"""{IDENTITE_ODYXIA}
+
+Tu analyses un jugement ou arrêt de justice pour en extraire
+les métadonnées structurées destinées à la base de prédiction
+juridictionnelle OHADA/Cameroun.
+
+━━━ DOCUMENT ━━━
+Fichier : {nom_fichier}
+Contenu :
+{texte[:12000]}
+
+━━━ MISSION ━━━
+Extrais les informations suivantes avec une précision absolue.
+Si une information est absente du document, utilise null.
+N'invente jamais une information non présente dans le texte.
+
+━━━ ANONYMISATION OBLIGATOIRE ━━━
+Dans tous les champs textuels (titre, contenu, issue_detail) :
+- Remplace les noms des parties par : [PARTIE A] et [PARTIE B]
+- Remplace les noms des avocats par : [AVOCAT]
+- Remplace les numéros de compte, NINEA, numéros de contrat par : [REF]
+- Conserve intacts : noms des juges, juridictions, références légales,
+  articles de loi, montants financiers, dates
+
+━━━ INSTRUCTION ━━━
+Réponds UNIQUEMENT avec ce JSON strict, sans markdown ni backticks :
+
+{{
+  "titre": "Intitulé anonymisé de l'affaire — ex: [PARTIE A] c/ [PARTIE B]",
+  "juridiction": "Nom exact de la juridiction — ex: TGI Douala, CCJA, Cour d'Appel du Littoral",
+  "chambre": "Chambre concernée ou null — ex: Chambre Civile, Chambre Commerciale",
+  "juge": "Nom du juge ou président de chambre ou null",
+  "date_dec": "Date de la décision au format YYYY-MM-DD ou null",
+  "reference": "Numéro de rôle ou référence officielle ou null",
+  "domaine": "Un seul parmi : commercial | societaire | recouvrement | surete | arbitrage | bancaire | assurance | travail | foncier | penal | administratif | fiscal | autre",
+  "issue": "Un seul parmi : favorable | defavorable | partiel | irrecevable | incompetence | renvoi",
+  "issue_detail": "Résumé anonymisé du dispositif en 2-3 phrases — ce que le juge a exactement décidé",
+  "montant_litige": "Montant principal en FCFA comme entier ou null si non chiffrable",
+  "type_partie": "Un seul parmi : prive_prive | prive_etat | societe_societe | societe_prive | autre",
+  "moyens_retenus": [
+    "Argument juridique 1 retenu par le juge avec l'article ou texte cité",
+    "Argument juridique 2"
+  ],
+  "moyens_rejetes": [
+    "Argument rejeté 1 avec la raison du rejet",
+    "Argument rejeté 2"
+  ],
+  "textes_appliques": [
+    "AUPSRVE Art. 54",
+    "Code Travail CMR Art. 34"
+  ],
+  "ratio_decidendi": "Le raisonnement central du juge en 3-5 phrases anonymisées — pourquoi il a décidé ainsi",
+  "contenu": "Résumé anonymisé complet du jugement en 8-10 phrases — faits, procédure, décision, motivations principales",
+  "est_jugement": true,
+  "confiance": "haute | moyenne | faible — niveau de confiance dans l'extraction selon la lisibilité du document"
+}}
+"""
 
 
+def prompt_verification_anonymisation(texte_extrait: str) -> str:
+    """
+    Vérifie qu'un texte extrait ne contient plus de données personnelles
+    identifiantes avant insertion dans la base commune.
+    Couche de sécurité supplémentaire.
+    """
+    return f"""{IDENTITE_ODYXIA}
+
+Tu es un expert en protection des données personnelles (RGPD).
+Vérifie que ce texte extrait d'un jugement est correctement anonymisé
+avant insertion dans une base de données commune.
+
+━━━ TEXTE À VÉRIFIER ━━━
+{texte_extrait[:4000]}
+
+━━━ CE QUI DOIT AVOIR ÉTÉ SUPPRIMÉ ━━━
+- Noms et prénoms des parties (personnes physiques)
+- Dénominations sociales complètes identifiantes
+- Adresses précises
+- Numéros de compte, NINEA, NIF, CNI
+- Numéros de téléphone, emails
+
+━━━ CE QUI DOIT RESTER ━━━
+- Noms des juges et juridictions
+- Articles de loi et références légales
+- Montants financiers
+- Dates
+- [PARTIE A], [PARTIE B], [AVOCAT], [REF]
+
+Réponds UNIQUEMENT avec ce JSON strict :
+
+{{
+  "anonymisation_ok": true,
+  "donnees_residuelles": [
+    "Donnée personnelle résiduelle détectée si applicable"
+  ],
+  "risque": "faible | moyen | eleve",
+  "action": "valider | corriger | rejeter"
+}}
+"""
