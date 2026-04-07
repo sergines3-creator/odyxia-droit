@@ -1504,7 +1504,15 @@ let TENANT_ID  = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 let DOC_ACTIF  = null;
 let AFFAIRE_ACTIVE = null;
 let SELECTED_DOMAIN = '';
-let conversations = JSON.parse(localStorage.getItem('od_convs') || '[]');
+function getConvKey() {
+  try {
+    const token = localStorage.getItem('od_token');
+    if (!token) return 'od_convs_anon';
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return 'od_convs_' + (payload.sub || 'anon');
+  } catch { return 'od_convs_anon'; }
+}
+let conversations = JSON.parse(localStorage.getItem(getConvKey()) || '[]');
 let convActuelle = null;
 let chatOpen = false;
 let CONTEXTE_MEMOIRE = '';
@@ -1530,7 +1538,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ── AUTH ─────────────────────────────────────────────
 async function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
+  const email = document.getElementById('login-email')?.value.trim() || '';
   const pass  = document.getElementById('login-pass').value;
   const code  = document.getElementById('login-2fa').value;
   if (!email) {
@@ -1552,6 +1560,7 @@ async function doLogin() {
         const expiry = Date.now() + (d.expires_in || 900) * 1000;
         localStorage.setItem('od_token_exp', expiry.toString());
       }
+      conversations = JSON.parse(localStorage.getItem(getConvKey()) || '[]');
       document.getElementById('login-screen').classList.remove('show');
       document.getElementById('app').classList.add('show');
       document.getElementById('chat-fab').classList.add('show');
@@ -1565,7 +1574,7 @@ async function doLogin() {
     document.getElementById('login-err').textContent = 'Connexion impossible';
   }
 }
-document.getElementById('login-email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('login-pass').focus(); });
+document.getElementById('login-email')?.addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('login-pass').focus(); });
 document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 
 async function doLogout() {
@@ -2783,11 +2792,11 @@ async function nouvelleConversation() {
 }
 
 function sauvegarderHist() {
-  localStorage.setItem('od_convs', JSON.stringify(conversations.slice(0,50)));
+  localStorage.setItem(getConvKey(), JSON.stringify(conversations.slice(0,50)));
 }
 
 function chargerHistorique() {
-  conversations = JSON.parse(localStorage.getItem('od_convs') || '[]');
+  conversations = JSON.parse(localStorage.getItem(getConvKey()) || '[]');
   document.getElementById('stat-convs').textContent = conversations.length;
   const hist = document.getElementById('chat-hist');
   hist.innerHTML = '';
@@ -2819,17 +2828,62 @@ function chargerConversation(conv) {
 }
 
 // ── API ───────────────────────────────────────────────
+let _refreshEnCours = false;
+
+async function tenterRefresh() {
+  if (_refreshEnCours) return false;
+  _refreshEnCours = true;
+  try {
+    const rt = localStorage.getItem('od_refresh');
+    if (!rt) return false;
+    const r = await fetch('/refresh', {
+      method: 'POST',
+      headers: {'Authorization': 'Bearer ' + rt}
+    });
+    if (!r.ok) return false;
+    const d = await r.json();
+    if (d.token) {
+      TOKEN = d.token;
+      localStorage.setItem('od_token', TOKEN);
+      const expiry = Date.now() + (d.expires_in || 900) * 1000;
+      localStorage.setItem('od_token_exp', expiry.toString());
+      return true;
+    }
+    return false;
+  } catch(e) { return false; }
+  finally { _refreshEnCours = false; }
+}
+
+function expiredSoon() {
+  const exp = parseInt(localStorage.getItem('od_token_exp') || '0');
+  return exp > 0 && Date.now() > exp - 60000;
+}
+
+function deconnecterSession() {
+  localStorage.removeItem('od_token');
+  localStorage.removeItem('od_refresh');
+  localStorage.removeItem('od_token_exp');
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('chat-fab').classList.remove('show');
+  document.getElementById('login-screen').classList.add('show');
+  showToast('Session expirée — reconnectez-vous', true);
+}
+
 async function apiFetch(url, method='GET', body=null) {
+  if (expiredSoon()) await tenterRefresh();
   const opts = {method, headers:{'Authorization':'Bearer '+TOKEN}};
   if (body) { opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(body); }
-  const r = await fetch(url, opts);
+  let r = await fetch(url, opts);
   if (r.status === 401) {
-    localStorage.removeItem('od_token');
-    document.getElementById('app').classList.remove('show');
-    document.getElementById('chat-fab').classList.remove('show');
-    document.getElementById('login-screen').classList.add('show');
-    showToast('Session expirée — reconnectez-vous', true);
-    throw new Error('Session expirée');
+    const ok = await tenterRefresh();
+    if (ok) {
+      opts.headers['Authorization'] = 'Bearer ' + TOKEN;
+      r = await fetch(url, opts);
+    }
+    if (r.status === 401) {
+      deconnecterSession();
+      throw new Error('Session expirée');
+    }
   }
   const text = await r.text();
   if (!text || !text.trim()) return null;
@@ -3116,10 +3170,16 @@ function copierRedaction() {
   navigator.clipboard.writeText(REDAC_CONTENU).then(() => showToast('Copié')).catch(() => showToast('Erreur copie', true));
 }
 
-function supprimerDocAffaire(btn) {
+async function supprimerDocAffaire(btn) {
   const did = btn.getAttribute('data-did');
   if (!did || !confirm('Supprimer ce document ?')) return;
-  supprimerDocById(did, btn);
+  try {
+    await apiFetch('/supprimer_document', 'DELETE', {id: did});
+    showToast('Document supprimé');
+    const row = btn.closest('.aff-doc-row');
+    if (row) row.remove();
+    if (AFFAIRE_ACTIVE) await afficherPageAffaire(AFFAIRE_ACTIVE);
+  } catch(e) { showToast('Erreur : ' + e.message, true); }
 }
 
 function showToast(msg, err=false) {
