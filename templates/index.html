@@ -34,8 +34,6 @@
   --sidebar:  220px;
   --header:   48px;
   --trans:    all .18s ease;
-  --or:       #C9A84C;
-  --or-lt:    #F5E6C0;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:13px;line-height:1.6;height:100vh;overflow:hidden;}
@@ -72,7 +70,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   to{opacity:1;filter:blur(0);}
 }
 .splash-droit {
-  font-family:var(--font);font-size:18px;font-weight:300;color:var(--or);
+  font-family:var(--font);font-size:18px;font-weight:300;color:#0A0A0A;
   opacity:0;transform:translateX(20px);
   animation:droitReveal .8s ease 1.8s forwards;
   letter-spacing:2px;text-transform:uppercase;
@@ -218,9 +216,6 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   font-family:var(--font);
 }
 .btn-new-affaire:hover{background:#1C1C1C;color:#D4D4D4;}
-/* Scroll sidebar affaires récentes */
-#affaires-sidebar{overflow-y:auto;max-height:200px;}
-
 
 /* ══ MAIN ═════════════════════════════════════════════ */
 .main{display:flex;flex-direction:column;overflow:hidden;}
@@ -335,7 +330,6 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   font-size:11px;padding:5px 12px;border-radius:6px;cursor:pointer;
   font-family:var(--font);transition:var(--trans);border:0.5px solid #E5E5E5;
   background:var(--bg);color:var(--text2);
-  display:inline-flex;align-items:center;gap:5px;
 }
 .btn-sm:hover{background:var(--bg2);}
 .btn-sm.primary{background:#0A0A0A;color:#fff;border-color:#0A0A0A;}
@@ -847,7 +841,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .redac-doc-content hr{border:none;border-top:0.5px solid #E5E5E5;margin:16px 0;}
 
 /* ══ AFFAIRES v3 ══════════════════════════════════════ */
-.aff-v3{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.aff-v3{flex:1;display:grid;grid-template-columns:260px 1fr;overflow:hidden;}
 .aff-v3-sidebar{
   background:#FAFAFA;border-right:0.5px solid #E5E5E5;
   display:flex;flex-direction:column;overflow:hidden;
@@ -959,7 +953,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">
-      <div style="font-family:var(--serif);font-size:22px;font-weight:500;color:#0A0A0A;letter-spacing:-0.3px;">Odyxia <span style="font-weight:300;color:var(--or);">Droit</span></div>
+      <div style="font-family:var(--serif);font-size:22px;font-weight:500;color:#0A0A0A;letter-spacing:-0.3px;">Odyxia <span style="font-weight:300;color:#525252;">Droit</span></div>
     </div>
     <label class="login-label">Mot de passe</label>
     <input class="login-input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
@@ -981,7 +975,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   <!-- Header -->
   <div class="hdr">
     <div class="hdr-logo">
-      <div class="hdr-icon" style="background:#2A2A2A;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" stroke-width="1.5" stroke-linecap="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9 12h6M12 9v6"/></svg></div>
+      <div class="hdr-icon" style="background:#3A3A3A;color:#A3A3A3;font-size:10px;">OD</div>
       <div>
         <div class="hdr-avocat" id="hdr-avocat">{{ cabinet_avocat }}</div>
       </div>
@@ -1143,9 +1137,9 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
             <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#A3A3A3" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="10" y1="10" x2="14" y2="14"/></svg>
             <input type="text" id="bib-search" placeholder="Rechercher un document..." oninput="filtrerDocs(this.value)"/>
           </div>
-          <button class="btn-sm" id="btn-carte-mentale" onclick="afficherCarteMentale()" style="display:none;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="7" x2="5" y2="17"/><line x1="12" y1="7" x2="19" y2="17"/><line x1="5" y1="19" x2="19" y2="19"/></svg> Carte mentale</button>
-          <button class="btn-sm" id="btn-rediger-bib" onclick="showRedaction(null)" style="display:none;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg> Rédiger</button>
-          <button class="btn-sm primary" id="btn-export-bib" onclick="exporterPDF()" style="display:none;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exporter</button>
+          <button class="btn-sm" id="btn-carte-mentale" onclick="afficherCarteMentale()" style="display:none;">🗺 Carte mentale</button>
+          <button class="btn-sm" id="btn-rediger-bib" onclick="showRedaction(null)" style="display:none;">Rédiger un acte</button>
+          <button class="btn-sm primary" id="btn-export-bib" onclick="exporterPDF()" style="display:none;">Exporter PDF</button>
           <input type="file" id="file-input-bib" accept=".pdf" style="display:none" onchange="uploadFichier(this.files[0],null)"/>
         </div>
 
@@ -1211,7 +1205,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
           <div class="aff-v3-main-hdr">
             <span class="aff-v3-main-title" id="aff-v3-title">Affaires</span>
             <input type="file" id="file-input-aff" accept=".pdf" style="display:none" onchange="uploadFichier(this.files[0], AFFAIRE_ACTIVE?.id)"/>
-            <button class="btn-sm" id="btn-aff-upload" onclick="document.getElementById('file-input-aff').click()" style="display:none;gap:5px;align-items:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Pièce</button>
+            <button class="btn-sm" id="btn-aff-upload" onclick="document.getElementById('file-input-aff').click()" style="display:none;">+ Pièce</button>
           </div>
           <div class="aff-v3-body" id="aff-v3-body">
             <div class="aff-v3-empty">
@@ -1382,7 +1376,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
           </div>
 
           <button class="btn-full" onclick="lancerComparaison()">Analyser le profil juge</button>
-          <div class="save-confirm" id="cmp-save-confirm"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Dossier enregistré dans la base documentaire</div>
+          <div class="save-confirm" id="cmp-save-confirm">✓ Dossier enregistré dans la base documentaire</div>
         </div>
 
         <div class="resizer" id="resizer-comp"></div>
@@ -1400,6 +1394,8 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
       </div>
     </div>
 
+  </div>
+</div>
 
     <!-- ── RÉDACTION ─────────────────────────────────── -->
     <div class="page" id="page-redaction">
@@ -1432,8 +1428,8 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
         <div class="redac-result-col">
           <div class="redac-result-toolbar">
             <span style="font-size:12px;font-weight:500;color:#0A0A0A;flex:1;" id="redac-result-title">Document généré</span>
-            <button class="btn-sm" id="btn-redac-export" onclick="exporterRedaction()" style="display:none;gap:5px;align-items:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exporter</button>
-            <button class="btn-sm" id="btn-redac-copy" onclick="copierRedaction()" style="display:none;gap:5px;align-items:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copier</button>
+            <button class="btn-sm" id="btn-redac-export" onclick="exporterRedaction()" style="display:none;">Exporter PDF</button>
+            <button class="btn-sm" id="btn-redac-copy" onclick="copierRedaction()" style="display:none;">Copier</button>
           </div>
           <div class="redac-result-body" id="redac-result-body">
             <div class="redac-result-empty">
@@ -1452,10 +1448,6 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
       </div>
     </div>
 
-
-  </div>
-</div>
-
     <!-- ══ CHAT FLOTTANT ═══════════════════════════════════ -->
 <div id="chat-fab" onclick="toggleChat()">
   <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5">
@@ -1469,7 +1461,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
     <div class="chat-panel-actions">
       <button class="chat-panel-btn" onclick="toggleHist()">Historique</button>
       <button class="chat-panel-btn" onclick="nouvelleConversation()">+ Nouveau</button>
-      <button class="chat-close" onclick="toggleChat()" style="display:flex;align-items:center;justify-content:center;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <button class="chat-close" onclick="toggleChat()">×</button>
     </div>
   </div>
 
@@ -1482,7 +1474,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   <div class="mind-panel" id="mind-panel">
     <div class="mind-panel-hdr" onclick="toggleMindPanel()">
       <span class="mind-panel-label">Carte mentale</span>
-      <span id="mind-toggle-lbl" style="font-size:9px;color:#0A0A0A;">Réduire</span>
+      <span id="mind-toggle-lbl" style="font-size:9px;color:#0A0A0A;">Réduire ▴</span>
     </div>
     <div class="mind-panel-body" id="mind-panel-body"></div>
   </div>
@@ -1491,7 +1483,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
     <div class="chat-input-wrap">
       <input id="chat-input" placeholder="Votre question juridique..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();envoyerMessage();}"/>
     </div>
-    <button class="btn-send" onclick="envoyerMessage()" style="display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+    <button class="btn-send" onclick="envoyerMessage()">→</button>
   </div>
 </div>
 
@@ -1505,6 +1497,8 @@ if (!localStorage.getItem('od_token') && localStorage.getItem('odyxia_token')) {
   localStorage.setItem('od_token', localStorage.getItem('odyxia_token'));
 }
 let TOKEN = localStorage.getItem('od_token') || '';
+// Refresh token lu au démarrage
+const _REFRESH_TOKEN_INIT = localStorage.getItem('od_refresh') || '';
 let SESSION_ID = 'sess_' + Math.random().toString(36).slice(2);
 let TENANT_ID  = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 let DOC_ACTIF  = null;
@@ -1547,6 +1541,11 @@ async function doLogin() {
     if (d.token) {
       TOKEN = d.token;
       localStorage.setItem('od_token', TOKEN);
+      if (d.refresh_token) {
+        localStorage.setItem('od_refresh', d.refresh_token);
+        const expiry = Date.now() + (d.expires_in || 900) * 1000;
+        localStorage.setItem('od_token_exp', expiry.toString());
+      }
       document.getElementById('login-screen').classList.remove('show');
       document.getElementById('app').classList.add('show');
       document.getElementById('chat-fab').classList.add('show');
@@ -1562,8 +1561,20 @@ async function doLogin() {
 }
 document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 
-function doLogout() {
+async function doLogout() {
+  try {
+    const rt = localStorage.getItem('od_refresh');
+    if (rt) {
+      await fetch('/logout', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},
+        body: JSON.stringify({refresh_token: rt})
+      });
+    }
+  } catch(e) {}
   localStorage.removeItem('od_token');
+  localStorage.removeItem('od_refresh');
+  localStorage.removeItem('od_token_exp');
   location.reload();
 }
 
@@ -1629,7 +1640,7 @@ function renderAffairesList(affaires) {
     row.className = 'aff-v3-row' + (AFFAIRE_ACTIVE?.id === a.id ? ' active' : '');
     const delBtn = document.createElement('button');
     delBtn.className = 'aff-v3-del';
-    delBtn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    delBtn.textContent = '✕';
     delBtn.onclick = e => { e.stopPropagation(); supprimerAffaire(a.id, a.nom); };
     const dot  = document.createElement('div'); dot.className = 'aff-v3-dot';
     const info = document.createElement('div'); info.className = 'aff-v3-info';
@@ -1702,7 +1713,7 @@ async function ouvrirDetailAffaire(a) {
 
   const docsHtml = docs.length
     ? docs.map(d => '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid #F5F5F5;">'
-        + '<div style="width:28px;height:32px;background:#F5F5F5;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width=\"10\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#A3A3A3\" stroke-width=\"1.5\" stroke-linecap=\"round\"><path d=\"M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z\"/><path d=\"M14 2v6h6\"/></svg></div>'
+        + '<div style="width:28px;height:32px;background:#F5F5F5;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#525252;flex-shrink:0;">PDF</div>'
         + '<div style="flex:1;overflow:hidden;"><div style="font-size:12px;color:#0A0A0A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (d.nom||d.filename) + '</div>'
         + '<div style="font-size:10px;color:#A3A3A3;">' + (d.created_at ? new Date(d.created_at).toLocaleDateString("fr") : "") + '</div></div>'
         + '</div>').join('')
@@ -1797,7 +1808,7 @@ async function chargerAffaires() {
       const _aid = a.id, _anom = a.nom.replace(/'/g,"&apos;");
       el.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;">'
         + '<div class="aff-item-name">' + a.nom + '</div>'
-        + '<button onclick="event.stopPropagation();supprimerAffaire(\'' + _aid + '\',\'' + _anom + '\')" style="background:none;border:none;cursor:pointer;padding:2px 6px;display:flex;align-items:center;color:var(--text3);"><svg width=\"9\" height=\"9\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"/><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"/></svg></button>'
+        + '<button onclick="event.stopPropagation();supprimerAffaire(\'' + _aid + '\',\'' + _anom + '\')" style="background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;padding:2px 6px;">&#x2715;</button>'
         + '</div>'
         + '<div class="aff-item-meta">' + (a.description || 'Aucune description') + '</div>'
         + '<span class="aff-item-status s-blue">En cours</span>';
@@ -1858,10 +1869,10 @@ async function afficherPageAffaire(a) {
         const date = d.created_at ? new Date(d.created_at).toLocaleDateString('fr') : '';
         const did  = d.id;
         return '<div class="aff-doc-row">'
-          + '<div class="aff-doc-icon" style="display:flex;align-items:center;justify-content:center;"><svg width=\"10\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#A3A3A3\" stroke-width=\"1.5\" stroke-linecap=\"round\"><path d=\"M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z\"/><path d=\"M14 2v6h6\"/></svg></div>'
+          + '<div class="aff-doc-icon">PDF</div>'
           + '<div style="flex:1;min-width:0;"><div style="font-size:12px;color:#0A0A0A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + nom + '</div>'
           + '<div style="font-size:10px;color:#A3A3A3;">' + date + '</div></div>'
-          + '<button data-did="' + did + '" onclick="supprimerDocAffaire(this)" style="border:none;background:none;color:#D4D4D4;cursor:pointer;padding:4px;display:flex;align-items:center;" title="Supprimer"><svg width=\"9\" height=\"9\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#D4D4D4\" stroke-width=\"2.5\" stroke-linecap=\"round\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"/><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"/></svg></button>'
+          + '<button data-did="' + did + '" onclick="supprimerDocAffaire(this)" style="border:none;background:none;color:#D4D4D4;cursor:pointer;font-size:12px;padding:4px;" title="Supprimer">✕</button>'
           + '</div>';
       }).join('')
     : '<div style="font-size:12px;color:#A3A3A3;padding:4px 0;">Aucune pièce — ajoutez un document</div>';
@@ -1969,6 +1980,117 @@ function lancerRedactionAffaire(type) {
   redigerActe(type, faits || (dem + ' c/ ' + def));
 }
 
+async function chargerCorpsAffaire(a) {
+  const body = document.getElementById('aff-body');
+  if (!body) {
+    // Mode Kanban — pas de aff-body, on affiche juste le nom
+    return;
+  }
+  body.innerHTML = '<div style="text-align:center;padding:20px;"><div class="spinner" style="margin:0 auto;"></div></div>';
+
+  let docs = [];
+  try { docs = await apiFetch('/liste_documents?dossier_id=' + a.id) || []; } catch(e) {}
+
+  body.innerHTML = `
+    <div class="aff-section">
+      <div class="aff-section-hdr">
+        <span class="aff-section-title">Suivi procédural</span>
+        <span class="badge badge-blue">En cours</span>
+      </div>
+      <div class="aff-section-body">
+        <div class="proc-track">
+          <div class="proc-step"><div class="proc-dot done"></div><div class="proc-name done">Saisine</div></div>
+          <div class="proc-line done"></div>
+          <div class="proc-step"><div class="proc-dot active"></div><div class="proc-name done">Instruction</div></div>
+          <div class="proc-line"></div>
+          <div class="proc-step"><div class="proc-dot"></div><div class="proc-name">Audience</div></div>
+          <div class="proc-line"></div>
+          <div class="proc-step"><div class="proc-dot"></div><div class="proc-name">Délibéré</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="aff-section">
+      <div class="aff-section-hdr">
+        <span class="aff-section-title">Pièces du dossier</span>
+        <span class="badge badge-blue">${docs.length} fichier(s)</span>
+      </div>
+      <div class="aff-section-body" id="aff-docs-body">
+        ${docs.length ? docs.map(d => '<div class="doc-row-dash"><div class="doc-icon-sm">PDF</div><div class="doc-name-sm">' + (d.nom||d.filename) + '</div><span class="doc-date-sm">' + (d.created_at ? new Date(d.created_at).toLocaleDateString('fr') : '') + '</span></div>').join('') : '<div style="font-size:11px;color:var(--text3);">Aucune pièce — ajoutez des documents</div>'}
+      </div>
+    </div>
+
+    <div class="aff-section">
+      <div class="aff-section-hdr">
+        <span class="aff-section-title">Rédiger un acte</span>
+      </div>
+      <div class="aff-section-body">
+        <div class="redac-grid" style="grid-template-columns:repeat(3,1fr);">
+            <div class="redac-btn" onclick="showRedaction('requete')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+              <div class="redac-btn-name">Requête introductive</div>
+              <div class="redac-btn-desc">Saisine du tribunal</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('conclusions')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg></div>
+              <div class="redac-btn-name">Conclusions</div>
+              <div class="redac-btn-desc">Mémoire en défense/demande</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('assignation')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+              <div class="redac-btn-name">Assignation</div>
+              <div class="redac-btn-desc">Citation à comparaître</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('mise_en_demeure')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/></svg></div>
+              <div class="redac-btn-name">Mise en demeure</div>
+              <div class="redac-btn-desc">Sommation préalable</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('contrat')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg></div>
+              <div class="redac-btn-name">Contrat</div>
+              <div class="redac-btn-desc">Rédaction contractuelle</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('rapport')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg></div>
+              <div class="redac-btn-name">Rapport client</div>
+              <div class="redac-btn-desc">Compte rendu d'avancement</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('replique')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg></div>
+              <div class="redac-btn-name">Mémoire en réplique</div>
+              <div class="redac-btn-desc">Réponse aux conclusions adverses</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('refere')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+              <div class="redac-btn-name">Requête en référé</div>
+              <div class="redac-btn-desc">Procédure d'urgence</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('signification')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+              <div class="redac-btn-name">Acte de signification</div>
+              <div class="redac-btn-desc">Notification officielle</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('jurisprudence')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.25C17.25 23.15 21 18.25 21 13V7z"/></svg></div>
+              <div class="redac-btn-name">Résumé jurisprudence</div>
+              <div class="redac-btn-desc">Note de décision CCJA/OHADA</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('protocole')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><path d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9a12.02 12.02 0 00-.382-3.016z"/></svg></div>
+              <div class="redac-btn-name">Protocole transactionnel</div>
+              <div class="redac-btn-desc">Accord amiable entre parties</div>
+            </div>
+            <div class="redac-btn" onclick="showRedaction('note_doctrine')">
+              <div class="redac-btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
+              <div class="redac-btn-name">Note de doctrine</div>
+              <div class="redac-btn-desc">Analyse doctrinale OHADA</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
 
 async function chargerDocsBib() {
   try {
@@ -1985,8 +2107,8 @@ async function chargerDocsBib() {
         const locked   = d.metadata && d.metadata.sensible;
         const is_ready = d.status === 'ready';
         const badge    = is_ready ? 'bib-b-ok' : 'bib-b-wait';
-        const lbl      = is_ready ? '<svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"var(--green)\" stroke-width=\"2.5\" stroke-linecap=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg>' : '<span style="opacity:.5">···</span>';
-        el.innerHTML = '<div class="bib-doc-icon" style="display:flex;align-items:center;justify-content:center;"><svg width=\"13\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#A3A3A3\" stroke-width=\"1.5\" stroke-linecap=\"round\"><path d=\"M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z\"/><path d=\"M14 2v6h6\"/></svg></div>'
+        const lbl      = is_ready ? '✓' : '…';
+        el.innerHTML = '<div class="bib-doc-icon">PDF</div>'
           + '<div class="bib-doc-info">'
           + '<div class="bib-doc-name">' + (d.nom || d.filename) + '</div>'
           + '<div class="bib-doc-meta">' + (d.storage_tier || 'hot') + ' · ' + (d.created_at ? new Date(d.created_at).toLocaleDateString('fr') : '') + '</div>'
@@ -2004,7 +2126,7 @@ async function chargerDocsBib() {
       const dashItems = r.slice(0,4).map(d => {
         const nom  = d.nom || d.filename || 'Document';
         const date = d.created_at ? new Date(d.created_at).toLocaleDateString('fr') : '';
-        return '<div class="doc-row-dash"><div class="doc-icon-sm" style="display:flex;align-items:center;justify-content:center;"><svg width=\"10\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#A3A3A3\" stroke-width=\"1.5\" stroke-linecap=\"round\"><path d=\"M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z\"/><path d=\"M14 2v6h6\"/></svg></div>'
+        return '<div class="doc-row-dash"><div class="doc-icon-sm">PDF</div>'
              + '<div class="doc-name-sm">' + nom + '</div>'
              + '<div class="doc-date-sm">' + date + '</div></div>';
       }).join('');
@@ -2039,7 +2161,7 @@ function afficherDocViewer(doc) {
     + '</div>'
     + '<p>Document charg&eacute;. Utilisez le <strong>chat flottant</strong> pour l\'interroger.</p>'
     + '<div class="mind-map-section" id="mind-map-section" style="display:none;">'
-    + '<div class="mind-map-toggle" onclick="toggleCarteMentaleViewer()"><svg width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"><circle cx=\"9\" cy=\"5\" r=\"2\"/><circle cx=\"18\" cy=\"5\" r=\"2\"/><circle cx=\"9\" cy=\"19\" r=\"2\"/><line x1=\"9\" y1=\"7\" x2=\"9\" y2=\"17\"/><line x1=\"11\" y1=\"5\" x2=\"16\" y2=\"5\"/></svg> <span id="mm-viewer-lbl">Afficher la carte mentale</span></div>'
+    + '<div class="mind-map-toggle" onclick="toggleCarteMentaleViewer()">🗺 <span id="mm-viewer-lbl">Afficher la carte mentale</span></div>'
     + '<div class="mind-map-body" id="mm-viewer-body" style="display:none;"></div>'
     + '</div>'
     + '</div>';
@@ -2158,7 +2280,7 @@ async function uploadFichier(file, dossierId) {
       const chunks = d.chunks || 0;
       showToast('"' + file.name + '" indexé — ' + chunks + ' passage' + (chunks > 1 ? 's' : '') + ' extraits');
       await chargerDocsBib();
-      if (dossierId && AFFAIRE_ACTIVE) await afficherPageAffaire(AFFAIRE_ACTIVE);
+      if (dossierId && AFFAIRE_ACTIVE) await chargerCorpsAffaire(AFFAIRE_ACTIVE);
     } else {
       showToast('Erreur : ' + (d.erreur || 'Upload échoué'), true);
     }
@@ -2256,7 +2378,7 @@ async function redigerActe(type, faits) {
     const genEl = document.getElementById('bib-generes-list');
     const docEl = document.createElement('div');
     docEl.className = 'doc-item active';
-    docEl.innerHTML = '<div class="doc-icon" style="display:flex;align-items:center;justify-content:center;"><svg width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#525252\" stroke-width=\"1.5\" stroke-linecap=\"round\"><path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4z\"/></svg></div><div class="doc-name">' + (r.nom||type) + '</div><span class="doc-badge badge-blue">Généré</span>';
+    docEl.innerHTML = '<div class="doc-icon">GEN</div><div class="doc-name">' + (r.nom||type) + '</div><span class="doc-badge badge-blue">Généré</span>';
     genEl.appendChild(docEl);
     showToast('Acte rédigé');
   } catch(e) {
@@ -2400,7 +2522,7 @@ async function uploadDecision(file) {
       el.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--bg);border:0.5px solid #E5E5E5;border-radius:5px;';
       el.innerHTML = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="var(--green)" stroke-width="1.5"><path d="M2 2h4v12H2zM6 2h4v12H6z"/></svg>'
         + '<span style="font-size:10px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + file.name + '</span>'
-        + '<span style="font-size:9px;color:var(--green);display:flex;align-items:center;gap:3px;"><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#16A34A\" stroke-width=\"2.5\" stroke-linecap=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg> ' + (manuscrit ? 'OCR' : 'Indexé') + '</span>';
+        + '<span style="font-size:9px;color:var(--green);">✓ ' + (manuscrit ? 'OCR' : 'Indexé') + '</span>';
       list.appendChild(el);
       showToast('Décision "' + file.name + '" indexée');
     } else {
@@ -2510,7 +2632,7 @@ function toggleHist() {
 function toggleMindPanel() {
   mindOpen = !mindOpen;
   document.getElementById('mind-panel').classList.toggle('open', mindOpen);
-  document.getElementById('mind-toggle-lbl').textContent = mindOpen ? 'Réduire' : 'Agrandir';
+  document.getElementById('mind-toggle-lbl').textContent = mindOpen ? 'Réduire ▴' : 'Agrandir ▾';
 }
 
 async function envoyerMessage() {
@@ -2690,17 +2812,70 @@ function chargerConversation(conv) {
 }
 
 // ── API ───────────────────────────────────────────────
+let _refreshEnCours = false;
+
+async function tenterRefresh() {
+  if (_refreshEnCours) return false;
+  _refreshEnCours = true;
+  try {
+    const rt = localStorage.getItem('od_refresh');
+    if (!rt) return false;
+    const r = await fetch('/refresh', {
+      method: 'POST',
+      headers: {'Authorization': 'Bearer ' + rt}
+    });
+    if (!r.ok) return false;
+    const d = await r.json();
+    if (d.token) {
+      TOKEN = d.token;
+      localStorage.setItem('od_token', TOKEN);
+      const expiry = Date.now() + (d.expires_in || 900) * 1000;
+      localStorage.setItem('od_token_exp', expiry.toString());
+      return true;
+    }
+    return false;
+  } catch(e) {
+    return false;
+  } finally {
+    _refreshEnCours = false;
+  }
+}
+
+function expiredSoon() {
+  const exp = parseInt(localStorage.getItem('od_token_exp') || '0');
+  return exp > 0 && Date.now() > exp - 60000; // refresh si < 1min restante
+}
+
+function deconnecterSession() {
+  localStorage.removeItem('od_token');
+  localStorage.removeItem('od_refresh');
+  localStorage.removeItem('od_token_exp');
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('chat-fab').classList.remove('show');
+  document.getElementById('login-screen').classList.add('show');
+  showToast('Session expirée — reconnectez-vous', true);
+}
+
 async function apiFetch(url, method='GET', body=null) {
+  // Refresh préventif si token expire bientôt
+  if (expiredSoon()) {
+    await tenterRefresh();
+  }
   const opts = {method, headers:{'Authorization':'Bearer '+TOKEN}};
   if (body) { opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(body); }
-  const r = await fetch(url, opts);
+  let r = await fetch(url, opts);
+
+  // Si 401 : tenter refresh automatique puis réessayer une fois
   if (r.status === 401) {
-    localStorage.removeItem('od_token');
-    document.getElementById('app').classList.remove('show');
-    document.getElementById('chat-fab').classList.remove('show');
-    document.getElementById('login-screen').classList.add('show');
-    showToast('Session expirée — reconnectez-vous', true);
-    throw new Error('Session expirée');
+    const ok = await tenterRefresh();
+    if (ok) {
+      opts.headers['Authorization'] = 'Bearer ' + TOKEN;
+      r = await fetch(url, opts);
+    }
+    if (r.status === 401) {
+      deconnecterSession();
+      throw new Error('Session expirée');
+    }
   }
   const text = await r.text();
   if (!text || !text.trim()) return null;

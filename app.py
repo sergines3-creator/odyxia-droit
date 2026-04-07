@@ -19,7 +19,7 @@ from flask_cors import CORS
 from flask_talisman import Talisman
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from datetime import datetime, timedelta, timezone
 from anthropic import Anthropic
 from supabase import create_client
@@ -47,7 +47,9 @@ from prompts import (
     prompt_matching_veille,
     get_prompt_redaction,
     lister_types_documents,
-    PROMPTS_REDACTION
+    PROMPTS_REDACTION,
+    prompt_extraction_jurisprudence,
+    prompt_verification_anonymisation,
 )
 from prompt_injection import analyser_injection, analyser_dict, REPONSE_BLOQUEE, SEUIL_ALERTE
 
@@ -76,6 +78,8 @@ Talisman(app,
     content_security_policy=False
 )
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "Odyxia-JWT-2026!")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"]  = timedelta(minutes=15)
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
 jwt_manager = JWTManager(app)
 
@@ -440,7 +444,7 @@ def setup_2fa():
 @limiter.limit("10 per minute")
 def login():
     try:
-        import bcrypt
+        import bcrypt, hashlib
         data     = request.json
         password = data.get("password", "").encode()
         hash_s   = os.environ.get("CABINET_PASSWORD", "").encode()
@@ -458,17 +462,35 @@ def login():
                         pass
                     return jsonify({"erreur": "Code 2FA incorrect ou expiré"}), 401
 
-            # Identity = user_id (pour récupérer tenant_id ensuite)
-            # En mode solo : on utilise DEFAULT_TENANT_ID comme identity
-            identity = os.environ.get("DEFAULT_USER_ID", "solo_user")
-            token = create_access_token(identity=identity)
+            identity     = os.environ.get("DEFAULT_USER_ID", "solo_user")
+            tenant_id    = os.environ.get("DEFAULT_TENANT_ID", "")
+            access_token = create_access_token(identity=identity)
+            refresh_tok  = create_refresh_token(identity=identity)
+
+            token_hash = hashlib.sha256(refresh_tok.encode()).hexdigest()
+            expires_at = datetime.utcnow() + timedelta(days=30)
+            try:
+                supabase.table("refresh_tokens").insert({
+                    "user_id":    identity,
+                    "tenant_id":  tenant_id,
+                    "token_hash": token_hash,
+                    "expires_at": expires_at.isoformat(),
+                    "user_agent": request.headers.get("User-Agent", "")[:200],
+                    "ip_address": request.remote_addr
+                }).execute()
+            except Exception as ex:
+                log_erreur("REFRESH_TOKEN_STORE", ex)
 
             log_security_event("login_success", details={"mode": "password"})
             try:
                 log_audit(ACTION_LOGIN, {"status": "succes"}, succes=True)
             except Exception:
                 pass
-            return jsonify({"token": token})
+            return jsonify({
+                "token":         access_token,
+                "refresh_token": refresh_tok,
+                "expires_in":    900
+            })
         else:
             log_security_event("login_failed", details={"reason": "wrong_password"})
             try:
@@ -2211,6 +2233,229 @@ def supprimer_document():
     except Exception as e:
         return jsonify({"erreur": str(e)}), 500
 
+# ─── PRÉDICTION JURIDICTIONNELLE ─────────────────────────────────────────────
+
+@app.route("/jurisprudence/contribuer", methods=["POST"])
+@jwt_required()
+@limiter.limit("20 per minute")
+def contribuer_jurisprudence():
+    """
+    Extrait les métadonnées d'un jugement uploadé et les insère
+    dans la base commune de prédiction — avec consentement explicite.
+    Document brut reste privé dans le tenant.
+    """
+    try:
+        data        = request.json
+        document_id = data.get("document_id", "")
+        consentement= data.get("consentement", False)
+        tenant_id   = get_current_tenant_id()
+        user_id     = get_current_user_id()
+
+        if not document_id:
+            return jsonify({"erreur": "document_id requis"}), 400
+
+        if not consentement:
+            return jsonify({"erreur": "Consentement requis"}), 400
+
+        # ── Vérification appartenance tenant ──────────────────────────
+        doc_check = supabase.table("documents").select(
+            "id, nom, filename"
+        ).eq("id", document_id).eq("tenant_id", tenant_id).execute()
+
+        if not doc_check.data:
+            return jsonify({"erreur": "Document non trouvé"}), 404
+
+        nom_fichier = doc_check.data[0].get("nom") or doc_check.data[0].get("filename", "")
+
+        # ── Récupérer le contenu indexé ───────────────────────────────
+        chunks = supabase.table("chunks").select(
+            "content, contenu, page_number"
+        ).eq("document_id", document_id).order("chunk_index").limit(40).execute()
+
+        if not chunks.data:
+            return jsonify({"erreur": "Document non indexé"}), 404
+
+        texte = "\n".join([
+            c.get("content") or c.get("contenu", "")
+            for c in chunks.data
+            if not est_chiffre(c.get("content") or c.get("contenu", ""))
+        ])[:12000]
+
+        # ── Extraction via Claude ─────────────────────────────────────
+        prompt_texte = prompt_extraction_jurisprudence(texte, nom_fichier)
+
+        response = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=2000,
+            messages=[{"role": "user", "content": prompt_texte}]
+        )
+
+        raw = response.content[0].text.strip().replace("```json", "").replace("```", "").strip()
+
+        try:
+            meta = json.loads(raw)
+        except json.JSONDecodeError:
+            return jsonify({"erreur": "Erreur d'extraction — document illisible"}), 500
+
+        # ── Vérification : est-ce bien un jugement ? ──────────────────
+        if not meta.get("est_jugement", False):
+            return jsonify({
+                "succes":  False,
+                "message": "Ce document ne semble pas être un jugement ou arrêt.",
+                "est_jugement": False
+            })
+
+        # ── Vérification confiance ────────────────────────────────────
+        if meta.get("confiance") == "faible":
+            return jsonify({
+                "succes":  False,
+                "message": "Document trop peu lisible pour une extraction fiable. Essayez avec l'option OCR activée.",
+                "confiance": "faible"
+            })
+
+        # ── Vérification anonymisation ────────────────────────────────
+        texte_a_verifier = " ".join([
+            meta.get("titre", ""),
+            meta.get("contenu", ""),
+            meta.get("ratio_decidendi", ""),
+            meta.get("issue_detail", "")
+        ])
+
+        prompt_verif = prompt_verification_anonymisation(texte_a_verifier)
+        response_verif = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=500,
+            messages=[{"role": "user", "content": prompt_verif}]
+        )
+
+        raw_verif = response_verif.content[0].text.strip().replace("```json", "").replace("```", "").strip()
+
+        try:
+            verif = json.loads(raw_verif)
+        except json.JSONDecodeError:
+            verif = {"action": "valider", "risque": "faible"}
+
+        if verif.get("action") == "rejeter":
+            log_security_event("jurisprudence_anonymisation_echec", tenant_id, user_id, {
+                "document_id": document_id,
+                "risque": verif.get("risque"),
+                "donnees_residuelles": verif.get("donnees_residuelles", [])
+            })
+            return jsonify({
+                "succes":  False,
+                "message": "Anonymisation insuffisante — contribution non enregistrée.",
+                "risque":  verif.get("risque")
+            })
+
+        # ── Insertion dans la base commune ────────────────────────────
+        juris_id = str(uuid.uuid4())
+
+        supabase.table("jurisprudence_predict").insert({
+            "id":            juris_id,
+            "titre":         meta.get("titre", ""),
+            "contenu":       meta.get("contenu", ""),
+            "domaine":       meta.get("domaine", "autre"),
+            "issue":         meta.get("issue", ""),
+            "issue_detail":  meta.get("issue_detail", ""),
+            "juridiction":   meta.get("juridiction", ""),
+            "juge":          meta.get("juge"),
+            "chambre":       meta.get("chambre"),
+            "date_dec":      meta.get("date_dec"),
+            "reference":     meta.get("reference"),
+            "montant_litige":meta.get("montant_litige"),
+            "type_partie":   meta.get("type_partie"),
+            "textes_appliques": meta.get("textes_appliques", []),
+            "moyens_retenus":   meta.get("moyens_retenus", []),
+            "moyens_rejetes":   meta.get("moyens_rejetes", []),
+            "ratio_decidendi":  meta.get("ratio_decidendi", ""),
+            "source":        "contribution_cabinet",
+            "tenant_id":     tenant_id,
+            "contributed_by":user_id,
+            "document_id":   document_id,
+            "anonymise":     True,
+            "consentement":  True,
+        }).execute()
+
+        # ── Marquer le document comme contribué ───────────────────────
+        supabase.table("documents").update({
+            "metadata": {
+                **doc_check.data[0].get("metadata", {}),
+                "contribue_jurisprudence": True,
+                "juris_id": juris_id
+            }
+        }).eq("id", document_id).eq("tenant_id", tenant_id).execute()
+
+        log_audit_event("JURISPRUDENCE_CONTRIBUEE", tenant_id, user_id, {
+            "document_id": document_id,
+            "juris_id":    juris_id,
+            "domaine":     meta.get("domaine"),
+            "juridiction": meta.get("juridiction"),
+            "issue":       meta.get("issue"),
+            "confiance":   meta.get("confiance")
+        })
+
+        return jsonify({
+            "succes":      True,
+            "juris_id":    juris_id,
+            "message":     "Merci pour votre contribution. Ce jugement enrichit la base commune.",
+            "extraction": {
+                "juridiction": meta.get("juridiction"),
+                "juge":        meta.get("juge"),
+                "domaine":     meta.get("domaine"),
+                "issue":       meta.get("issue"),
+                "date_dec":    meta.get("date_dec"),
+                "confiance":   meta.get("confiance")
+            }
+        })
+
+    except Exception as e:
+        log_erreur("JURISPRUDENCE_CONTRIBUER", e)
+        return jsonify({"erreur": str(e)}), 500
+
+
+@app.route("/jurisprudence/stats", methods=["GET"])
+@jwt_required()
+def stats_jurisprudence():
+    """
+    Retourne les statistiques de la base commune.
+    Utile pour afficher à l'avocat l'état de la base.
+    """
+    try:
+        result = supabase.table("jurisprudence_predict").select(
+            "domaine, issue, juridiction, date_dec"
+        ).execute()
+
+        decisions = result.data or []
+        total     = len(decisions)
+
+        domaines = {}
+        juridictions = {}
+        issues = {"favorable": 0, "defavorable": 0, "partiel": 0, "autre": 0}
+
+        for d in decisions:
+            dom  = d.get("domaine", "autre") or "autre"
+            jurid= d.get("juridiction", "autre") or "autre"
+            iss  = d.get("issue", "autre") or "autre"
+
+            domaines[dom]       = domaines.get(dom, 0) + 1
+            juridictions[jurid] = juridictions.get(jurid, 0) + 1
+            if iss in issues:
+                issues[iss] += 1
+            else:
+                issues["autre"] = issues.get("autre", 0) + 1
+
+        return jsonify({
+            "total":        total,
+            "domaines":     domaines,
+            "juridictions": juridictions,
+            "issues":       issues,
+            "fiable":       total >= 50
+        })
+
+    except Exception as e:
+        log_erreur("JURISPRUDENCE_STATS", e)
+        return jsonify({"total": 0, "fiable": False}), 500
+    
 
 # ─── COMPARAISON ──────────────────────────────────────────────────────────────
 
