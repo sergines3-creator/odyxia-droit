@@ -649,19 +649,30 @@ def setup_2fa_init():
         if not user_id:
             return jsonify({"erreur": "Identifiants incorrects"}), 401
 
-        # 2. Générer/récupérer le secret TOTP de cet utilisateur
-        res = supabase.table("users").select("totp_secret, display_name, full_name, id").eq("email", email).execute()
-        db_user_id = res.data[0]["id"] if res.data else None
-        existing_secret = res.data[0].get("totp_secret") if res.data else None
+        # 2. Générer/récupérer le secret TOTP
+        res = supabase.table("users").select("totp_secret, display_name, full_name, id").eq("id", user_id).execute()
+
+        if not res.data:
+            # L'utilisateur n'existe pas dans users — on le crée
+            supabase.table("users").insert({
+                "id":        user_id,
+                "email":     email,
+                "role":      "owner",
+                "is_active": True,
+            }).execute()
+            db_user_id = user_id
+            existing_secret = None
+        else:
+            db_user_id = res.data[0]["id"]
+            existing_secret = res.data[0].get("totp_secret")
 
         if not existing_secret:
             secret = pyotp.random_base32()
             supabase.table("users").update({"totp_secret": secret}).eq("id", db_user_id).execute()
-            print(f"[SETUP_2FA] db_user_id={db_user_id} secret={secret[:8]}...")
         else:
             secret = existing_secret
 
-        nom = (res.data.get("display_name") or res.data.get("full_name") or email) if res.data else email
+        nom = (res.data[0].get("display_name") or res.data[0].get("full_name") or email) if res.data else email
 
         # 3. Générer le QR code
         totp = pyotp.TOTP(secret)
