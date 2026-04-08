@@ -180,8 +180,8 @@ def verifier_totp(user_id: str, code: str) -> bool:
     """
     try:
         # 1. Récupérer le secret unique de l'utilisateur en base
-        res = supabase.table("users").select("totp_secret").eq("id", user_id).single().execute()
-        user_secret = res.data.get("totp_secret") if res.data else None
+        res = supabase.table("users").select("totp_secret").eq("id", user_id).execute()
+        user_secret = res.data[0].get("totp_secret") if res.data else None
 
         # 2. Sécurité : Si pas de secret configuré, on refuse l'accès 2FA
         if not user_secret:
@@ -650,8 +650,9 @@ def setup_2fa_init():
             return jsonify({"erreur": "Identifiants incorrects"}), 401
 
         # 2. Générer/récupérer le secret TOTP de cet utilisateur
-        res = supabase.table("users").select("totp_secret, display_name, full_name").eq("id", user_id).single().execute()
-        existing_secret = res.data.get("totp_secret") if res.data else None
+        res = supabase.table("users").select("totp_secret").eq("id", user_id).execute()
+        user_secret = res.data[0].get("totp_secret") if res.data else None
+        existing_secret = res.data[0].get("totp_secret") if res.data else None
 
         if not existing_secret:
             secret = pyotp.random_base32()
