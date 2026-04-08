@@ -588,7 +588,6 @@ def setup_2fa_page():
     return render_template("setup_2fa.html")
 
 @app.route("/setup-2fa", methods=["GET"])
-@jwt_required()
 def setup_2fa():
     try:
         user_id = get_current_user_id()
@@ -627,6 +626,81 @@ def setup_2fa():
     except Exception as e:
         log_erreur("SETUP_2FA", e)
         return jsonify({"erreur": str(e)}), 500
+    
+@app.route("/setup-2fa-init", methods=["POST"])
+@limiter.limit("10 per minute")
+def setup_2fa_init():
+    """Route publique : login email/password → génère QR code individuel."""
+    try:
+        data     = request.json
+        email    = data.get("email", "").strip().lower()
+        password = data.get("password", "")
+
+        if not email or not password:
+            return jsonify({"erreur": "Email et mot de passe requis"}), 400
+
+        # 1. Authentification Supabase
+        try:
+            auth_response = supabase.auth.sign_in_with_password({"email": email, "password": password})
+            user_id = auth_response.user.id if auth_response.user else None
+        except Exception:
+            user_id = None
+
+        if not user_id:
+            return jsonify({"erreur": "Identifiants incorrects"}), 401
+
+        # 2. Générer/récupérer le secret TOTP de cet utilisateur
+        res = supabase.table("users").select("totp_secret, display_name, full_name").eq("id", user_id).single().execute()
+        existing_secret = res.data.get("totp_secret") if res.data else None
+
+        if not existing_secret:
+            secret = pyotp.random_base32()
+            supabase.table("users").update({"totp_secret": secret}).eq("id", user_id).execute()
+        else:
+            secret = existing_secret
+
+        nom = (res.data.get("display_name") or res.data.get("full_name") or email) if res.data else email
+
+        # 3. Générer le QR code
+        totp = pyotp.TOTP(secret)
+        uri  = totp.provisioning_uri(name=nom, issuer_name="Odyxia Droit")
+        qr   = qrcode.make(uri)
+        buf  = BytesIO()
+        qr.save(buf, format="PNG")
+        qr_b64 = base64.b64encode(buf.getvalue()).decode()
+
+        return jsonify({
+            "qr_code":  f"data:image/png;base64,{qr_b64}",
+            "secret":   secret,
+            "user_id":  user_id,
+            "nom":      nom
+        })
+    except Exception as e:
+        log_erreur("SETUP_2FA_INIT", e)
+        return jsonify({"erreur": str(e)}), 500
+
+
+@app.route("/setup-2fa-verify", methods=["POST"])
+@limiter.limit("10 per minute")
+def setup_2fa_verify():
+    """Vérifie le code TOTP et confirme la configuration."""
+    try:
+        data    = request.json
+        user_id = data.get("user_id", "")
+        code    = data.get("code", "").strip()
+
+        if not user_id or not code:
+            return jsonify({"erreur": "Données manquantes"}), 400
+
+        if not verifier_totp(user_id, code):
+            return jsonify({"erreur": "Code incorrect — réessayez"}), 401
+
+        supabase.table("users").update({"mfa_enabled": True}).eq("id", user_id).execute()
+        log_security_event("2fa_configured", user_id=user_id)
+        return jsonify({"succes": True})
+    except Exception as e:
+        log_erreur("SETUP_2FA_VERIFY", e)
+        return jsonify({"erreur": str(e)}), 500    
 
 @app.route("/login", methods=["POST"])
 @limiter.limit("10 per minute")
@@ -1628,6 +1702,7 @@ def upload_document():
             }
         }).execute()
 
+        chunks_a_inserer = []
         for page_data in pages_texte:
             texte = page_data["texte"]
             for j in range(0, len(texte), 800):
@@ -1639,7 +1714,7 @@ def upload_document():
                     else:
                         contenu_final = chunk_texte
                         index_final   = chunk_texte
-                    supabase.table("chunks").insert({
+                    chunks_a_inserer.append({
                         "tenant_id":     tenant_id,
                         "document_id":   doc_id,
                         "content":       contenu_final,
@@ -1651,9 +1726,12 @@ def upload_document():
                         "source_type":   "document",
                         "source_hash":   file_hash,
                         "char_count":    len(chunk_texte),
-                        "metadata":      {"sensible":est_sensible,"manuscrit":est_manuscrit}
-                    }).execute()
-                    chunks_inseres += 1
+                        "metadata":      {"sensible": est_sensible, "manuscrit": est_manuscrit}
+                    })
+
+        for i in range(0, len(chunks_a_inserer), 100):
+            supabase.table("chunks").insert(chunks_a_inserer[i:i+100]).execute()
+            chunks_inseres += len(chunks_a_inserer[i:i+100])
 
         threading.Thread(
             target=_vectoriser_document,

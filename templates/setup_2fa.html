@@ -340,58 +340,97 @@ body {
 </div>
 
 <script>
-// ── Charger le QR code ──────────────────────────────────────────────────────
+let USER_ID = null;
+
+// ── Étape 1 : formulaire email/password affiché au-dessus du QR ─────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Injecter le formulaire de connexion avant l'étape 2
+  const step2 = document.querySelector('.step:nth-child(3)'); // étape 2 (QR)
+  const formHtml = `
+    <div class="step" id="step-auth">
+      <div class="step-num" style="background:#525252;">0</div>
+      <div class="step-body">
+        <div class="step-title">Identifiez-vous</div>
+        <div class="step-desc">Entrez vos identifiants pour générer votre QR code personnel.</div>
+        <input id="setup-email" class="input-code" type="email" placeholder="votre@email.com"
+               style="font-size:13px;letter-spacing:0;margin-bottom:8px;text-align:left;padding:10px 14px;"/>
+        <input id="setup-pass" class="input-code" type="password" placeholder="Mot de passe"
+               style="font-size:13px;letter-spacing:0;text-align:left;padding:10px 14px;"/>
+        <div class="msg" id="msg-auth"></div>
+        <button class="btn-primary" onclick="chargerQR()">Générer mon QR code</button>
+      </div>
+    </div>`;
+  step2.insertAdjacentHTML('beforebegin', formHtml);
+});
+
 async function chargerQR() {
+  const email = document.getElementById('setup-email').value.trim();
+  const pass  = document.getElementById('setup-pass').value;
+  const msg   = document.getElementById('msg-auth');
+
+  if (!email || !pass) {
+    msg.textContent = 'Email et mot de passe requis.';
+    msg.className = 'msg error show'; return;
+  }
+
+  msg.className = 'msg';
   try {
-    const r = await fetch('/setup-2fa');
+    const r = await fetch('/setup-2fa-init', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email, password: pass})
+    });
     const data = await r.json();
-    if (data.qr_code) {
-      const img = document.getElementById('qr-img');
-      img.src = data.qr_code;
-      img.style.display = 'block';
-      document.getElementById('qr-loading').style.display = 'none';
+    if (!r.ok) {
+      msg.textContent = data.erreur || 'Erreur';
+      msg.className = 'msg error show'; return;
     }
+    USER_ID = data.user_id;
+    const img = document.getElementById('qr-img');
+    img.src = data.qr_code;
+    img.style.display = 'block';
+    document.getElementById('qr-loading').style.display = 'none';
     if (data.secret) {
-      const box = document.getElementById('secret-box');
-      box.textContent = data.secret;
-      box.style.display = 'block';
+      document.getElementById('secret-box').textContent = data.secret;
+      document.getElementById('secret-box').style.display = 'block';
       document.getElementById('secret-label').style.display = 'block';
     }
+    msg.textContent = '✓ QR code généré — scannez-le maintenant.';
+    msg.className = 'msg success show';
   } catch(e) {
-    document.getElementById('qr-loading').textContent = 'Erreur de chargement';
+    msg.textContent = 'Erreur réseau.';
+    msg.className = 'msg error show';
   }
 }
 
-// ── Vérifier le code ────────────────────────────────────────────────────────
 async function verifierCode() {
-  const code  = document.getElementById('totp-code').value.trim();
-  const msg   = document.getElementById('msg-verify');
-  const btn   = document.getElementById('btn-verify');
-
-  msg.className = 'msg';
-  msg.textContent = '';
+  const code = document.getElementById('totp-code').value.trim();
+  const msg  = document.getElementById('msg-verify');
+  const btn  = document.getElementById('btn-verify');
 
   if (code.length !== 6 || !/^\d{6}$/.test(code)) {
     msg.textContent = 'Entrez un code à 6 chiffres.';
-    msg.className = 'msg error show';
-    return;
+    msg.className = 'msg error show'; return;
+  }
+  if (!USER_ID) {
+    msg.textContent = 'Générez d\'abord votre QR code (étape 2).';
+    msg.className = 'msg error show'; return;
   }
 
   btn.disabled = true;
   btn.textContent = 'Vérification…';
 
   try {
-    const r = await fetch('/login', {
+    const r = await fetch('/setup-2fa-verify', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: '', code_2fa: code })
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({user_id: USER_ID, code})
     });
     const data = await r.json();
-
-    if (data.token || r.ok) {
-      msg.textContent = '✓ Double authentification configurée avec succès.';
+    if (data.succes) {
+      msg.textContent = '✓ Double authentification activée avec succès.';
       msg.className = 'msg success show';
-      btn.textContent = 'Configuré ✓';
+      btn.textContent = 'Activé ✓';
       setTimeout(() => { window.location.href = '/login'; }, 1800);
     } else {
       msg.textContent = data.erreur || 'Code incorrect — réessayez.';
@@ -400,20 +439,17 @@ async function verifierCode() {
       btn.textContent = 'Confirmer et activer';
     }
   } catch(e) {
-    msg.textContent = 'Erreur réseau — réessayez.';
+    msg.textContent = 'Erreur réseau.';
     msg.className = 'msg error show';
     btn.disabled = false;
     btn.textContent = 'Confirmer et activer';
   }
 }
 
-// Valider à la saisie des 6 chiffres
 document.getElementById('totp-code').addEventListener('input', function() {
   this.value = this.value.replace(/\D/g, '').slice(0, 6);
   if (this.value.length === 6) verifierCode();
 });
-
-chargerQR();
 </script>
 </body>
 </html>
