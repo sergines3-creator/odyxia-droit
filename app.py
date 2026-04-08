@@ -25,6 +25,8 @@ from anthropic import Anthropic
 from supabase import create_client
 import requests
 import pyotp
+totp = pyotp.TOTP("DDB5XE6KQ7Q23I4XLSSA354MIR7ZPVDK")
+print(totp.now())
 import qrcode
 import base64
 from io import BytesIO
@@ -192,7 +194,7 @@ def verifier_totp(user_id: str, code: str) -> bool:
         totp = pyotp.TOTP(user_secret)
         
         # On limite la fenêtre à 1 (30s avant/après) pour compenser les désynchronisations d'horloge
-        return totp.verify(code, valid_window=2)
+        return totp.verify(code, valid_window=4)
 
     except Exception as e:
         log_erreur("TOTP_VERIFICATION_ERROR", e)
