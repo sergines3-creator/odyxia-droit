@@ -1534,26 +1534,41 @@ window.addEventListener('DOMContentLoaded', () => {
 // ── AUTH ─────────────────────────────────────────────
 async function doLogin() {
     const email = document.getElementById('login-email').value;
-    const pass = document.getElementById('login-pass').value;
-    const wrap2fa = document.getElementById('login-2fa-wrap'); // Le bloc du code à 6 chiffres
+    const password = document.getElementById('login-pass').value;
+    const otp = document.getElementById('login-2fa').value; // Le code à 6 chiffres
+    const wrap2fa = document.getElementById('login-2fa-wrap');
+    const errEl = document.getElementById('login-err');
 
-    // 1. On envoie d'abord Email + Pass
-    const r = await fetch('/login', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ email, password: pass })
-    });
+    // On cache l'erreur à chaque tentative
+    errEl.style.display = 'none';
 
-    const d = await r.json();
+    try {
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, code: otp })
+        });
 
-    if (r.status === 200 && d.requires_2fa) {
-        // C'est ici qu'on fait apparaître le champ pour le code à 6 chiffres
-        wrap2fa.style.display = 'block'; 
-        showToast("Veuillez entrer votre code Authy");
-    } else if (r.ok) {
-        // Si pas de 2FA requis, on entre direct
-        localStorage.setItem('access_token', d.access_token);
-        location.reload();
+        const data = await response.json();
+
+        if (response.status === 200) {
+            if (data.requires_2fa && !otp) {
+                // CAS 1 : Mot de passe OK, on demande le code Authy
+                wrap2fa.style.display = 'block';
+                console.log("Mot de passe validé, en attente du code 2FA...");
+            } else {
+                // CAS 2 : Tout est OK (ou code OTP validé)
+                localStorage.setItem('access_token', data.access_token);
+                window.location.reload();
+            }
+        } else {
+            // ERREUR : Mauvais pass ou mauvais mail
+            errEl.innerText = data.erreur || "Identifiants incorrects";
+            errEl.style.display = 'block';
+        }
+    } catch (err) {
+        errEl.innerText = "Erreur de connexion";
+        errEl.style.display = 'block';
     }
 }
 
