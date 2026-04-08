@@ -1534,40 +1534,26 @@ window.addEventListener('DOMContentLoaded', () => {
 // ── AUTH ─────────────────────────────────────────────
 async function doLogin() {
     const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-pass').value;
-    const otp = document.getElementById('login-2fa').value;
-    const errEl = document.getElementById('login-err');
+    const pass = document.getElementById('login-pass').value;
+    const wrap2fa = document.getElementById('login-2fa-wrap'); // Le bloc du code à 6 chiffres
 
-    if (!email || !password) {
-        errEl.innerText = "Email et mot de passe requis";
-        errEl.style.display = 'block';
-        return;
-    }
+    // 1. On envoie d'abord Email + Pass
+    const r = await fetch('/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ email, password: pass })
+    });
 
-    try {
-        const response = await fetch('/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                email: email, 
-                password: password, 
-                code: otp 
-            })
-        });
+    const d = await r.json();
 
-        const data = await response.json();
-
-        if (response.ok) {
-            // On stocke le token et on entre
-            localStorage.setItem('access_token', data.access_token);
-            window.location.reload(); 
-        } else {
-            errEl.innerText = data.erreur || "Identifiants incorrects";
-            errEl.style.display = 'block';
-        }
-    } catch (err) {
-        errEl.innerText = "Erreur de connexion au serveur";
-        errEl.style.display = 'block';
+    if (r.status === 200 && d.requires_2fa) {
+        // C'est ici qu'on fait apparaître le champ pour le code à 6 chiffres
+        wrap2fa.style.display = 'block'; 
+        showToast("Veuillez entrer votre code Authy");
+    } else if (r.ok) {
+        // Si pas de 2FA requis, on entre direct
+        localStorage.setItem('access_token', d.access_token);
+        location.reload();
     }
 }
 
