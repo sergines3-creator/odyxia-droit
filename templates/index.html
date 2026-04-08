@@ -1525,35 +1525,49 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ── AUTH ─────────────────────────────────────────────
 async function doLogin() {
-  const pass = document.getElementById('login-pass').value;
-  const code = document.getElementById('login-2fa').value;
-  const body = {password: pass};
-  if (code) body.code_2fa = code;
+  const btn = document.getElementById('login-btn'); // Supposons que vous avez un bouton
+  const passEl = document.getElementById('login-pass');
+  const codeEl = document.getElementById('login-2fa');
+  const errEl = document.getElementById('login-err');
+
+  if (btn) btn.disabled = true; // Empêche le double-clic
+  errEl.style.display = 'none';
+
+  const body = { password: passEl.value };
+  if (codeEl.value) body.code_2fa = codeEl.value;
+
   try {
-    const r = await fetch('/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const r = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
     const d = await r.json();
-    if (d.require_2fa) { document.getElementById('login-2fa-wrap').style.display='block'; return; }
-    if (d.token) {
+
+    if (d.require_2fa) {
+      document.getElementById('login-2fa-wrap').style.display = 'block';
+      codeEl.focus(); // Meilleure UX
+      return;
+    }
+
+    if (r.ok && d.token) {
       TOKEN = d.token;
       localStorage.setItem('od_token', TOKEN);
+      // Transition d'écran plus propre
       document.getElementById('login-screen').classList.remove('show');
       document.getElementById('app').classList.add('show');
-      document.getElementById('chat-fab').classList.add('show');
       init();
     } else {
-      document.getElementById('login-err').style.display = 'block';
-      document.getElementById('login-err').textContent = d.erreur || 'Identifiants incorrects';
+      errEl.style.display = 'block';
+      errEl.textContent = d.erreur || 'Identifiants incorrects';
     }
-  } catch(e) {
-    document.getElementById('login-err').style.display = 'block';
-    document.getElementById('login-err').textContent = 'Connexion impossible';
+  } catch (e) {
+    errEl.style.display = 'block';
+    errEl.textContent = 'Erreur réseau ou serveur injoignable';
+  } finally {
+    if (btn) btn.disabled = false;
   }
-}
-document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
-
-function doLogout() {
-  localStorage.removeItem('od_token');
-  location.reload();
 }
 
 // ── INIT ─────────────────────────────────────────────
@@ -2236,77 +2250,76 @@ function buildMindMapSVG(carte) {
 }
 
 // ── UPLOAD ────────────────────────────────────────────
-async function uploadFichier(file, dossierId) {
-  if (!file) return;
-  showLoading(true);
-  const formData = new FormData();
-  formData.append('fichier', file);
-  if (dossierId) formData.append('dossier_id', dossierId);
-  const sensible  = dossierId ? false : document.getElementById('chk-sensible-bib')?.checked;
-  const manuscrit = dossierId ? false : document.getElementById('chk-manuscrit-bib')?.checked;
-  formData.append('sensible',  sensible  ? 'true' : 'false');
-  formData.append('manuscrit', manuscrit ? 'true' : 'false');
-  try {
-    const r = await fetch('/upload_document', {
-      method:'POST',
-      headers:{'Authorization':'Bearer '+TOKEN},
-      body: formData
-    });
-    const d = await r.json();
-    showLoading(false);
-    if (d.succes) {
-      const chunks = d.chunks || 0;
-      showToast('"' + file.name + '" indexé — ' + chunks + ' passage' + (chunks > 1 ? 's' : '') + ' extraits');
-      await chargerDocsBib();
-      if (dossierId && AFFAIRE_ACTIVE) await chargerCorpsAffaire(AFFAIRE_ACTIVE);
-    } else {
-      showToast('Erreur : ' + (d.erreur || 'Upload échoué'), true);
+// --- VÉRIFIEZ QUE CE BLOC EST BIEN PRÉSENT ---
+
+async function uploadDocument() {
+    const fileInput = document.getElementById('fileInput');
+    const statusMsg = document.getElementById('statusMsg'); 
+    const progressBar = document.getElementById('progressBar');
+    const progressContainer = document.getElementById('progressContainer');
+
+    if (!fileInput.files[0]) return alert("Veuillez sélectionner un PDF");
+
+    const formData = new FormData();
+    formData.append('fichier', fileInput.files[0]);
+
+    // On affiche la barre de progression dès le clic
+    if(progressContainer) progressContainer.style.display = 'block';
+    if(statusMsg) statusMsg.innerText = "Téléchargement en cours...";
+
+    try {
+        const response = await fetch('/upload_document', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` },
+            body: formData
+        });
+
+        const data = await response.json();
+        
+        // 202 signifie que le serveur a accepté le fichier et lancé le Thread
+        if (response.status === 202) {
+            suivreLaProgression(data.document_id);
+        } else {
+            alert("Erreur : " + data.erreur);
+        }
+    } catch (err) {
+        console.error("Erreur critique :", err);
     }
-  } catch(e) {
-    showLoading(false);
-    showToast('Erreur upload', true);
-  }
-  document.getElementById('file-input-bib').value = '';
-  document.getElementById('file-input-aff').value = '';
 }
 
-function handleDrop(e, ctx) {
-  e.preventDefault();
-  document.getElementById('upload-zone-' + ctx).classList.remove('dragover');
-  const file = e.dataTransfer.files[0];
-  if (file?.type === 'application/pdf') uploadFichier(file, null);
-  else showToast('Format PDF uniquement', true);
-}
+function suivreLaProgression(docId) {
+    const timer = setInterval(async () => {
+        try {
+            const res = await fetch(`/document_status/${docId}`, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+            });
+            const data = await res.json();
 
-function toggleOpt(id) {
-  document.getElementById(id).classList.toggle('active');
-}
+            const bar = document.getElementById('progressBar');
+            const msg = document.getElementById('statusMsg');
 
-async function supprimerDocById(id, btn) {
-  if (!window.confirm("Supprimer ce document ?")) return;
-  try {
-    await apiFetch('/supprimer_document', 'DELETE', {id});
-    showToast('Document supprimé');
-    const row = btn.closest('.bib-doc-row');
-    if (row) row.remove();
-    if (DOC_ACTIF?.id === id) {
-      DOC_ACTIF = null;
-      document.getElementById('bib-viewer').innerHTML = '<div class="bib-empty-viewer"><div style="font-size:13px;font-weight:500;color:#D4D4D4;">Sélectionnez un document</div></div>';
-      ['btn-carte-mentale','btn-rediger-bib','btn-export-bib'].forEach(i => { const el = document.getElementById(i); if(el) el.style.display='none'; });
-    }
-  } catch(e) { showToast('Erreur : ' + e.message, true); }
-}
-
-async function supprimerDocActif() {
-  if (!DOC_ACTIF || !confirm('Supprimer ce document ?')) return;
-  try {
-    await apiFetch('/supprimer_document', 'DELETE', {id: DOC_ACTIF.id});
-    showToast('Document supprimé');
-    DOC_ACTIF = null;
-    document.getElementById('bib-viewer').innerHTML = '<div class="doc-viewer-empty"><div style="font-size:13px;">Document supprimé</div></div>';
-    ['btn-carte-mentale','btn-rediger-bib','btn-export-bib','btn-del-bib'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
-    await chargerDocsBib();
-  } catch(e) { showToast('Erreur', true); }
+            if (data.statut === 'pret') {
+                if(bar) bar.style.width = '100%';
+                if(msg) msg.innerText = "Analyse juridique terminée (100%) !";
+                clearInterval(timer); // On arrête d'interroger le serveur
+                
+                // Optionnel : recharger la liste des documents après 1 seconde
+                setTimeout(() => { location.reload(); }, 1500);
+            } 
+            else if (data.statut === 'erreur') {
+                if(msg) msg.innerText = "Erreur lors de l'analyse.";
+                clearInterval(timer);
+            } 
+            else {
+                // On met à jour le % en temps réel
+                let p = data.progression || 0;
+                if(bar) bar.style.width = p + '%';
+                if(msg) msg.innerText = `Lecture du document : ${p}%`;
+            }
+        } catch (e) {
+            console.error("Erreur lors du suivi :", e);
+        }
+    }, 2000); // On vérifie toutes les 2 secondes
 }
 
 // ── REDACTION ─────────────────────────────────────────
@@ -2581,6 +2594,65 @@ async function lancerComparaison() {
     showLoading(false);
     showToast('Erreur : ' + e.message, true);
   }
+}
+
+// ── NOUVEL OUTIL : ANALYSE DOSSIER VOLUMINEUX (RAG) ──
+
+async function uploadDocument() {
+    const fileInput = document.getElementById('fileInput');
+    const statusMsg = document.getElementById('statusMsg'); 
+    const progressBar = document.getElementById('progressBar');
+    const progressContainer = document.getElementById('progressContainer');
+
+    if (!fileInput.files[0]) return alert("Veuillez sélectionner un PDF");
+
+    const formData = new FormData();
+    formData.append('fichier', fileInput.files[0]);
+
+    if(progressContainer) progressContainer.style.display = 'block';
+    
+    try {
+        const response = await fetch('/upload_document', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + TOKEN }, 
+            body: formData
+        });
+
+        const data = await response.json();
+        if (response.status === 202) {
+            // On lance la boucle de vérification du pourcentage
+            suivreLaProgression(data.document_id);
+        } else {
+            alert("Erreur : " + (data.erreur || "Inconnue"));
+        }
+    } catch (err) {
+        console.error("Erreur critique :", err);
+    }
+}
+
+function suivreLaProgression(docId) {
+    const timer = setInterval(async () => {
+        try {
+            const res = await fetch(`/document_status/${docId}`, {
+                headers: { 'Authorization': 'Bearer ' + TOKEN }
+            });
+            const data = await res.json();
+
+            const bar = document.getElementById('progressBar');
+            const msg = document.getElementById('statusMsg');
+
+            if (data.statut === 'pret') {
+                if(bar) bar.style.width = '100%';
+                if(msg) msg.innerText = "Analyse terminée !";
+                clearInterval(timer);
+                showToast("Document prêt pour le Chat !");
+            } else {
+                let p = data.progression || 0;
+                if(bar) bar.style.width = p + '%';
+                if(msg) msg.innerText = `Analyse en cours : ${p}%`;
+            }
+        } catch (e) { console.error(e); }
+    }, 2000);
 }
 
 // ── CHAT FLOTTANT ─────────────────────────────────────

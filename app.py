@@ -10,25 +10,35 @@ import json
 import tempfile
 import threading
 import time
+import hashlib
+import base64
+import requests
+from io import BytesIO
+from datetime import datetime, timedelta, timezone
 
+# --- Bibliothèques spécialisées ---
+import fitz  # PyMuPDF (lecture PDF intégrale et rapide)
+import pyotp
+import qrcode
+from anthropic import Anthropic
+from supabase import create_client
+
+# --- Configuration de l'encodage (Indispensable pour Windows/Emoji) ---
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
+# --- Flask & Sécurité ---
 from flask import Flask, render_template, request, jsonify, send_file, Response, stream_with_context
 from flask_cors import CORS
 from flask_talisman import Talisman
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
-from datetime import datetime, timedelta, timezone
-from anthropic import Anthropic
-from supabase import create_client
-import requests
-import pyotp
-import qrcode
-import base64
-from io import BytesIO
+from flask_jwt_extended import (
+    JWTManager, create_access_token, create_refresh_token, 
+    jwt_required, get_jwt_identity, get_jwt  # Ajout de get_jwt ici pour le tenant_id
+)
 
+# --- Tes modules personnalisés (Vérifie qu'ils sont dans le même dossier) ---
 from encryption import chiffrer, dechiffrer, est_chiffre, extraire_index
 from audit_logger import (
     log_audit, ACTION_LOGIN, ACTION_LOGIN_ECHEC,
@@ -36,20 +46,11 @@ from audit_logger import (
     ACTION_SUPPRESSION
 )
 from prompts import (
-    prompt_chat,
-    prompt_synthese_document,
-    prompt_prediction,
-    prompt_analyse_comparative,
-    prompt_analyse_veille,
-    prompt_carte_mentale,
-    prompt_timeline_dossier,
-    prompt_rapport_client,
-    prompt_matching_veille,
-    get_prompt_redaction,
-    lister_types_documents,
-    PROMPTS_REDACTION,
-    prompt_extraction_jurisprudence,
-    prompt_verification_anonymisation,
+    prompt_chat, prompt_synthese_document, prompt_prediction,
+    prompt_analyse_comparative, prompt_analyse_veille, prompt_carte_mentale,
+    prompt_timeline_dossier, prompt_rapport_client, prompt_matching_veille,
+    get_prompt_redaction, lister_types_documents, PROMPTS_REDACTION,
+    prompt_extraction_jurisprudence, prompt_verification_anonymisation,
 )
 from prompt_injection import analyser_injection, analyser_dict, REPONSE_BLOQUEE, SEUIL_ALERTE
 
@@ -65,6 +66,62 @@ TOTP_SECRET    = os.environ.get("TOTP_SECRET", "")
 CABINET_NOM    = os.environ.get("CABINET_NOM",    "Odyxia Droit")
 CABINET_AVOCAT = os.environ.get("CABINET_AVOCAT", "Maitre")
 CABINET_VILLE  = os.environ.get("CABINET_VILLE",  "Douala, Cameroun")
+
+# --- MOTEUR DE TRAITEMENT DES DOCUMENTS (RAG INTÉGRAL) ---
+
+def decouper_texte_en_chunks(texte, size=1000, overlap=200):
+    """Découpe le texte avec un chevauchement pour ne pas casser les phrases juridiques."""
+    chunks = []
+    if not texte: return chunks
+    for i in range(0, len(texte), size - overlap):
+        chunks.append(texte[i:i + size])
+    return chunks
+
+def process_full_pdf_worker(file_path, tenant_id, document_id):
+    """
+    Worker asynchrone qui parcourt 100% des pages.
+    Met à jour la colonne 'progression' dans Supabase.
+    """
+    try:
+        doc = fitz.open(file_path)
+        total_pages = len(doc)
+        all_chunks = []
+        
+        for page_num in range(total_pages):
+            page = doc.load_page(page_num)
+            texte = page.get_text("text")
+            
+            # Gestion du vide/manuscrit
+            if len(texte.strip()) < 10:
+                texte = f"[Contenu visuel ou manuscrit en page {page_num + 1}]"
+
+            morceaux = decouper_texte_en_chunks(texte)
+            for m in morceaux:
+                all_chunks.append({
+                    "document_id": document_id,
+                    "tenant_id": tenant_id,
+                    "contenu": m,
+                    "page_numero": page_num + 1
+                })
+
+            # Mise à jour de la progression SQL (colonne que tu as créée)
+            prog = int(((page_num + 1) / total_pages) * 100)
+            supabase.table("documents").update({"progression": prog}).eq("id", document_id).execute()
+
+        # Insertion des chunks par lots de 50 (plus stable)
+        for i in range(0, len(all_chunks), 50):
+            supabase.table("document_chunks").insert(all_chunks[i:i+50]).execute()
+            
+        # Finalisation du statut
+        supabase.table("documents").update({"statut": "pret", "progression": 100}).eq("id", document_id).execute()
+        
+        # Suppression du fichier temporaire après indexation
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+    except Exception as e:
+        print(f"Erreur Worker PDF: {e}")
+        supabase.table("documents").update({"statut": "erreur"}).eq("id", document_id).execute()
 
 # ─── FLASK ────────────────────────────────────────────────────────────────────
 app = Flask(__name__)
@@ -129,41 +186,74 @@ def get_current_user_id() -> str:
     return os.environ.get("DEFAULT_USER_ID", "")
 
 
-def log_audit_event(event: str, tenant_id: str, user_id: str, meta: dict,
-                    severity: str = "info"):
+from datetime import datetime, timezone
+
+def log_audit_event(event: str, tenant_id: str, user_id: str, meta: dict, severity: str = "info"):
+    """Journalise les actions métiers avec isolation par tenant."""
     try:
+        # On s'assure que le meta est bien un dictionnaire
+        safe_meta = meta if isinstance(meta, dict) else {"data": str(meta)}
+        
         supabase.table("audit_logs").insert({
-            "event":      event,
-            "tenant_id":  tenant_id,
-            "user_id":    user_id,
-            "meta":       meta,
-            "severity":   severity,
-            "created_at": datetime.now().isoformat()
+            "event": event,
+            "tenant_id": tenant_id,
+            "user_id": user_id,
+            "meta": safe_meta,
+            "severity": severity,
+            # On laisse idéalement la DB gérer le created_at, sinon :
+            "created_at": datetime.now(timezone.utc).isoformat()
         }).execute()
     except Exception as e:
-        print(f"[AUDIT] Erreur : {e}")
+        # En prod, évitez print(), préférez un logger standard
+        print(f"[AUDIT ERROR] {datetime.now(timezone.utc)}: {e}")
 
-
-def log_security_event(event_type: str, tenant_id: str = None,
-                       user_id: str = None, details: dict = None):
+def log_security_event(event_type: str, tenant_id: str = None, user_id: str = None, details: dict = None):
+    """Journalise les alertes de sécurité avec contexte technique complet."""
     try:
+        context = {
+            "ip_address": request.remote_addr if request else "internal",
+            "user_agent": request.headers.get("User-Agent", "unknown")[:255],
+            "path": request.path if request else None,
+            "method": request.method if request else None
+        }
+        
+        # Fusion des détails fournis et du contexte technique
+        full_details = {**(details or {}), **context}
+        
         supabase.table("security_events").insert({
             "event_type": event_type,
-            "tenant_id":  tenant_id,
-            "user_id":    user_id,
-            "details":    details or {},
-            "ip_address": request.remote_addr if request else None,
-            "created_at": datetime.now().isoformat()
+            "tenant_id": tenant_id,
+            "user_id": user_id,
+            "details": full_details,
+            "created_at": datetime.now(timezone.utc).isoformat()
         }).execute()
     except Exception as e:
-        print(f"[SECURITY] Erreur : {e}")
+        print(f"[SECURITY ERROR] {datetime.now(timezone.utc)}: {e}")
 
 
-def verifier_totp(code: str) -> bool:
-    if not TOTP_SECRET:
-        return True
-    totp = pyotp.TOTP(TOTP_SECRET)
-    return totp.verify(code, valid_window=1)
+def verifier_totp(user_id: str, code: str) -> bool:
+    """
+    Vérifie le code 2FA spécifiquement pour un utilisateur donné.
+    """
+    try:
+        # 1. Récupérer le secret unique de l'utilisateur en base
+        res = supabase.table("users").select("totp_secret").eq("id", user_id).single().execute()
+        user_secret = res.data.get("totp_secret") if res.data else None
+
+        # 2. Sécurité : Si pas de secret configuré, on refuse l'accès 2FA
+        if not user_secret:
+            log_security_event("2fa_missing_secret", details={"user_id": user_id})
+            return False
+
+        # 3. Vérification avec pyotp
+        totp = pyotp.TOTP(user_secret)
+        
+        # On limite la fenêtre à 1 (30s avant/après) pour compenser les désynchronisations d'horloge
+        return totp.verify(code, valid_window=1)
+
+    except Exception as e:
+        log_erreur("TOTP_VERIFICATION_ERROR", e)
+        return False
 
 
 def get_session(session_id: str, tenant_id: str) -> list:
@@ -417,6 +507,45 @@ def verifier_abonnement(tenant_id: str) -> dict:
         log_erreur("VERIFIER_ABONNEMENT", e)
         return {"actif": True, "plan": "inconnu", "jours_restants": 0, "message": ""}
 
+def decouper_texte_en_chunks(texte, size=1000, overlap=200):
+    chunks = []
+    if not texte: return chunks
+    for i in range(0, len(texte), size - overlap):
+        chunks.append(texte[i:i + size])
+    return chunks
+
+def traiter_document_integral(file_path, tenant_id, document_id):
+    try:
+        doc = fitz.open(file_path)
+        chunks_a_inserer = []
+        
+        for page_num in range(len(doc)):
+            page = doc.load_page(page_num)
+            texte_page = page.get_text("text")
+            
+            # Découpage intelligent
+            morceaux = decouper_texte_en_chunks(texte_page)
+            
+            for contenu in morceaux:
+                # Appelez ici votre fonction actuelle qui crée les vecteurs
+                vecteur = generer_embedding(contenu) 
+                
+                chunks_a_inserer.append({
+                    "document_id": document_id,
+                    "tenant_id": tenant_id,
+                    "contenu": contenu,
+                    "page_numero": page_num + 1,
+                    "embedding": vecteur
+                })
+
+        # On insère par paquets pour la stabilité de la base
+        for i in range(0, len(chunks_a_inserer), 50):
+            supabase.table("document_chunks").insert(chunks_a_inserer[i:i+50]).execute()
+            
+        return True
+    except Exception as e:
+        log_erreur("PARSING_INTEGRAL", e)
+        return False
 
 @app.route("/abonnement/statut", methods=["GET"])
 @jwt_required()
@@ -508,6 +637,30 @@ def webhook_paiement():
         return jsonify({"erreur": str(e)}), 500
 
 
+# --- FONCTIONS UTILITAIRES ---
+
+def obtenir_stats_connexions(tenant_id, debut, fin):
+    """Calcule les stats de connexion pour un tenant spécifique sur une période donnée."""
+    try:
+        # Compte des succès
+        ok = supabase.table("security_events").select("id", count="exact")\
+            .eq("tenant_id", tenant_id)\
+            .eq("event_type", "login_success")\
+            .gte("created_at", debut.isoformat())\
+            .lt("created_at", fin.isoformat()).execute()
+        
+        # Compte des échecs
+        fail = supabase.table("security_events").select("id", count="exact")\
+            .eq("tenant_id", tenant_id)\
+            .eq("event_type", "login_failed")\
+            .gte("created_at", debut.isoformat())\
+            .lt("created_at", fin.isoformat()).execute()
+
+        return ok.count or 0, fail.count or 0
+    except Exception as e:
+        log_erreur("STATS_CONNEXIONS", e)
+        return 0, 0
+
 # ─── ROUTES PUBLIQUES ─────────────────────────────────────────────────────────
 
 @app.route("/")
@@ -553,76 +706,68 @@ def setup_2fa():
 def login():
     try:
         import hashlib
-        data     = request.json
-        email    = data.get("email", "").strip().lower()
+        data = request.json
+        email = data.get("email", "").strip().lower()
         password = data.get("password", "")
         code_2fa = data.get("code_2fa", "").strip()
 
         if not email or not password:
-            return jsonify({"erreur": "Email et mot de passe requis"}), 400
+            return jsonify({"erreur": "Identifiants requis"}), 400
 
+        # 1. Vérification Supabase
         try:
-            auth_response = supabase.auth.sign_in_with_password({
-                "email":    email,
-                "password": password
-            })
+            auth_response = supabase.auth.sign_in_with_password({"email": email, "password": password})
             user_id = auth_response.user.id if auth_response.user else None
-            if not user_id:
-                log_security_event("login_failed", details={"reason": "supabase_auth_echec"})
-                return jsonify({"erreur": "Identifiants incorrects"}), 401
         except Exception:
-            log_security_event("login_failed", details={"reason": "supabase_auth_echec"})
+            user_id = None
+
+        if not user_id:
+            log_security_event("login_failed", details={"reason": "auth_echec", "email": email})
             return jsonify({"erreur": "Identifiants incorrects"}), 401
 
+        # 2. Gestion de la 2FA
+        # ATTENTION : En production, ne renvoyez 'require_2fa' que si l'utilisateur a vraiment activé la 2FA
         if not code_2fa:
             return jsonify({"require_2fa": True}), 200
 
         if not verifier_totp(code_2fa):
-            log_security_event("login_failed", details={"reason": "2fa_echec"})
-            try:
-                log_audit(ACTION_LOGIN_ECHEC, {"status": "2fa_echec"}, succes=False)
-            except Exception:
-                pass
-            return jsonify({"erreur": "Code 2FA incorrect ou expire"}), 401
+            log_security_event("login_failed", details={"reason": "2fa_echec", "user_id": user_id})
+            return jsonify({"erreur": "Code de sécurité invalide"}), 401
 
+        # 3. Isolation des données (Multi-ténance)
         try:
-            user_row  = supabase.table("users").select("tenant_id").eq("id", user_id).execute()
-            tenant_id = user_row.data[0]["tenant_id"] if user_row.data else os.environ.get("DEFAULT_TENANT_ID", "")
+            user_row = supabase.table("users").select("tenant_id").eq("id", user_id).single().execute()
+            tenant_id = user_row.data["tenant_id"] if user_row.data else os.environ.get("DEFAULT_TENANT_ID")
         except Exception:
-            tenant_id = os.environ.get("DEFAULT_TENANT_ID", "")
+            tenant_id = os.environ.get("DEFAULT_TENANT_ID")
 
-        access_token = create_access_token(identity=user_id)
+        # 4. Génération des tokens (Session persistante)
+        access_token = create_access_token(identity=user_id, additional_claims={"tenant_id": tenant_id})
         refresh_tok  = create_refresh_token(identity=user_id)
 
+        # Stockage sécurisé du hash
         token_hash = hashlib.sha256(refresh_tok.encode()).hexdigest()
         expires_at = datetime.utcnow() + timedelta(days=30)
-        try:
-            supabase.table("refresh_tokens").insert({
-                "user_id":    user_id,
-                "tenant_id":  tenant_id,
-                "token_hash": token_hash,
-                "expires_at": expires_at.isoformat(),
-                "user_agent": request.headers.get("User-Agent", "")[:200],
-                "ip_address": request.remote_addr
-            }).execute()
-        except Exception as ex:
-            log_erreur("REFRESH_TOKEN_STORE", ex)
-
-        log_security_event("login_success", tenant_id, user_id, {"mode": "supabase_auth"})
-        try:
-            log_audit(ACTION_LOGIN, {"status": "succes"}, succes=True)
-        except Exception:
-            pass
+        
+        supabase.table("refresh_tokens").insert({
+            "user_id": user_id,
+            "tenant_id": tenant_id,
+            "token_hash": token_hash,
+            "expires_at": expires_at.isoformat(),
+            "user_agent": request.headers.get("User-Agent", "")[:200],
+            "ip_address": request.remote_addr
+        }).execute()
 
         return jsonify({
-            "token":         access_token,
+            "token": access_token,
             "refresh_token": refresh_tok,
-            "expires_in":    900
+            "expires_in": 900
         })
 
     except Exception as e:
-        log_erreur("LOGIN", e)
-        return jsonify({"erreur": str(e)}), 500
+        log_erreur("LOGIN_GLOBAL", e)
+        # On ne renvoie pas str(e) au client pour la sécurité
+        return jsonify({"erreur": "Service temporairement indisponible"}), 500
 
 
 @app.route("/refresh", methods=["POST"])
@@ -667,24 +812,23 @@ def refresh():
 def logout():
     try:
         import hashlib
-        identity  = get_jwt_identity()
-        data      = request.json or {}
-        raw_token = data.get("refresh_token", "")
+        user_id = get_jwt_identity() # Identité extraite du JWT
+        data = request.json or {}
+        raw_token = data.get("refresh_token")
+
         if raw_token:
             token_hash = hashlib.sha256(raw_token.encode()).hexdigest()
+            # Double vérification : hash ET user_id
             supabase.table("refresh_tokens").update({
-                "revoked":    True,
+                "revoked": True,
                 "revoked_at": datetime.utcnow().isoformat()
-            }).eq("token_hash", token_hash).execute()
-        log_security_event("logout", details={"user_id": identity})
-        try:
-            log_audit("LOGOUT", {"status": "succes"}, succes=True)
-        except Exception:
-            pass
+            }).eq("token_hash", token_hash).eq("user_id", user_id).execute()
+
+        log_security_event("logout", tenant_id=get_current_tenant_id(), user_id=user_id)
         return jsonify({"succes": True})
     except Exception as e:
         log_erreur("LOGOUT", e)
-        return jsonify({"erreur": str(e)}), 500
+        return jsonify({"erreur": "Erreur lors de la déconnexion"}), 500
     
 @app.route("/profil", methods=["GET"])
 @jwt_required()
@@ -873,26 +1017,51 @@ def creer_compte():
 # ─── CHAT ─────────────────────────────────────────────────────────────────────
 
 def _preparer_contexte_chat(q: str, session_id: str,
-                             tenant_id: str, dossier_id: str = None):
+                            tenant_id: str, dossier_id: str = None):
+    # 1. Récupération sécurisée de l'historique (limité au tenant)
     historique_session = get_session(session_id, tenant_id)
+    
+    # 2. Recherche de connaissances (RAG) avec isolation stricte
+    # Vérifiez bien que 'rechercher_chunks' applique le filtre tenant_id
     chunks = rechercher_chunks(q, dossier_id=dossier_id, tenant_id=tenant_id)
 
-    contexte = ""
-    sources  = []
+    contexte_parts = []
+    sources = []
+    
+    # Utilisation d'un set pour éviter les doublons de noms de docs (plus rapide)
+    doc_cache = {}
+
     if chunks:
         for i, chunk in enumerate(chunks, 1):
-            nom_doc = obtenir_nom_document(chunk["document_id"])
-            page    = chunk.get("page_numero", 1)
-            contexte += f"\n[Passage {i} - {nom_doc}, Page {page}]\n{chunk['contenu']}\n"
-            sources.append(f"{nom_doc} - p.{page}")
+            doc_id = chunk["document_id"]
+            if doc_id not in doc_cache:
+                doc_cache[doc_id] = obtenir_nom_document(doc_id)
+            
+            nom_doc = doc_cache[doc_id]
+            page = chunk.get("page_numero", 1)
+            
+            content = f"[Passage {i} - {nom_doc}, Page {page}]\n{chunk['contenu']}"
+            contexte_parts.append(content)
+            
+            ref = f"{nom_doc} (p.{page})"
+            if ref not in sources:
+                sources.append(ref)
 
+    contexte_global = "\n\n".join(contexte_parts)
+
+    # 3. Construction des messages pour l'IA
     messages = []
-    for echange in historique_session[-6:]:
-        messages.append({"role": "user",      "content": echange["question"]})
+    # On garde les 3 derniers tours (6 messages) pour la cohérence
+    for echange in historique_session[-3:]: 
+        messages.append({"role": "user", "content": echange["question"]})
         messages.append({"role": "assistant", "content": echange["reponse"]})
 
-    system_prompt = prompt_chat(q, contexte)
+    # 4. Injection du Prompt Système (C'est ici qu'on définit les règles juridiques)
+    system_prompt = prompt_chat(q, contexte_global)
+    
+    # Message actuel
     messages.append({"role": "user", "content": q})
+
     return system_prompt, messages, sources, historique_session
 
 
@@ -953,38 +1122,38 @@ def question():
 @limiter.limit("30 per minute")
 def question_stream():
     try:
-        data       = request.json
-        q          = data.get("question", "").strip()
+        # 1. Extraction et validation
+        user_id = get_current_user_id()
+        tenant_id = get_current_tenant_id() # Doit venir du JWT
+        data = request.json
+        q = data.get("question", "").strip()
         session_id = data.get("session_id", "default")
-        dossier_id = data.get("dossier_id", None)
-        tenant_id  = get_current_tenant_id()
+        dossier_id = data.get("dossier_id")
 
+        # 2. Vérification d'accès (Abonnement)
         _abo = verifier_abonnement(tenant_id)
         if not _abo["actif"]:
-            return jsonify({"erreur": "acces_expire",
-                            "message": _abo["message"],
-                            "plan": _abo["plan"]}), 402
+            return jsonify({"erreur": "acces_expire", "message": _abo["message"]}), 402
 
         if not q:
-            return jsonify({"erreur": "Question vide"}), 400
+            return jsonify({"erreur": "La question est requise"}), 400
 
+        # 3. Sécurité : Détection d'injection
         inj = analyser_injection(q, champ="question_stream")
         if inj.bloque:
-            log_security_event("prompt_injection_bloquee", tenant_id,
-                get_current_user_id(), {"score":inj.score,"patterns":inj.patterns,
-                "champ":"question_stream","extrait":q[:120]})
-            return jsonify(REPONSE_BLOQUEE), 400
-        if inj.score >= SEUIL_ALERTE:
-            log_security_event("prompt_injection_alerte", tenant_id,
-                get_current_user_id(), {"score":inj.score,"patterns":inj.patterns})
+            log_security_event("prompt_injection_bloquee", tenant_id, user_id, {"score": inj.score})
+            return jsonify({"erreur": "Contenu non autorisé"}), 400
 
+        # 4. Préparation du contexte
         system_prompt, messages, sources, historique_session = \
             _preparer_contexte_chat(q, session_id, tenant_id, dossier_id)
 
         def generer():
             reponse_complete = ""
             try:
-                yield f"data: {json.dumps({'type':'sources','sources':list(set(sources))},ensure_ascii=False)}\n\n"
+                # Envoi immédiat des sources pour rassurer l'utilisateur
+                yield f"data: {json.dumps({'type':'sources','sources':list(set(sources))}, ensure_ascii=False)}\n\n"
+
                 with client.messages.stream(
                     model="claude-sonnet-4-20250514",
                     max_tokens=2000,
@@ -993,21 +1162,32 @@ def question_stream():
                 ) as stream:
                     for token in stream.text_stream:
                         reponse_complete += token
-                        yield f"data: {json.dumps({'type':'token','text':token},ensure_ascii=False)}\n\n"
-                historique_session.append({"question":q,"reponse":reponse_complete})
-                save_session(session_id, historique_session, tenant_id)
-                yield f"data: {json.dumps({'type':'fin','complet':reponse_complete},ensure_ascii=False)}\n\n"
+                        yield f"data: {json.dumps({'type':'token','text':token}, ensure_ascii=False)}\n\n"
+
+                # Sauvegarde sécurisée même si la connexion client coupe après le stream
+                try:
+                    historique_session.append({"question": q, "reponse": reponse_complete, "at": datetime.utcnow().isoformat()})
+                    save_session(session_id, historique_session, tenant_id)
+                except Exception as e_save:
+                    log_erreur("SAVE_SESSION_STREAM", e_save)
+
+                yield f"data: {json.dumps({'type':'fin','complet':reponse_complete}, ensure_ascii=False)}\n\n"
+
             except Exception as e:
-                log_erreur("STREAM", e)
-                yield f"data: {json.dumps({'type':'erreur','message':str(e)},ensure_ascii=False)}\n\n"
+                log_erreur("STREAM_CORE", e)
+                yield f"data: {json.dumps({'type':'erreur','message': 'Une interruption est survenue'}, ensure_ascii=False)}\n\n"
 
         return Response(stream_with_context(generer()),
-            mimetype="text/event-stream",
-            headers={"Cache-Control":"no-cache","X-Accel-Buffering":"no","Connection":"keep-alive"})
+                        mimetype="text/event-stream",
+                        headers={
+                            "Cache-Control": "no-cache",
+                            "X-Accel-Buffering": "no",
+                            "Connection": "keep-alive"
+                        })
 
     except Exception as e:
-        log_erreur("QUESTION_STREAM", e)
-        return jsonify({"erreur": str(e)}), 500
+        log_erreur("QUESTION_STREAM_GLOBAL", e)
+        return jsonify({"erreur": "Erreur interne du service de streaming"}), 500
 
 
 @app.route("/nouvelle-conversation", methods=["POST"])
@@ -1379,201 +1559,93 @@ def supprimer_dossier(dossier_id):
 @jwt_required()
 @limiter.limit("10 per minute")
 def upload_document():
-    chunks_inseres = 0
     try:
+        # 1. Vérifications initiales
         if "fichier" not in request.files:
-            return jsonify({"erreur":"Aucun fichier recu"}), 400
+            return jsonify({"erreur": "Aucun fichier reçu"}), 400
 
-        fichier       = request.files["fichier"]
-        dossier_id    = request.form.get("dossier_id","")
-        est_sensible  = request.form.get("sensible","false").lower() == "true"
-        est_chiffre_d = request.form.get("chiffre","false").lower() == "true"
-        est_manuscrit = request.form.get("manuscrit","false").lower() == "true"
-        tenant_id     = get_current_tenant_id()
-        user_id       = get_current_user_id()
+        fichier = request.files["fichier"]
+        dossier_id = request.form.get("dossier_id", "")
+        tenant_id = get_current_tenant_id()  # Utilise ta fonction existante
+        user_id = get_jwt_identity()
 
+        # 2. Vérification de l'abonnement
         _abo = verifier_abonnement(tenant_id)
         if not _abo["actif"]:
-            return jsonify({"erreur":"acces_expire",
-                            "message":_abo["message"],
-                            "plan":_abo["plan"]}), 402
+            return jsonify({"erreur": "acces_expire", "message": _abo["message"]}), 402
 
-        if est_chiffre_d:
-            est_sensible = True
-
+        # 3. Validation du format PDF
         if not fichier.filename.lower().endswith(".pdf"):
-            return jsonify({"erreur":"Format PDF uniquement"}), 400
+            return jsonify({"erreur": "Format PDF uniquement"}), 400
 
+        # Vérification Magic Bytes
         header = fichier.read(5)
         fichier.seek(0)
         if header != b'%PDF-':
-            log_security_event("document_quarantined", tenant_id, user_id,
-                               {"reason":"invalid_magic_bytes","filename":fichier.filename})
-            return jsonify({"erreur":"Fichier invalide"}), 400
+            return jsonify({"erreur": "Fichier PDF invalide"}), 400
 
-        fichier.seek(0, 2)
-        taille = fichier.tell()
-        fichier.seek(0)
-        if taille > 50 * 1024 * 1024:
-            return jsonify({"erreur":"Fichier trop volumineux - max 50 Mo"}), 400
-
-        import hashlib
+        # 4. Détection de doublons (SHA-256) - On garde ta logique de sécurité
         fichier_bytes = fichier.read()
         file_hash = hashlib.sha256(fichier_bytes).hexdigest()
         fichier.seek(0)
 
         hash_check = supabase.table("documents").select("id,nom").eq(
-            "file_hash_sha256",file_hash).eq("tenant_id",tenant_id).execute()
+            "file_hash_sha256", file_hash).eq("tenant_id", tenant_id).execute()
+        
         if hash_check.data:
             return jsonify({
-                "erreur": f"Ce document existe deja : '{hash_check.data[0].get('nom') or fichier.filename}'"
+                "erreur": f"Ce document existe déjà : '{hash_check.data[0].get('nom')}'"
             }), 400
 
-        import fitz
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-            fichier.save(tmp.name)
-            tmp_path = tmp.name
-
-        doc         = fitz.open(tmp_path)
-        pages_texte = []
-        nb_pages    = len(doc)
-
-        for i, page in enumerate(doc):
-            texte = page.get_text().strip()
-            if texte:
-                pages_texte.append({"page":i+1,"texte":texte})
-
-        doc.close()
-        os.unlink(tmp_path)
-
-        if not pages_texte:
-            if est_manuscrit:
-                try:
-                    import pytesseract
-                    from PIL import Image
-                    doc_ocr = fitz.open(tmp_path if os.path.exists(tmp_path) else "-")
-                    for i, page in enumerate(doc_ocr):
-                        mat = fitz.Matrix(2.0, 2.0)
-                        pix = page.get_pixmap(matrix=mat)
-                        img = Image.frombytes("RGB",[pix.width,pix.height],pix.samples)
-                        texte_ocr = pytesseract.image_to_string(img, lang="fra+eng").strip()
-                        if texte_ocr:
-                            pages_texte.append({"page":i+1,"texte":texte_ocr})
-                    doc_ocr.close()
-                except ImportError:
-                    pages_texte = [{"page":1,"texte":f"[Document manuscrit - {nb_pages} page(s) - OCR non disponible]"}]
-                except Exception as e_ocr:
-                    pages_texte = [{"page":1,"texte":f"[Document scanne - {nb_pages} page(s) - erreur OCR]"}]
-            else:
-                pages_texte = [{"page":1,"texte":f"[Document PDF image - {nb_pages} page(s) - cochez Manuscrit pour OCR]"}]
-
-        if not pages_texte:
-            pages_texte = [{"page":1,"texte":"[Document vide ou illisible]"}]
-
-        doc_id = str(uuid.uuid4())
-
-        compression_algo  = "none"
-        compression_ratio = 1.0
-        taille_compresse  = taille
-
-        try:
-            import zstandard as zstd
-            compressor = zstd.ZstdCompressor(level=3)
-            fichier_compresse = compressor.compress(fichier_bytes)
-            ratio = len(fichier_compresse) / taille
-            if ratio < 0.80:
-                decompressor = zstd.ZstdDecompressor()
-                fichier_decompresse = decompressor.decompress(fichier_compresse)
-                if hashlib.sha256(fichier_decompresse).hexdigest() == file_hash:
-                    taille_compresse  = len(fichier_compresse)
-                    compression_algo  = "zstd_3"
-                    compression_ratio = round(ratio, 4)
-        except Exception:
-            pass
-
-        supabase.table("documents").insert({
-            "id":                doc_id,
-            "tenant_id":         tenant_id,
-            "uploaded_by":       user_id if user_id else None,
-            "filename":          fichier.filename,
-            "original_filename": fichier.filename,
-            "nom":               fichier.filename,
-            "type":              "juridique",
-            "mime_type":         "application/pdf",
-            "file_size_bytes":   taille,
-            "file_hash_sha256":  file_hash,
-            "compression_algo":  compression_algo,
-            "compression_ratio": compression_ratio,
-            "compressed_size_bytes": taille_compresse,
-            "compression_valid": compression_algo != "none",
-            "dossier_id":        dossier_id if dossier_id else None,
-            "manuscrit":         est_manuscrit,
-            "ocr_status":        "done",
-            "scan_status":       "clean",
-            "status":            "ready",
-            "storage_tier":      "hot",
+        # 5. Création de l'entrée en base de données
+        # On initialise statut à 'en_cours' et progression à 0
+        doc_res = supabase.table("documents").insert({
+            "nom": fichier.filename,
+            "tenant_id": tenant_id,
+            "uploaded_by": user_id,
+            "file_hash_sha256": file_hash,
+            "dossier_id": dossier_id if dossier_id else None,
+            "statut": "en_cours",
+            "progression": 0,
             "metadata": {
-                "sensible":  est_sensible,
-                "chiffre":   est_chiffre_d,
-                "manuscrit": est_manuscrit,
-                "type_doc":  request.form.get("type_doc","juridique"),
-                "juge":      request.form.get("juge",""),
+                "type_doc": request.form.get("type_doc", "juridique"),
+                "ajoute_le": datetime.now(timezone.utc).isoformat()
             }
         }).execute()
 
-        for page_data in pages_texte:
-            texte = page_data["texte"]
-            for j in range(0, len(texte), 800):
-                chunk_texte = texte[j:j+800].strip()
-                if len(chunk_texte) > 50:
-                    if est_sensible:
-                        contenu_final = chiffrer(chunk_texte)
-                        index_final   = extraire_index(chunk_texte)
-                    else:
-                        contenu_final = chunk_texte
-                        index_final   = chunk_texte
-                    supabase.table("chunks").insert({
-                        "tenant_id":     tenant_id,
-                        "document_id":   doc_id,
-                        "content":       contenu_final,
-                        "contenu":       contenu_final,
-                        "contenu_index": index_final,
-                        "page_number":   page_data["page"],
-                        "page_numero":   page_data["page"],
-                        "chunk_index":   j // 800,
-                        "source_type":   "document",
-                        "source_hash":   file_hash,
-                        "char_count":    len(chunk_texte),
-                        "metadata":      {"sensible":est_sensible,"manuscrit":est_manuscrit}
-                    }).execute()
-                    chunks_inseres += 1
+        if not doc_res.data:
+            return jsonify({"erreur": "Erreur lors de la création en base"}), 500
+        
+        document_id = doc_res.data[0]["id"]
 
+        # 6. Sauvegarde temporaire du fichier
+        filename = f"{uuid.uuid4()}.pdf"
+        file_path = os.path.join("uploads", filename)
+        fichier.save(file_path)
+
+        # 7. --- LANCEMENT ASYNCHRONE ---
+        # On délègue tout le travail lourd (PyMuPDF, chunks, progression) au Thread
         threading.Thread(
-            target=_vectoriser_document,
-            args=(doc_id, tenant_id),
+            target=process_full_pdf_worker, 
+            args=(file_path, tenant_id, document_id),
             daemon=True
         ).start()
 
-        log_audit_event("DOCUMENT_UPLOADED", tenant_id, user_id, {
-            "filename":fichier.filename,"hash":file_hash,
-            "chunks":chunks_inseres,"dossier_id":dossier_id})
+        # 8. Log d'audit
         try:
-            log_audit(ACTION_UPLOAD, {"fichier":fichier.filename,
-                "chunks":chunks_inseres,"manuscrit":est_manuscrit,"dossier_id":dossier_id})
-        except Exception:
-            pass
+            log_audit(ACTION_UPLOAD, {"fichier": fichier.filename, "document_id": document_id})
+        except Exception: pass
 
+        # Réponse immédiate au client
         return jsonify({
-            "succes":      True,
-            "message":     f"'{fichier.filename}' indexe",
-            "chunks":      chunks_inseres,
-            "document_id": doc_id,
-            "manuscrit":   est_manuscrit
-        })
-    except Exception as e:
-        log_erreur("UPLOAD", e)
-        return jsonify({"erreur":str(e)}), 500
+            "succes": True,
+            "document_id": document_id,
+            "message": "Analyse lancée. Vous pouvez suivre la progression."
+        }), 202
 
+    except Exception as e:
+        log_erreur("UPLOAD_ROUTE_ERROR", e)
+        return jsonify({"erreur": "Erreur interne lors du traitement"}), 500
 
 @app.route("/liste_documents", methods=["GET"])
 @jwt_required()
