@@ -177,33 +177,20 @@ def log_security_event(event_type: str, tenant_id: str = None, user_id: str = No
 
 
 def verifier_totp(user_id: str, code: str) -> bool:
-    """
-    Vérifie le code 2FA spécifiquement pour un utilisateur donné.
-    """
     try:
         print(f"[TOTP] user_id={user_id} code={code}")
         res = supabase.table("users").select("totp_secret").eq("id", user_id).execute()
-        print(f"[TOTP] res.data={res.data}")
+        print(f"[TOTP] data={res.data}")
         user_secret = res.data[0].get("totp_secret") if res.data else None
         print(f"[TOTP] secret={user_secret}")
-        
-        # 1. Récupérer le secret unique de l'utilisateur en base
-        res = supabase.table("users").select("totp_secret").eq("id", user_id).execute()
-        user_secret = res.data[0].get("totp_secret") if res.data else None
-
-        # 2. Sécurité : Si pas de secret configuré, on refuse l'accès 2FA
         if not user_secret:
-            log_security_event("2fa_missing_secret", details={"user_id": user_id})
             return False
-
-        # 3. Vérification avec pyotp
         totp = pyotp.TOTP(user_secret)
-        
-        # On limite la fenêtre à 1 (30s avant/après) pour compenser les désynchronisations d'horloge
-        return totp.verify(code, valid_window=4)
-
+        result = totp.verify(code, valid_window=4)
+        print(f"[TOTP] result={result}")
+        return result
     except Exception as e:
-        log_erreur("TOTP_VERIFICATION_ERROR", e)
+        print(f"[TOTP] erreur={e}")
         return False
 
 
