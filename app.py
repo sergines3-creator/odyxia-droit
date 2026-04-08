@@ -650,13 +650,14 @@ def setup_2fa_init():
             return jsonify({"erreur": "Identifiants incorrects"}), 401
 
         # 2. Générer/récupérer le secret TOTP de cet utilisateur
-        res = supabase.table("users").select("totp_secret").eq("id", user_id).execute()
-        user_secret = res.data[0].get("totp_secret") if res.data else None
+        res = supabase.table("users").select("totp_secret, display_name, full_name, id").eq("email", email).execute()
+        db_user_id = res.data[0]["id"] if res.data else None
         existing_secret = res.data[0].get("totp_secret") if res.data else None
 
         if not existing_secret:
             secret = pyotp.random_base32()
-            supabase.table("users").update({"totp_secret": secret}).eq("id", user_id).execute()
+            supabase.table("users").update({"totp_secret": secret}).eq("id", db_user_id).execute()
+            print(f"[SETUP_2FA] db_user_id={db_user_id} secret={secret[:8]}...")
         else:
             secret = existing_secret
 
