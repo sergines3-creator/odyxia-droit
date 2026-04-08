@@ -192,7 +192,7 @@ def verifier_totp(user_id: str, code: str) -> bool:
         totp = pyotp.TOTP(user_secret)
         
         # On limite la fenêtre à 1 (30s avant/après) pour compenser les désynchronisations d'horloge
-        return totp.verify(code, valid_window=1)
+        return totp.verify(code, valid_window=2)
 
     except Exception as e:
         log_erreur("TOTP_VERIFICATION_ERROR", e)
