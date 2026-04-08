@@ -181,6 +181,12 @@ def verifier_totp(user_id: str, code: str) -> bool:
     Vérifie le code 2FA spécifiquement pour un utilisateur donné.
     """
     try:
+        print(f"[TOTP] user_id={user_id} code={code}")
+        res = supabase.table("users").select("totp_secret").eq("id", user_id).execute()
+        print(f"[TOTP] res.data={res.data}")
+        user_secret = res.data[0].get("totp_secret") if res.data else None
+        print(f"[TOTP] secret={user_secret}")
+        
         # 1. Récupérer le secret unique de l'utilisateur en base
         res = supabase.table("users").select("totp_secret").eq("id", user_id).execute()
         user_secret = res.data[0].get("totp_secret") if res.data else None
