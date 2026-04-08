@@ -10,35 +10,25 @@ import json
 import tempfile
 import threading
 import time
-import hashlib
-import base64
-import requests
-from io import BytesIO
-from datetime import datetime, timedelta, timezone
 
-# --- Bibliothèques spécialisées ---
-import fitz  # PyMuPDF (lecture PDF intégrale et rapide)
-import pyotp
-import qrcode
-from anthropic import Anthropic
-from supabase import create_client
-
-# --- Configuration de l'encodage (Indispensable pour Windows/Emoji) ---
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
-# --- Flask & Sécurité ---
 from flask import Flask, render_template, request, jsonify, send_file, Response, stream_with_context
 from flask_cors import CORS
 from flask_talisman import Talisman
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask_jwt_extended import (
-    JWTManager, create_access_token, create_refresh_token, 
-    jwt_required, get_jwt_identity, get_jwt  # Ajout de get_jwt ici pour le tenant_id
-)
+from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
+from datetime import datetime, timedelta, timezone
+from anthropic import Anthropic
+from supabase import create_client
+import requests
+import pyotp
+import qrcode
+import base64
+from io import BytesIO
 
-# --- Tes modules personnalisés (Vérifie qu'ils sont dans le même dossier) ---
 from encryption import chiffrer, dechiffrer, est_chiffre, extraire_index
 from audit_logger import (
     log_audit, ACTION_LOGIN, ACTION_LOGIN_ECHEC,
@@ -46,11 +36,20 @@ from audit_logger import (
     ACTION_SUPPRESSION
 )
 from prompts import (
-    prompt_chat, prompt_synthese_document, prompt_prediction,
-    prompt_analyse_comparative, prompt_analyse_veille, prompt_carte_mentale,
-    prompt_timeline_dossier, prompt_rapport_client, prompt_matching_veille,
-    get_prompt_redaction, lister_types_documents, PROMPTS_REDACTION,
-    prompt_extraction_jurisprudence, prompt_verification_anonymisation,
+    prompt_chat,
+    prompt_synthese_document,
+    prompt_prediction,
+    prompt_analyse_comparative,
+    prompt_analyse_veille,
+    prompt_carte_mentale,
+    prompt_timeline_dossier,
+    prompt_rapport_client,
+    prompt_matching_veille,
+    get_prompt_redaction,
+    lister_types_documents,
+    PROMPTS_REDACTION,
+    prompt_extraction_jurisprudence,
+    prompt_verification_anonymisation,
 )
 from prompt_injection import analyser_injection, analyser_dict, REPONSE_BLOQUEE, SEUIL_ALERTE
 
@@ -66,62 +65,6 @@ TOTP_SECRET    = os.environ.get("TOTP_SECRET", "")
 CABINET_NOM    = os.environ.get("CABINET_NOM",    "Odyxia Droit")
 CABINET_AVOCAT = os.environ.get("CABINET_AVOCAT", "Maitre")
 CABINET_VILLE  = os.environ.get("CABINET_VILLE",  "Douala, Cameroun")
-
-# --- MOTEUR DE TRAITEMENT DES DOCUMENTS (RAG INTÉGRAL) ---
-
-def decouper_texte_en_chunks(texte, size=1000, overlap=200):
-    """Découpe le texte avec un chevauchement pour ne pas casser les phrases juridiques."""
-    chunks = []
-    if not texte: return chunks
-    for i in range(0, len(texte), size - overlap):
-        chunks.append(texte[i:i + size])
-    return chunks
-
-def process_full_pdf_worker(file_path, tenant_id, document_id):
-    """
-    Worker asynchrone qui parcourt 100% des pages.
-    Met à jour la colonne 'progression' dans Supabase.
-    """
-    try:
-        doc = fitz.open(file_path)
-        total_pages = len(doc)
-        all_chunks = []
-        
-        for page_num in range(total_pages):
-            page = doc.load_page(page_num)
-            texte = page.get_text("text")
-            
-            # Gestion du vide/manuscrit
-            if len(texte.strip()) < 10:
-                texte = f"[Contenu visuel ou manuscrit en page {page_num + 1}]"
-
-            morceaux = decouper_texte_en_chunks(texte)
-            for m in morceaux:
-                all_chunks.append({
-                    "document_id": document_id,
-                    "tenant_id": tenant_id,
-                    "contenu": m,
-                    "page_numero": page_num + 1
-                })
-
-            # Mise à jour de la progression SQL (colonne que tu as créée)
-            prog = int(((page_num + 1) / total_pages) * 100)
-            supabase.table("documents").update({"progression": prog}).eq("id", document_id).execute()
-
-        # Insertion des chunks par lots de 50 (plus stable)
-        for i in range(0, len(all_chunks), 50):
-            supabase.table("document_chunks").insert(all_chunks[i:i+50]).execute()
-            
-        # Finalisation du statut
-        supabase.table("documents").update({"statut": "pret", "progression": 100}).eq("id", document_id).execute()
-        
-        # Suppression du fichier temporaire après indexation
-        if os.path.exists(file_path):
-            os.remove(file_path)
-
-    except Exception as e:
-        print(f"Erreur Worker PDF: {e}")
-        supabase.table("documents").update({"statut": "erreur"}).eq("id", document_id).execute()
 
 # ─── FLASK ────────────────────────────────────────────────────────────────────
 app = Flask(__name__)
@@ -507,45 +450,6 @@ def verifier_abonnement(tenant_id: str) -> dict:
         log_erreur("VERIFIER_ABONNEMENT", e)
         return {"actif": True, "plan": "inconnu", "jours_restants": 0, "message": ""}
 
-def decouper_texte_en_chunks(texte, size=1000, overlap=200):
-    chunks = []
-    if not texte: return chunks
-    for i in range(0, len(texte), size - overlap):
-        chunks.append(texte[i:i + size])
-    return chunks
-
-def traiter_document_integral(file_path, tenant_id, document_id):
-    try:
-        doc = fitz.open(file_path)
-        chunks_a_inserer = []
-        
-        for page_num in range(len(doc)):
-            page = doc.load_page(page_num)
-            texte_page = page.get_text("text")
-            
-            # Découpage intelligent
-            morceaux = decouper_texte_en_chunks(texte_page)
-            
-            for contenu in morceaux:
-                # Appelez ici votre fonction actuelle qui crée les vecteurs
-                vecteur = generer_embedding(contenu) 
-                
-                chunks_a_inserer.append({
-                    "document_id": document_id,
-                    "tenant_id": tenant_id,
-                    "contenu": contenu,
-                    "page_numero": page_num + 1,
-                    "embedding": vecteur
-                })
-
-        # On insère par paquets pour la stabilité de la base
-        for i in range(0, len(chunks_a_inserer), 50):
-            supabase.table("document_chunks").insert(chunks_a_inserer[i:i+50]).execute()
-            
-        return True
-    except Exception as e:
-        log_erreur("PARSING_INTEGRAL", e)
-        return False
 
 @app.route("/abonnement/statut", methods=["GET"])
 @jwt_required()
@@ -684,22 +588,45 @@ def setup_2fa_page():
     return render_template("setup_2fa.html")
 
 @app.route("/setup-2fa", methods=["GET"])
+@jwt_required()
 def setup_2fa():
-    secret = os.environ.get("TOTP_SECRET", "")
-    if not secret:
-        return jsonify({"erreur": "TOTP_SECRET non configure"}), 500
-    totp = pyotp.TOTP(secret)
-    uri  = totp.provisioning_uri(
-        name=CABINET_AVOCAT,
-        issuer_name=f"Odyxia Droit - {CABINET_NOM}"
-    )
-    qr = qrcode.make(uri)
-    buffer = BytesIO()
-    qr.save(buffer, format="PNG")
-    qr_b64 = base64.b64encode(buffer.getvalue()).decode()
-    return jsonify({"qr_code": f"data:image/png;base64,{qr_b64}",
-                    "secret": secret, "uri": uri})
-
+    try:
+        user_id = get_current_user_id()
+        
+        # Vérifier si l'utilisateur a déjà un secret
+        res = supabase.table("users").select("totp_secret").eq("id", user_id).single().execute()
+        existing_secret = res.data.get("totp_secret") if res.data else None
+        
+        # Générer un nouveau secret si inexistant
+        if not existing_secret:
+            secret = pyotp.random_base32()
+            supabase.table("users").update({"totp_secret": secret}).eq("id", user_id).execute()
+        else:
+            secret = existing_secret
+        
+        # Récupérer le display_name pour le QR code
+        profil = supabase.table("users").select("display_name, full_name, email").eq("id", user_id).single().execute()
+        nom_avocat = (profil.data.get("display_name") or profil.data.get("full_name") or profil.data.get("email", "Avocat")) if profil.data else "Avocat"
+        
+        totp = pyotp.TOTP(secret)
+        uri  = totp.provisioning_uri(
+            name=nom_avocat,
+            issuer_name="Odyxia Droit"
+        )
+        qr = qrcode.make(uri)
+        buffer = BytesIO()
+        qr.save(buffer, format="PNG")
+        qr_b64 = base64.b64encode(buffer.getvalue()).decode()
+        
+        return jsonify({
+            "qr_code": f"data:image/png;base64,{qr_b64}",
+            "secret":  secret,
+            "uri":     uri,
+            "nom":     nom_avocat
+        })
+    except Exception as e:
+        log_erreur("SETUP_2FA", e)
+        return jsonify({"erreur": str(e)}), 500
 
 @app.route("/login", methods=["POST"])
 @limiter.limit("10 per minute")
@@ -730,7 +657,7 @@ def login():
         if not code_2fa:
             return jsonify({"require_2fa": True}), 200
 
-        if not verifier_totp(code_2fa):
+        if not verifier_totp(user_id, code_2fa):
             log_security_event("login_failed", details={"reason": "2fa_echec", "user_id": user_id})
             return jsonify({"erreur": "Code de sécurité invalide"}), 401
 
@@ -1559,93 +1486,201 @@ def supprimer_dossier(dossier_id):
 @jwt_required()
 @limiter.limit("10 per minute")
 def upload_document():
+    chunks_inseres = 0
     try:
-        # 1. Vérifications initiales
         if "fichier" not in request.files:
-            return jsonify({"erreur": "Aucun fichier reçu"}), 400
+            return jsonify({"erreur":"Aucun fichier recu"}), 400
 
-        fichier = request.files["fichier"]
-        dossier_id = request.form.get("dossier_id", "")
-        tenant_id = get_current_tenant_id()  # Utilise ta fonction existante
-        user_id = get_jwt_identity()
+        fichier       = request.files["fichier"]
+        dossier_id    = request.form.get("dossier_id","")
+        est_sensible  = request.form.get("sensible","false").lower() == "true"
+        est_chiffre_d = request.form.get("chiffre","false").lower() == "true"
+        est_manuscrit = request.form.get("manuscrit","false").lower() == "true"
+        tenant_id     = get_current_tenant_id()
+        user_id       = get_current_user_id()
 
-        # 2. Vérification de l'abonnement
         _abo = verifier_abonnement(tenant_id)
         if not _abo["actif"]:
-            return jsonify({"erreur": "acces_expire", "message": _abo["message"]}), 402
+            return jsonify({"erreur":"acces_expire",
+                            "message":_abo["message"],
+                            "plan":_abo["plan"]}), 402
 
-        # 3. Validation du format PDF
+        if est_chiffre_d:
+            est_sensible = True
+
         if not fichier.filename.lower().endswith(".pdf"):
-            return jsonify({"erreur": "Format PDF uniquement"}), 400
+            return jsonify({"erreur":"Format PDF uniquement"}), 400
 
-        # Vérification Magic Bytes
         header = fichier.read(5)
         fichier.seek(0)
         if header != b'%PDF-':
-            return jsonify({"erreur": "Fichier PDF invalide"}), 400
+            log_security_event("document_quarantined", tenant_id, user_id,
+                               {"reason":"invalid_magic_bytes","filename":fichier.filename})
+            return jsonify({"erreur":"Fichier invalide"}), 400
 
-        # 4. Détection de doublons (SHA-256) - On garde ta logique de sécurité
+        fichier.seek(0, 2)
+        taille = fichier.tell()
+        fichier.seek(0)
+        if taille > 50 * 1024 * 1024:
+            return jsonify({"erreur":"Fichier trop volumineux - max 50 Mo"}), 400
+
+        import hashlib
         fichier_bytes = fichier.read()
         file_hash = hashlib.sha256(fichier_bytes).hexdigest()
         fichier.seek(0)
 
         hash_check = supabase.table("documents").select("id,nom").eq(
-            "file_hash_sha256", file_hash).eq("tenant_id", tenant_id).execute()
-        
+            "file_hash_sha256",file_hash).eq("tenant_id",tenant_id).execute()
         if hash_check.data:
             return jsonify({
-                "erreur": f"Ce document existe déjà : '{hash_check.data[0].get('nom')}'"
+                "erreur": f"Ce document existe deja : '{hash_check.data[0].get('nom') or fichier.filename}'"
             }), 400
 
-        # 5. Création de l'entrée en base de données
-        # On initialise statut à 'en_cours' et progression à 0
-        doc_res = supabase.table("documents").insert({
-            "nom": fichier.filename,
-            "tenant_id": tenant_id,
-            "uploaded_by": user_id,
-            "file_hash_sha256": file_hash,
-            "dossier_id": dossier_id if dossier_id else None,
-            "statut": "en_cours",
-            "progression": 0,
+        import fitz
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+            fichier.save(tmp.name)
+            tmp_path = tmp.name
+
+        doc         = fitz.open(tmp_path)
+        pages_texte = []
+        nb_pages    = len(doc)
+
+        for i, page in enumerate(doc):
+            texte = page.get_text().strip()
+            if texte:
+                pages_texte.append({"page":i+1,"texte":texte})
+
+        doc.close()
+        os.unlink(tmp_path)
+
+        if not pages_texte:
+            if est_manuscrit:
+                try:
+                    import pytesseract
+                    from PIL import Image
+                    doc_ocr = fitz.open(tmp_path if os.path.exists(tmp_path) else "-")
+                    for i, page in enumerate(doc_ocr):
+                        mat = fitz.Matrix(2.0, 2.0)
+                        pix = page.get_pixmap(matrix=mat)
+                        img = Image.frombytes("RGB",[pix.width,pix.height],pix.samples)
+                        texte_ocr = pytesseract.image_to_string(img, lang="fra+eng").strip()
+                        if texte_ocr:
+                            pages_texte.append({"page":i+1,"texte":texte_ocr})
+                    doc_ocr.close()
+                except ImportError:
+                    pages_texte = [{"page":1,"texte":f"[Document manuscrit - {nb_pages} page(s) - OCR non disponible]"}]
+                except Exception as e_ocr:
+                    pages_texte = [{"page":1,"texte":f"[Document scanne - {nb_pages} page(s) - erreur OCR]"}]
+            else:
+                pages_texte = [{"page":1,"texte":f"[Document PDF image - {nb_pages} page(s) - cochez Manuscrit pour OCR]"}]
+
+        if not pages_texte:
+            pages_texte = [{"page":1,"texte":"[Document vide ou illisible]"}]
+
+        doc_id = str(uuid.uuid4())
+
+        compression_algo  = "none"
+        compression_ratio = 1.0
+        taille_compresse  = taille
+
+        try:
+            import zstandard as zstd
+            compressor = zstd.ZstdCompressor(level=3)
+            fichier_compresse = compressor.compress(fichier_bytes)
+            ratio = len(fichier_compresse) / taille
+            if ratio < 0.80:
+                decompressor = zstd.ZstdDecompressor()
+                fichier_decompresse = decompressor.decompress(fichier_compresse)
+                if hashlib.sha256(fichier_decompresse).hexdigest() == file_hash:
+                    taille_compresse  = len(fichier_compresse)
+                    compression_algo  = "zstd_3"
+                    compression_ratio = round(ratio, 4)
+        except Exception:
+            pass
+
+        supabase.table("documents").insert({
+            "id":                doc_id,
+            "tenant_id":         tenant_id,
+            "uploaded_by":       user_id if user_id else None,
+            "filename":          fichier.filename,
+            "original_filename": fichier.filename,
+            "nom":               fichier.filename,
+            "type":              "juridique",
+            "mime_type":         "application/pdf",
+            "file_size_bytes":   taille,
+            "file_hash_sha256":  file_hash,
+            "compression_algo":  compression_algo,
+            "compression_ratio": compression_ratio,
+            "compressed_size_bytes": taille_compresse,
+            "compression_valid": compression_algo != "none",
+            "dossier_id":        dossier_id if dossier_id else None,
+            "manuscrit":         est_manuscrit,
+            "ocr_status":        "done",
+            "scan_status":       "clean",
+            "status":            "ready",
+            "storage_tier":      "hot",
             "metadata": {
-                "type_doc": request.form.get("type_doc", "juridique"),
-                "ajoute_le": datetime.now(timezone.utc).isoformat()
+                "sensible":  est_sensible,
+                "chiffre":   est_chiffre_d,
+                "manuscrit": est_manuscrit,
+                "type_doc":  request.form.get("type_doc","juridique"),
+                "juge":      request.form.get("juge",""),
             }
         }).execute()
 
-        if not doc_res.data:
-            return jsonify({"erreur": "Erreur lors de la création en base"}), 500
-        
-        document_id = doc_res.data[0]["id"]
+        for page_data in pages_texte:
+            texte = page_data["texte"]
+            for j in range(0, len(texte), 800):
+                chunk_texte = texte[j:j+800].strip()
+                if len(chunk_texte) > 50:
+                    if est_sensible:
+                        contenu_final = chiffrer(chunk_texte)
+                        index_final   = extraire_index(chunk_texte)
+                    else:
+                        contenu_final = chunk_texte
+                        index_final   = chunk_texte
+                    supabase.table("chunks").insert({
+                        "tenant_id":     tenant_id,
+                        "document_id":   doc_id,
+                        "content":       contenu_final,
+                        "contenu":       contenu_final,
+                        "contenu_index": index_final,
+                        "page_number":   page_data["page"],
+                        "page_numero":   page_data["page"],
+                        "chunk_index":   j // 800,
+                        "source_type":   "document",
+                        "source_hash":   file_hash,
+                        "char_count":    len(chunk_texte),
+                        "metadata":      {"sensible":est_sensible,"manuscrit":est_manuscrit}
+                    }).execute()
+                    chunks_inseres += 1
 
-        # 6. Sauvegarde temporaire du fichier
-        filename = f"{uuid.uuid4()}.pdf"
-        file_path = os.path.join("uploads", filename)
-        fichier.save(file_path)
-
-        # 7. --- LANCEMENT ASYNCHRONE ---
-        # On délègue tout le travail lourd (PyMuPDF, chunks, progression) au Thread
         threading.Thread(
-            target=process_full_pdf_worker, 
-            args=(file_path, tenant_id, document_id),
+            target=_vectoriser_document,
+            args=(doc_id, tenant_id),
             daemon=True
         ).start()
 
-        # 8. Log d'audit
+        log_audit_event("DOCUMENT_UPLOADED", tenant_id, user_id, {
+            "filename":fichier.filename,"hash":file_hash,
+            "chunks":chunks_inseres,"dossier_id":dossier_id})
         try:
-            log_audit(ACTION_UPLOAD, {"fichier": fichier.filename, "document_id": document_id})
-        except Exception: pass
+            log_audit(ACTION_UPLOAD, {"fichier":fichier.filename,
+                "chunks":chunks_inseres,"manuscrit":est_manuscrit,"dossier_id":dossier_id})
+        except Exception:
+            pass
 
-        # Réponse immédiate au client
         return jsonify({
-            "succes": True,
-            "document_id": document_id,
-            "message": "Analyse lancée. Vous pouvez suivre la progression."
-        }), 202
-
+            "succes":      True,
+            "message":     f"'{fichier.filename}' indexe",
+            "chunks":      chunks_inseres,
+            "document_id": doc_id,
+            "manuscrit":   est_manuscrit
+        })
     except Exception as e:
-        log_erreur("UPLOAD_ROUTE_ERROR", e)
-        return jsonify({"erreur": "Erreur interne lors du traitement"}), 500
+        log_erreur("UPLOAD", e)
+        return jsonify({"erreur":str(e)}), 500
+
 
 @app.route("/liste_documents", methods=["GET"])
 @jwt_required()
