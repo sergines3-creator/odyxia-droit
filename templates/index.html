@@ -955,14 +955,22 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
     <div class="login-logo">
       <div style="font-family:var(--serif);font-size:22px;font-weight:500;color:#0A0A0A;letter-spacing:-0.3px;">Odyxia <span style="font-weight:300;color:#525252;">Droit</span></div>
     </div>
+
+    <label class="login-label">Email professionnel</label>
+    <input class="login-input" type="email" id="login-email" placeholder="nom@cabinet.com" autocomplete="email"/>
+
     <label class="login-label">Mot de passe</label>
     <input class="login-input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
+
     <div class="login-2fa" id="login-2fa-wrap">
-      <label class="login-label">Code d'authentification</label>
-      <input class="login-input" type="text" id="login-2fa" placeholder="000000" maxlength="6" inputmode="numeric"/>
+      <label class="login-label">Code Google Authy (OTP)</label>
+      <input class="login-input" type="text" id="login-2fa" placeholder="000 000" maxlength="6" inputmode="numeric"/>
     </div>
-    <button class="login-btn" onclick="doLogin()">Accéder</button>
-    <div class="login-err" id="login-err">Identifiants incorrects</div>
+
+    <button class="login-btn" onclick="doLogin()">Accéder au cabinet</button>
+    
+    <div class="login-err" id="login-err">Identifiants ou code incorrects</div>
+    
     <div class="login-setup">
       <a href="/setup-2fa-page">Première connexion — configurer l'authentification</a>
     </div>
@@ -1525,49 +1533,42 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ── AUTH ─────────────────────────────────────────────
 async function doLogin() {
-  const btn = document.getElementById('login-btn'); // Supposons que vous avez un bouton
-  const passEl = document.getElementById('login-pass');
-  const codeEl = document.getElementById('login-2fa');
-  const errEl = document.getElementById('login-err');
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-pass').value;
+    const otp = document.getElementById('login-2fa').value;
+    const errEl = document.getElementById('login-err');
 
-  if (btn) btn.disabled = true; // Empêche le double-clic
-  errEl.style.display = 'none';
-
-  const body = { password: passEl.value };
-  if (codeEl.value) body.code_2fa = codeEl.value;
-
-  try {
-    const r = await fetch('/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-
-    const d = await r.json();
-
-    if (d.require_2fa) {
-      document.getElementById('login-2fa-wrap').style.display = 'block';
-      codeEl.focus(); // Meilleure UX
-      return;
+    if (!email || !password) {
+        errEl.innerText = "Email et mot de passe requis";
+        errEl.style.display = 'block';
+        return;
     }
 
-    if (r.ok && d.token) {
-      TOKEN = d.token;
-      localStorage.setItem('od_token', TOKEN);
-      // Transition d'écran plus propre
-      document.getElementById('login-screen').classList.remove('show');
-      document.getElementById('app').classList.add('show');
-      init();
-    } else {
-      errEl.style.display = 'block';
-      errEl.textContent = d.erreur || 'Identifiants incorrects';
+    try {
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                email: email, 
+                password: password, 
+                code: otp 
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // On stocke le token et on entre
+            localStorage.setItem('access_token', data.access_token);
+            window.location.reload(); 
+        } else {
+            errEl.innerText = data.erreur || "Identifiants incorrects";
+            errEl.style.display = 'block';
+        }
+    } catch (err) {
+        errEl.innerText = "Erreur de connexion au serveur";
+        errEl.style.display = 'block';
     }
-  } catch (e) {
-    errEl.style.display = 'block';
-    errEl.textContent = 'Erreur réseau ou serveur injoignable';
-  } finally {
-    if (btn) btn.disabled = false;
-  }
 }
 
 // ── INIT ─────────────────────────────────────────────
