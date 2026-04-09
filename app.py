@@ -583,7 +583,7 @@ def setup_2fa_page():
 @app.route("/setup-2fa", methods=["GET"])
 def setup_2fa():
     try:
-        user_id = get_current_user_id()
+        user_id = get_jwt_identity()
         
         # Vérifier si l'utilisateur a déjà un secret
         res = supabase.table("users").select("totp_secret").eq("id", user_id).execute()
