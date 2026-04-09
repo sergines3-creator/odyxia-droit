@@ -1130,7 +1130,7 @@ def question():
 def question_stream():
     try:
         # 1. Extraction et validation
-        user_id = get_current_user_id()
+        user_id = get_jwt_identity()
         tenant_id = get_current_tenant_id() # Doit venir du JWT
         data = request.json
         q = data.get("question", "").strip()
