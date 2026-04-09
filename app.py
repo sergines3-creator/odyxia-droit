@@ -1708,40 +1708,46 @@ def upload_document():
             }
         }).execute()
 
-        chunks_a_inserer = []
-        for page_data in pages_texte:
-            texte = page_data["texte"]
-            for j in range(0, len(texte), 800):
-                chunk_texte = texte[j:j+800].strip()
-                if len(chunk_texte) > 50:
-                    if est_sensible:
-                        contenu_final = chiffrer(chunk_texte)
-                        index_final   = extraire_index(chunk_texte)
-                    else:
-                        contenu_final = chunk_texte
-                        index_final   = chunk_texte
-                    chunks_a_inserer.append({
-                        "tenant_id":     tenant_id,
-                        "document_id":   doc_id,
-                        "content":       contenu_final,
-                        "contenu":       contenu_final,
-                        "contenu_index": index_final,
-                        "page_number":   page_data["page"],
-                        "page_numero":   page_data["page"],
-                        "chunk_index":   j // 800,
-                        "source_type":   "document",
-                        "source_hash":   file_hash,
-                        "char_count":    len(chunk_texte),
-                        "metadata":      {"sensible": est_sensible, "manuscrit": est_manuscrit}
-                    })
-
-        for i in range(0, len(chunks_a_inserer), 100):
-            supabase.table("chunks").insert(chunks_a_inserer[i:i+100]).execute()
-            chunks_inseres += len(chunks_a_inserer[i:i+100])
+        def traiter_pdf_async(pages_texte, doc_id, tenant_id, file_hash, est_sensible, est_manuscrit):
+            try:
+                chunks_a_inserer = []
+                for page_data in pages_texte:
+                    texte = page_data["texte"]
+                    for j in range(0, len(texte), 800):
+                        chunk_texte = texte[j:j+800].strip()
+                        if len(chunk_texte) > 50:
+                            if est_sensible:
+                                contenu_final = chiffrer(chunk_texte)
+                                index_final   = extraire_index(chunk_texte)
+                            else:
+                                contenu_final = chunk_texte
+                                index_final   = chunk_texte
+                            chunks_a_inserer.append({
+                                "tenant_id":     tenant_id,
+                                "document_id":   doc_id,
+                                "content":       contenu_final,
+                                "contenu":       contenu_final,
+                                "contenu_index": index_final,
+                                "page_number":   page_data["page"],
+                                "page_numero":   page_data["page"],
+                                "chunk_index":   j // 800,
+                                "source_type":   "document",
+                                "source_hash":   file_hash,
+                                "char_count":    len(chunk_texte),
+                                "metadata":      {"sensible": est_sensible, "manuscrit": est_manuscrit}
+                            })
+                for i in range(0, len(chunks_a_inserer), 100):
+                    supabase.table("chunks").insert(chunks_a_inserer[i:i+100]).execute()
+                _vectoriser_document(doc_id, tenant_id)
+                supabase.table("documents").update({"status": "ready"}).eq("id", doc_id).execute()
+                print(f"[UPLOAD] {doc_id[:8]} — {len(chunks_a_inserer)} chunks insérés")
+            except Exception as e:
+                print(f"[UPLOAD ERROR] {e}")
+                supabase.table("documents").update({"status": "error"}).eq("id", doc_id).execute()
 
         threading.Thread(
-            target=_vectoriser_document,
-            args=(doc_id, tenant_id),
+            target=traiter_pdf_async,
+            args=(pages_texte, doc_id, tenant_id, file_hash, est_sensible, est_manuscrit),
             daemon=True
         ).start()
 
