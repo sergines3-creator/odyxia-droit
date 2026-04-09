@@ -174,10 +174,10 @@ def log_security_event(event_type: str, tenant_id: str = None, user_id: str = No
         print(f"[SECURITY ERROR] {datetime.now(timezone.utc)}: {e}")
 
 
-def verifier_totp(user_id: str, code: str) -> bool:
+def verifier_totp_by_email(email: str, code: str) -> bool:
     try:
-        print(f"[TOTP] user_id={user_id} code={code}")
-        res = supabase.table("users").select("totp_secret").eq("id", user_id).execute()
+        print(f"[TOTP] email={email} code={code}")
+        res = supabase.table("users").select("totp_secret").eq("email", email).execute()
         print(f"[TOTP] data={res.data}")
         user_secret = res.data[0].get("totp_secret") if res.data else None
         print(f"[TOTP] secret={user_secret}")
@@ -737,14 +737,14 @@ def login():
         if not code_2fa:
             return jsonify({"require_2fa": True}), 200
 
-        if not verifier_totp(user_id, code_2fa):
+        if not verifier_totp_by_email(email, code_2fa):
             log_security_event("login_failed", details={"reason": "2fa_echec", "user_id": user_id})
             return jsonify({"erreur": "Code de sécurité invalide"}), 401
 
         # 3. Isolation des données (Multi-ténance)
         try:
-            user_row = supabase.table("users").select("tenant_id").eq("id", user_id).single().execute()
-            tenant_id = user_row.data["tenant_id"] if user_row.data else os.environ.get("DEFAULT_TENANT_ID")
+            user_row = supabase.table("users").select("tenant_id").eq("id", user_id).execute()
+            tenant_id = user_row.data[0]["tenant_id"] if user_row.data else os.environ.get("DEFAULT_TENANT_ID")
         except Exception:
             tenant_id = os.environ.get("DEFAULT_TENANT_ID")
 
