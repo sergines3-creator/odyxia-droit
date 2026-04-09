@@ -404,6 +404,7 @@ async function chargerQR() {
 }
 
 async function verifierCode() {
+  console.log('USER_ID:', USER_ID);
   const code = document.getElementById('totp-code').value.trim();
   const msg  = document.getElementById('msg-verify');
   const btn  = document.getElementById('btn-verify');
