@@ -25,8 +25,6 @@ from anthropic import Anthropic
 from supabase import create_client
 import requests
 import pyotp
-totp = pyotp.TOTP("DDB5XE6KQ7Q23I4XLSSA354MIR7ZPVDK")
-print(totp.now())
 import qrcode
 import base64
 from io import BytesIO
@@ -588,8 +586,8 @@ def setup_2fa():
         user_id = get_current_user_id()
         
         # Vérifier si l'utilisateur a déjà un secret
-        res = supabase.table("users").select("totp_secret").eq("id", user_id).single().execute()
-        existing_secret = res.data.get("totp_secret") if res.data else None
+        res = supabase.table("users").select("totp_secret").eq("id", user_id).execute()
+        existing_secret = res.data[0].get("totp_secret") if res.data else None
         
         # Générer un nouveau secret si inexistant
         if not existing_secret:
