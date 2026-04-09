@@ -112,11 +112,14 @@ def get_current_tenant_id() -> str:
         user_id = get_jwt_identity()
         if user_id:
             result = supabase.table("users").select("tenant_id").eq("id", user_id).execute()
-            if result.data:
+            if result.data and result.data[0].get("tenant_id"):
                 return result.data[0]["tenant_id"]
+            result2 = supabase.table("tenants").select("id").limit(1).execute()
+            if result2.data:
+                return result2.data[0]["id"]
     except Exception:
         pass
-    return os.environ.get("DEFAULT_TENANT_ID", "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+    return os.environ.get("DEFAULT_TENANT_ID", "")
 
 
 def get_current_user_id() -> str:
