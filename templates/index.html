@@ -2115,8 +2115,13 @@ async function chargerDocsBib() {
           + '<div class="bib-doc-name">' + (d.nom || d.filename) + '</div>'
           + '<div class="bib-doc-meta">' + (d.storage_tier || 'hot') + ' · ' + (d.created_at ? new Date(d.created_at).toLocaleDateString('fr') : '') + '</div>'
           + '</div>'
-          + '<span class="bib-doc-badge ' + badge + '">' + lbl + '</span>'
-          + '<button class="bib-doc-del" onclick="event.stopPropagation();supprimerDocById(\"' + d.id + '\",this)" title="Supprimer">&#x2715;</button>';
+          + '<span class="bib-doc-badge ' + badge + '">' + lbl + '</span>';
+        const delBtn = document.createElement('button');
+        delBtn.className = 'bib-doc-del';
+        delBtn.title = 'Supprimer';
+        delBtn.innerHTML = '&#x2715;';
+        delBtn.onclick = (e) => { e.stopPropagation(); supprimerDocById(d.id, delBtn); };
+        el.appendChild(delBtn);
         el.onclick = () => afficherDocViewer(d);
         list.appendChild(el);
       });
