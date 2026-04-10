@@ -1769,7 +1769,6 @@ async function uploadFichier(file, dossierId) {
       const chunks = d.chunks || 0;
       showToast('"' + file.name + '" indexé — ' + chunks + ' passage' + (chunks > 1 ? 's' : '') + ' extraits');
       await chargerDocsBib();
-      if (dossierId && AFFAIRE_ACTIVE) await chargerCorpsAffaire(AFFAIRE_ACTIVE);
     } else {
       showToast('Erreur : ' + (d.erreur || 'Upload échoué'), true);
     }
@@ -2516,20 +2515,7 @@ function selectionnerActe(acte, el) {
         : '<input type="text" id="rc-' + key + '" placeholder="' + label + '..."/>');
     champs.appendChild(div);
   });
-  // Pré-remplir avec l'affaire active si disponible
-  if (AFFAIRE_ACTIVE) {
-    const map = {
-      demandeur: AFFAIRE_ACTIVE.demandeur, defendeur: AFFAIRE_ACTIVE.defendeur,
-      faits: AFFAIRE_ACTIVE.description, juridiction: AFFAIRE_ACTIVE.juridiction,
-      requérant: AFFAIRE_ACTIVE.demandeur, adversaire: AFFAIRE_ACTIVE.defendeur,
-      tribunal: AFFAIRE_ACTIVE.juridiction,
-    };
-    Object.entries(map).forEach(([k,v]) => {
-      const el2 = document.getElementById('rc-' + k);
-      if (el2 && v) el2.value = v;
-    });
   }
-}
 
 async function lancerRedaction() {
   if (!ACTE_ACTIF) { showToast('Choisissez un acte', true); return; }
