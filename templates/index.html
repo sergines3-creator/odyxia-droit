@@ -1547,7 +1547,6 @@ async function init() {
   document.getElementById('dash-greeting').textContent = greeting + ', Maître';
   document.getElementById('dash-date').textContent = now.toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
   chargerHistorique();
-  await chargerAffaires();
   await chargerStats();
   await chargerDocsBib();
   setTimeout(initAllResizers, 100);
@@ -1570,7 +1569,6 @@ async function chargerStats() {
   try {
     const r = await apiFetch('/stats');
     if (!r) return;
-    document.getElementById('stat-affaires').textContent = r.dossiers || 0;
     document.getElementById('stat-docs').textContent = r.documents || 0;
     document.getElementById('stat-actes').textContent = 0;
     document.getElementById('stat-convs').textContent = conversations.length;
