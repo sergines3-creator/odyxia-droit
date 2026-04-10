@@ -1419,13 +1419,10 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
   <div class="chat-panel-hdr">
     <span class="chat-panel-title">Assistant juridique</span>
     <div class="chat-panel-actions">
-      <button class="chat-panel-btn" onclick="toggleHist()">Historique</button>
       <button class="chat-panel-btn" onclick="nouvelleConversation()">+ Nouveau</button>
       <button class="chat-close" onclick="toggleChat()">×</button>
     </div>
   </div>
-
-  <div class="chat-hist" id="chat-hist"></div>
 
   <div class="chat-messages" id="chat-messages">
     <div class="msg-ai">Bonjour Maître. Je suis votre assistant juridique ODYXIA, spécialisé en droit OHADA, CEMAC et camerounais. Posez-moi vos questions — je puise mes réponses directement dans votre base documentaire.</div>
@@ -1461,10 +1458,7 @@ let SESSION_ID = 'sess_' + Math.random().toString(36).slice(2);
 let TENANT_ID  = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 let DOC_ACTIF  = null;
 let SELECTED_DOMAIN = '';
-let conversations = JSON.parse(localStorage.getItem('od_convs') || '[]');
-let convActuelle = null;
 let chatOpen = false;
-let histOpen = false;
 let mindOpen = false;
 
 // ── SPLASH ───────────────────────────────────────────
@@ -1546,7 +1540,6 @@ async function init() {
   const greeting = h < 12 ? 'Bonjour' : h < 18 ? 'Bon après-midi' : 'Bonsoir';
   document.getElementById('dash-greeting').textContent = greeting + ', Maître';
   document.getElementById('dash-date').textContent = now.toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  chargerHistorique();
   await chargerStats();
   await chargerDocsBib();
   setTimeout(initAllResizers, 100);
@@ -2112,11 +2105,6 @@ function toggleChat() {
   document.getElementById('chat-panel').classList.toggle('show', chatOpen);
 }
 
-function toggleHist() {
-  histOpen = !histOpen;
-  document.getElementById('chat-hist').classList.toggle('open', histOpen);
-}
-
 function toggleMindPanel() {
   mindOpen = !mindOpen;
   document.getElementById('mind-panel').classList.toggle('open', mindOpen);
@@ -2136,7 +2124,6 @@ async function envoyerMessage() {
   if (!convActuelle) {
     convActuelle = {id: SESSION_ID, titre: q.slice(0,40), date: new Date().toLocaleString('fr'), messages:[]};
     conversations.unshift(convActuelle);
-    sauvegarderHist();
   }
   convActuelle.messages.push({role:'user', content:q});
 
@@ -2172,8 +2159,6 @@ async function envoyerMessage() {
           if (ev.type==='token')   { reponse += ev.text; renderMsg(msgEl, reponse, sources); }
           if (ev.type==='fin')     {
             convActuelle.messages.push({role:'assistant', content:reponse});
-            sauvegarderHist();
-            chargerHistorique();
             if (reponse.length > 300) genererCarteMentaleAuto(reponse);
           }
         } catch {}
@@ -2257,43 +2242,6 @@ async function nouvelleConversation() {
   document.getElementById('mind-panel').classList.remove('open');
   mindOpen = false;
   try { await apiFetch('/nouvelle-conversation', 'POST', {session_id: SESSION_ID}); } catch {}
-  chargerHistorique();
-}
-
-function sauvegarderHist() {
-  localStorage.setItem('od_convs', JSON.stringify(conversations.slice(0,50)));
-}
-
-function chargerHistorique() {
-  conversations = JSON.parse(localStorage.getItem('od_convs') || '[]');
-  document.getElementById('stat-convs').textContent = conversations.length;
-  const hist = document.getElementById('chat-hist');
-  hist.innerHTML = '';
-  conversations.forEach((c,i) => {
-    const el = document.createElement('div');
-    el.className = 'hist-item' + (c.id === SESSION_ID ? ' active' : '');
-    el.innerHTML = '<div class="hist-title">' + (c.titre||'Conversation') + '</div><div class="hist-date">' + (c.date||'') + '</div>';
-    el.onclick = () => chargerConversation(c);
-    hist.appendChild(el);
-  });
-}
-
-function chargerConversation(conv) {
-  SESSION_ID = conv.id;
-  convActuelle = conv;
-  const box = document.getElementById('chat-messages');
-  box.innerHTML = '';
-  (conv.messages||[]).forEach(m => {
-    const el = document.createElement('div');
-    el.className = m.role === 'user' ? 'msg-user' : 'msg-ai';
-    el.innerHTML = m.role === 'assistant'
-      ? m.content.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br/>')
-      : m.content;
-    box.appendChild(el);
-  });
-  box.scrollTop = box.scrollHeight;
-  chargerHistorique();
-  if (!chatOpen) toggleChat();
 }
 
 // ── API ───────────────────────────────────────────────
