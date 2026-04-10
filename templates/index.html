@@ -1504,7 +1504,6 @@ let SELECTED_DOMAIN = '';
 let conversations = JSON.parse(localStorage.getItem('od_convs') || '[]');
 let convActuelle = null;
 let chatOpen = false;
-let CONTEXTE_MEMOIRE = '';
 let histOpen = false;
 let mindOpen = false;
 
@@ -1591,7 +1590,6 @@ async function init() {
   await chargerAffaires();
   await chargerStats();
   await chargerDocsBib();
-  await chargerContexteMemoire();
   setTimeout(initAllResizers, 100);
   initRedaction();
 }
@@ -2662,9 +2660,6 @@ async function envoyerMessage() {
   try {
     const _aujourdhui = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
     let q_enrichie = '[Date du jour: ' + _aujourdhui + '] ' + q;
-    if (CONTEXTE_MEMOIRE) {
-      q_enrichie = '[Date du jour: ' + _aujourdhui + '] [Contexte sessions précédentes: ' + CONTEXTE_MEMOIRE + '] ' + q;
-    }
     const body = {question: q_enrichie, session_id:SESSION_ID};
     if (AFFAIRE_ACTIVE) body.dossier_id = AFFAIRE_ACTIVE.id;
 
