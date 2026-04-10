@@ -1397,6 +1397,7 @@ def carte_mentale():
 @limiter.limit("20 per minute")
 def rediger():
     try:
+        print(f"[REDIGER] début")
         data      = request.json
         type_doc  = data.get("type","")
         donnees   = data.get("donnees",{})
