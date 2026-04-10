@@ -2131,17 +2131,10 @@ async function envoyerMessage() {
   const typing = ajouterTyping();
   showLoading(true);
 
-  if (!convActuelle) {
-    convActuelle = {id: SESSION_ID, titre: q.slice(0,40), date: new Date().toLocaleString('fr'), messages:[]};
-    conversations.unshift(convActuelle);
-  }
-  convActuelle.messages.push({role:'user', content:q});
-
   try {
     const _aujourdhui = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
     let q_enrichie = '[Date du jour: ' + _aujourdhui + '] ' + q;
     const body = {question: q_enrichie, session_id:SESSION_ID};
-    if (AFFAIRE_ACTIVE) body.dossier_id = AFFAIRE_ACTIVE.id;
 
     const r = await fetch('/question_stream', {
       method:'POST',
@@ -2168,7 +2161,6 @@ async function envoyerMessage() {
           if (ev.type==='sources') sources = ev.sources||[];
           if (ev.type==='token')   { reponse += ev.text; renderMsg(msgEl, reponse, sources); }
           if (ev.type==='fin')     {
-            convActuelle.messages.push({role:'assistant', content:reponse});
             if (reponse.length > 300) genererCarteMentaleAuto(reponse);
           }
         } catch {}
