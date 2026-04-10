@@ -78,7 +78,7 @@ Talisman(app,
     content_security_policy=False
 )
 app.config["JWT_SECRET_KEY"]            = os.environ.get("JWT_SECRET_KEY", "Odyxia-JWT-2026!")
-app.config["JWT_ACCESS_TOKEN_EXPIRES"]  = timedelta(minutes=15)
+app.config["JWT_ACCESS_TOKEN_EXPIRES"]  = timedelta(hours=8)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
 jwt_manager = JWTManager(app)
 
@@ -701,7 +701,9 @@ def setup_2fa_verify():
         if not user_id or not code:
             return jsonify({"erreur": "Données manquantes"}), 400
 
-        if not verifier_totp(user_id, code):
+        res = supabase.table("users").select("email").eq("id", user_id).execute()
+        email = res.data[0]["email"] if res.data else None
+        if not email or not verifier_totp_by_email(email, code):
             return jsonify({"erreur": "Code incorrect — réessayez"}), 401
 
         supabase.table("users").update({"mfa_enabled": True}).eq("id", user_id).execute()
