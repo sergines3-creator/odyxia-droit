@@ -1877,28 +1877,6 @@ async function afficherPageAffaire(a) {
       }).join('')
     : '<div style="font-size:12px;color:#A3A3A3;padding:4px 0;">Aucune pièce — ajoutez un document</div>';
 
-  const ACTES = [
-    {key:'requete_introductive',  name:'Requête introductive',   desc:'Saisine tribunal'},
-    {key:'conclusions_fond',      name:'Conclusions défense',    desc:'Argumentation fond'},
-    {key:'injonction_payer',      name:'Injonction de payer',    desc:'Art. 1-21 AUPSRVE'},
-    {key:'mise_en_demeure',       name:'Mise en demeure',        desc:'Sommation préalable'},
-    {key:'saisie_attribution',    name:'Saisie-attribution',     desc:'Art. 153-172 AUPSRVE'},
-    {key:'memoire_reponse',       name:'Mémoire en réplique',    desc:'Réponse conclusions'},
-    {key:'contestation_saisie',   name:'Contestation saisie',    desc:'Juge exécution'},
-    {key:'protocole_transactionnel',name:'Protocole transact.', desc:'Accord amiable'},
-    {key:'assignation_refere',    name:'Référé urgence',         desc:'Procédure urgente'},
-    {key:'appel',                 name:'Appel',                  desc:'Recours décision'},
-    {key:'pourvoi_cassation',     name:'Pourvoi cassation',      desc:'CCJA / Cour Suprême'},
-    {key:'avis_juridique',        name:'Avis juridique',         desc:'Legal opinion'},
-  ];
-  const actesHtml = ACTES.map(ac => {
-    const k = ac.key, n = ac.name, ds = ac.desc;
-    return '<div class="aff-acte-btn" data-acte="' + k + '" onclick="lancerRedactionAffaire(this.dataset.acte)">'
-      + '<div class="aff-acte-name">' + n + '</div>'
-      + '<div class="aff-acte-desc">' + ds + '</div>'
-      + '</div>';
-  }).join('');
-
   const _etapeBtns = ETAPES_LABELS.map((e, i) =>
     '<button class="aff-etape-btn' + (i === etapeIdx ? ' active' : '') + '" onclick="changerEtape(' + i + ')">' + e + '</button>'
   ).join('');
@@ -1911,32 +1889,14 @@ async function afficherPageAffaire(a) {
 
   body.innerHTML =
     '<div class="aff-card">'
-    + '<div class="aff-card-hdr"><span class="aff-card-title">Informations générales</span>'
-    + '<button onclick="sauvegarderAffaire()" style="font-size:11px;padding:4px 12px;background:#0A0A0A;color:#fff;border:none;border-radius:6px;cursor:pointer;">Enregistrer</button>'
+    + '...(informations générales)...'
     + '</div>'
-    + '<div class="aff-card-body">'
-    + '<div class="aff-field-row">'
-    + '<div class="aff-field"><label>Partie demanderesse</label><input id="aff-demandeur" value="' + _aff_demandeur + '" placeholder="Nom ou dénomination"/></div>'
-    + '<div class="aff-field"><label>Partie défenderesse</label><input id="aff-defendeur" value="' + _aff_defendeur + '" placeholder="Nom ou dénomination"/></div>'
-    + '</div>'
-    + '<div class="aff-field-row">'
-    + '<div class="aff-field"><label>Juridiction</label><input id="aff-juridiction" value="' + _aff_juridiction + '" placeholder="Ex : TGI Douala"/></div>'
-    + '<div class="aff-field"><label>Numéro de rôle</label><input id="aff-numero" value="' + _aff_numero + '" placeholder="Ex : 123/CIV/2025"/></div>'
-    + '</div>'
-    + '<div class="aff-field"><label>Exposé des faits</label><textarea id="aff-faits" placeholder="Décrivez les faits...">' + _aff_faits + '</textarea></div>'
-    + '<div class="aff-field"><label>Étape procédurale</label><div class="aff-etape-bar" id="aff-etape-bar">' + _etapeBtns + '</div></div>'
-    + '</div></div>'
 
     + '<div class="aff-card">'
     + '<div class="aff-card-hdr"><span class="aff-card-title">Pièces (' + docs.length + ')</span>'
     + '<button onclick="ajouterPieceAffaire()" style="font-size:10px;padding:3px 9px;border:0.5px solid #E5E5E5;border-radius:5px;background:#fff;color:#525252;cursor:pointer;">+ Ajouter</button>'
     + '</div>'
     + '<div class="aff-card-body" id="aff-docs-body">' + docsHtml + '</div>'
-    + '</div>'
-
-    + '<div class="aff-card">'
-    + '<div class="aff-card-hdr"><span class="aff-card-title">Rédiger un acte</span></div>'
-    + '<div class="aff-card-body"><div class="aff-acte-grid">' + actesHtml + '</div></div>'
     + '</div>';
 
     // Stocker etapeIdx courant
