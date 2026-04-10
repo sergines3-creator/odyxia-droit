@@ -1578,37 +1578,6 @@ async function chargerStats() {
   } catch(e) {}
 }
 
-// ── AFFAIRES KANBAN ──────────────────────────────────
-
-  affaires.forEach(a => {
-    const etapeIdx = Math.min(a.etape_index || 0, ETAPES_LABELS.length - 1);
-    const row = document.createElement('div');
-    row.className = 'aff-v3-row' + (AFFAIRE_ACTIVE?.id === a.id ? ' active' : '');
-    const delBtn = document.createElement('button');
-    delBtn.className = 'aff-v3-del';
-    delBtn.textContent = '✕';
-    delBtn.onclick = e => { e.stopPropagation(); supprimerAffaire(a.id, a.nom); };
-    const dot  = document.createElement('div'); dot.className = 'aff-v3-dot';
-    const info = document.createElement('div'); info.className = 'aff-v3-info';
-    info.innerHTML = '<div class="aff-v3-nom">' + a.nom + '</div><div class="aff-v3-meta">' + ETAPES_LABELS[etapeIdx] + '</div>';
-    row.appendChild(dot);
-    row.appendChild(info);
-    row.appendChild(delBtn);
-    row.onclick = () => selectionnerAffaire(a);
-    list.appendChild(row);
-  });
-}
-
-async function supprimerAffaire(id, nom) {
-  if (!confirm('Supprimer "' + nom + '" ?')) return;
-  try {
-    await apiFetch('/dossiers/' + id, 'DELETE');
-    showToast('"' + nom + '" supprimée');
-    if (AFFAIRE_ACTIVE && AFFAIRE_ACTIVE.id === id) { AFFAIRE_ACTIVE = null; fermerDetailAffaire(); }
-    await chargerAffaires();
-  } catch(e) { showToast('Erreur suppression', true); }
-}
-
 async function chargerDocsBib() {
   try {
     const r = await apiFetch('/liste_documents') || [];
