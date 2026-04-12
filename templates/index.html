@@ -1232,145 +1232,145 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
     </div>
 
     <!-- ── COMPARAISON ──────────────────────────────── -->
-    <div class="page" id="page-comparaison">
-      <div class="comp-layout" style="flex:1;display:flex;">
-        <div class="comp-form" id="comp-form-col" style="width:340px;min-width:220px;max-width:520px;flex-shrink:0;">
-          <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;">Profil juge & stratégie</div>
-          <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">
-            Renseignez le juge et votre affaire. L'outil analyse le profil décisionnel et vous prépare une stratégie d'audience.
-          </div>
+      <div class="page" id="page-comparaison">
+        <div class="comp-layout" style="flex:1;display:flex;">
+          <div class="comp-form" id="comp-form-col" style="width:340px;min-width:220px;max-width:520px;flex-shrink:0;">
+            <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;">Profil juge & stratégie</div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">
+              Renseignez le juge et votre affaire. L'outil analyse le profil décisionnel et vous prépare une stratégie d'audience.
+            </div>
 
-          <div class="form-section">
-            <label class="form-label">Nom du juge</label>
-            <input class="form-input" id="cmp-juge" placeholder="Ex : MBARGA Paul"/>
-          </div>
-          <div class="form-row">
             <div class="form-section">
-              <label class="form-label">Juridiction</label>
-              <input class="form-input" id="cmp-juridiction" placeholder="Ex : TPI Douala"/>
+              <label class="form-label">Nom du juge</label>
+              <input class="form-input" id="cmp-juge" placeholder="Ex : MBARGA Paul"/>
             </div>
+            <div class="form-row">
+              <div class="form-section">
+                <label class="form-label">Juridiction</label>
+                <input class="form-input" id="cmp-juridiction" placeholder="Ex : TPI Douala"/>
+              </div>
+              <div class="form-section">
+                <label class="form-label">Chambre</label>
+                <input class="form-input" id="cmp-chambre" placeholder="Ex : Civile"/>
+              </div>
+            </div>
+
             <div class="form-section">
-              <label class="form-label">Chambre</label>
-              <input class="form-input" id="cmp-chambre" placeholder="Ex : Civile"/>
+              <label class="form-label">Domaine de l'affaire</label>
+              <select class="form-select" id="cmp-domaine">
+                <option value="">Tous les domaines</option>
+                <option value="commercial">Commercial OHADA</option>
+                <option value="societaire">Sociétaire OHADA</option>
+                <option value="recouvrement">Recouvrement OHADA</option>
+                <option value="surete">Sûretés OHADA</option>
+                <option value="bancaire">Bancaire COBAC</option>
+                <option value="assurance">Assurance CIMA</option>
+                <option value="travail">Droit du travail</option>
+                <option value="foncier">Foncier CMR</option>
+                <option value="penal">Pénal CMR</option>
+              </select>
             </div>
-          </div>
 
-          <div class="form-section">
-            <label class="form-label">Domaine de l'affaire</label>
-            <select class="form-select" id="cmp-domaine">
-              <option value="">Tous les domaines</option>
-              <option value="commercial">Commercial OHADA</option>
-              <option value="societaire">Sociétaire OHADA</option>
-              <option value="recouvrement">Recouvrement OHADA</option>
-              <option value="surete">Sûretés OHADA</option>
-              <option value="bancaire">Bancaire COBAC</option>
-              <option value="assurance">Assurance CIMA</option>
-              <option value="travail">Droit du travail</option>
-              <option value="foncier">Foncier CMR</option>
-              <option value="penal">Pénal CMR</option>
-            </select>
-          </div>
-
-          <div class="form-section">
-            <label class="form-label">Résumé de votre affaire</label>
-            <textarea class="form-textarea" id="cmp-affaire" placeholder="Décrivez brièvement les faits, les parties, l'enjeu et votre position..."></textarea>
-          </div>
-
-          <div class="form-section">
-            <label class="form-label">Arguments principaux</label>
-            <textarea class="form-textarea" id="cmp-arguments" style="min-height:60px;" placeholder="Quels sont vos arguments de fond ?"></textarea>
-          </div>
-
-          <div class="form-section">
-            <label class="form-label">Antécédents connus du juge (optionnel)</label>
-            <textarea class="form-textarea" id="cmp-antecedents" style="min-height:60px;" placeholder="Avez-vous déjà plaider devant ce juge ? Tendances observées..."></textarea>
-          </div>
-
-          <!-- Section décisions du juge -->
-          <div class="form-section" style="display:block;">
-            <label class="form-label">Décisions connues de ce juge (optionnel)</label>
-            <div style="background:var(--bg2);border:0.5px solid #E5E5E5;border-radius:var(--r);padding:10px 12px;margin-bottom:8px;">
-              <div style="font-size:10px;color:var(--text2);margin-bottom:8px;line-height:1.5;">
-                Uploadez des décisions manuscrites ou tapées de ce juge. Elles resteront privées à votre cabinet et enrichiront l'analyse.
-              </div>
-              <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-                <button class="btn-sm" onclick="document.getElementById('file-input-dec').click()" style="font-size:10px;">
-                  + Ajouter une décision PDF
-                </button>
-                <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);cursor:pointer;">
-                  <input type="checkbox" id="chk-dec-manuscrit" style="accent-color:#0A0A0A;"/>
-                  Manuscrit / Scanné
-                </label>
-              </div>
-              <input type="file" id="file-input-dec" accept=".pdf" style="display:none" onchange="uploadDecision(this.files[0])"/>
-              <div id="decisions-list" style="display:flex;flex-direction:column;gap:4px;"></div>
+            <div class="form-section">
+              <label class="form-label">Résumé de votre affaire</label>
+              <textarea class="form-textarea" id="cmp-affaire" placeholder="Décrivez brièvement les faits, les parties, l'enjeu et votre position..."></textarea>
             </div>
+
+            <div class="form-section">
+              <label class="form-label">Arguments principaux</label>
+              <textarea class="form-textarea" id="cmp-arguments" style="min-height:60px;" placeholder="Quels sont vos arguments de fond ?"></textarea>
+            </div>
+
+            <div class="form-section">
+              <label class="form-label">Antécédents connus du juge (optionnel)</label>
+              <textarea class="form-textarea" id="cmp-antecedents" style="min-height:60px;" placeholder="Avez-vous déjà plaider devant ce juge ? Tendances observées..."></textarea>
+            </div>
+
+            <!-- Section décisions du juge -->
+            <div class="form-section" style="display:block;">
+              <label class="form-label">Décisions connues de ce juge (optionnel)</label>
+              <div style="background:var(--bg2);border:0.5px solid #E5E5E5;border-radius:var(--r);padding:10px 12px;margin-bottom:8px;">
+                <div style="font-size:10px;color:var(--text2);margin-bottom:8px;line-height:1.5;">
+                  Uploadez des décisions manuscrites ou tapées de ce juge. Elles resteront privées à votre cabinet et enrichiront l'analyse.
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+                  <button class="btn-sm" onclick="document.getElementById('file-input-dec').click()" style="font-size:10px;">
+                    + Ajouter une décision PDF
+                  </button>
+                  <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);cursor:pointer;">
+                    <input type="checkbox" id="chk-dec-manuscrit" style="accent-color:#0A0A0A;"/>
+                    Manuscrit / Scanné
+                  </label>
+                </div>
+                <input type="file" id="file-input-dec" accept=".pdf" style="display:none" onchange="uploadDecision(this.files[0])"/>
+                <div id="decisions-list" style="display:flex;flex-direction:column;gap:4px;"></div>
+              </div>
+            </div>
+
+            <button class="btn-full" onclick="lancerComparaison()">Analyser le profil juge</button>
+            <div class="save-confirm" id="cmp-save-confirm">✓ Dossier enregistré dans la base documentaire</div>
           </div>
 
-          <button class="btn-full" onclick="lancerComparaison()">Analyser le profil juge</button>
-          <div class="save-confirm" id="cmp-save-confirm">✓ Dossier enregistré dans la base documentaire</div>
-        </div>
-
-        <div class="resizer" id="resizer-comp"></div>
-        <div class="comp-result" id="comp-result">
-          <div class="result-empty">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1">
-              <path d="M12 2L3 7v6c0 5 4 9.3 9 10 5-.7 9-5 9-10V7L12 2z"/>
-            </svg>
-            <div style="font-size:13px;font-weight:500;color:var(--text2);">Aucun profil juge analysé</div>
-            <div style="font-size:11px;color:var(--text3);text-align:center;max-width:260px;line-height:1.6;">
-              Renseignez le nom du juge, la juridiction et votre affaire pour obtenir son profil décisionnel et une stratégie d'audience.
+          <div class="resizer" id="resizer-comp"></div>
+          <div class="comp-result" id="comp-result">
+            <div class="result-empty">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1">
+                <path d="M12 2L3 7v6c0 5 4 9.3 9 10 5-.7 9-5 9-10V7L12 2z"/>
+              </svg>
+              <div style="font-size:13px;font-weight:500;color:var(--text2);">Aucun profil juge analysé</div>
+              <div style="font-size:11px;color:var(--text3);text-align:center;max-width:260px;line-height:1.6;">
+                Renseignez le nom du juge, la juridiction et votre affaire pour obtenir son profil décisionnel et une stratégie d'audience.
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
 
     <!-- ── RÉDACTION ─────────────────────────────────── -->
-    <div class="page" id="page-redaction">
-      <div class="redac-layout">
+      <div class="page" id="page-redaction">
+        <div class="redac-layout">
 
-        <!-- Colonne gauche : choix acte + champs -->
-        <div class="redac-form-col" id="redac-form-col">
+          <!-- Colonne gauche : choix acte + champs -->
+          <div class="redac-form-col" id="redac-form-col">
 
-          <div>
-            <div class="redac-section-title">Choisir un acte</div>
-            <div class="redac-acte-list" id="redac-acte-list">
-              <!-- rempli par JS -->
+            <div>
+              <div class="redac-section-title">Choisir un acte</div>
+              <div class="redac-acte-list" id="redac-acte-list">
+                <!-- rempli par JS -->
+              </div>
+            </div>
+
+            <div id="redac-champs-zone" style="display:none;">
+              <div style="height:0.5px;background:#E5E5E5;margin:4px 0 12px;"></div>
+              <div class="redac-section-title" id="redac-champs-title">Champs</div>
+              <div class="redac-champs" id="redac-champs"></div>
+              <button onclick="lancerRedaction()" style="
+                margin-top:12px;width:100%;padding:10px;background:#0A0A0A;color:#fff;
+                border:none;border-radius:7px;font-size:13px;font-weight:500;
+                font-family:var(--font);cursor:pointer;transition:.15s;
+              ">Générer le document</button>
+            </div>
+
+          </div>
+
+          <!-- Colonne droite : résultat -->
+          <div class="redac-result-col">
+            <div class="redac-result-toolbar">
+              <span style="font-size:12px;font-weight:500;color:#0A0A0A;flex:1;" id="redac-result-title">Document</span>
+              <button class="btn-sm" id="btn-redac-email" onclick="ouvrirEnvoiEmail()" style="display:none;">✉ Envoyer</button>
+              <button class="btn-sm primary" id="btn-redac-export" onclick="exporterRedaction()" style="display:none;">Exporter PDF</button>
+            </div>
+            <div class="redac-result-body" id="redac-result-body" style="padding:0;overflow:hidden;">
+              <div id="quill-editor" style="height:calc(100vh - 100px);min-height:500px;font-size:13px;background:#fff;"></div>
             </div>
           </div>
 
-          <div id="redac-champs-zone" style="display:none;">
-            <div style="height:0.5px;background:#E5E5E5;margin:4px 0 12px;"></div>
-            <div class="redac-section-title" id="redac-champs-title">Champs</div>
-            <div class="redac-champs" id="redac-champs"></div>
-            <button onclick="lancerRedaction()" style="
-              margin-top:12px;width:100%;padding:10px;background:#0A0A0A;color:#fff;
-              border:none;border-radius:7px;font-size:13px;font-weight:500;
-              font-family:var(--font);cursor:pointer;transition:.15s;
-            ">Générer le document</button>
-          </div>
-
         </div>
-
-        <!-- Colonne droite : résultat -->
-        <div class="redac-result-col">
-          <div class="redac-result-toolbar">
-            <span style="font-size:12px;font-weight:500;color:#0A0A0A;flex:1;" id="redac-result-title">Document</span>
-            <button class="btn-sm" id="btn-redac-email" onclick="ouvrirEnvoiEmail()" style="display:none;">✉ Envoyer</button>
-            <button class="btn-sm primary" id="btn-redac-export" onclick="exporterRedaction()" style="display:none;">Exporter PDF</button>
-          </div>
-          <div class="redac-result-body" id="redac-result-body" style="padding:0;overflow:hidden;">
-            <div id="quill-editor" style="height:calc(100vh - 100px);min-height:500px;font-size:13px;background:#fff;"></div>
-          </div>
-        </div>
-
       </div>
-    </div>
 
+    </div>
   </div>
-</div>
 
     <!-- ══ CHAT FLOTTANT ═══════════════════════════════════ -->
 <div id="chat-fab" onclick="toggleChat()">
