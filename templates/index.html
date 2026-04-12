@@ -219,11 +219,15 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
 /* ══ MAIN ═════════════════════════════════════════════ */
 .main{display:flex;flex-direction:column;overflow:hidden;}
+.main{display:flex;flex-direction:column;overflow:hidden;height:calc(100vh - var(--header));}
 
 /* ══ PAGES ════════════════════════════════════════════ */
 .page{display:none;flex:1;overflow:hidden;flex-direction:column;}
 .page.active{display:flex;flex:1;}
 #page-redaction.active{display:flex;flex-direction:column;}
+#page-redaction {
+  height: calc(100vh - var(--header));
+}
 
 /* ══ TABLEAU DE BORD ══════════════════════════════════ */
 .dash-layout{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px;}
