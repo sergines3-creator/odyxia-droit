@@ -927,8 +927,8 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .aff-acte-name{font-size:11px;font-weight:500;color:#0A0A0A;margin-bottom:2px;}
 .aff-acte-desc{font-size:9px;color:#A3A3A3;}
 </style>
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet"/>
-  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.6/quill.snow.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.6/quill.min.js"></script>
 </head>
 <body>
 
@@ -1055,68 +1055,39 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
     <div class="page active" id="page-dashboard">
       <div class="dash-layout">
         <div class="dash-welcome">
-          <h1 id="dash-greeting">Bonjour, Maître</h1>
+          <h1 id="dash-greeting">Bonjour, Maître Boubou</h1>
           <p id="dash-date">Chargement...</p>
         </div>
-        <div class="dash-grid">
-          <div class="stat-card">
-            <div class="stat-icon">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#525252" stroke-width="1.5">
-                <path d="M2 4h12v10H2zM5 4V2h6v2"/>
-              </svg>
-            </div>
-            <div class="stat-val" id="stat-affaires">0</div>
-            <div class="stat-label">Affaires actives</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#525252" stroke-width="1.5">
-                <path d="M2 2h4v12H2zM6 2h4v12H6z"/>
-              </svg>
-            </div>
-            <div class="stat-val" id="stat-docs">0</div>
-            <div class="stat-label">Documents indexés</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#525252" stroke-width="1.5">
-                <path d="M3 12L6 6l3 4 2-3 2 5"/>
-              </svg>
-            </div>
-            <div class="stat-val" id="stat-actes">0</div>
-            <div class="stat-label">Actes générés</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#525252" stroke-width="1.5">
-                <circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/>
-              </svg>
-            </div>
-            <div class="stat-val" id="stat-convs">0</div>
-            <div class="stat-label">Conversations</div>
-          </div>
-        </div>
-        <div class="dash-row">
-          <div class="dash-card">
-            <div class="dash-card-hdr">
-              <span class="dash-card-title">Affaires en cours</span>
-              <span class="badge badge-blue" id="dash-aff-count">0</span>
-            </div>
-            <div class="dash-card-body" id="dash-affaires-list">
-              <div style="font-size:11px;color:var(--text3);padding:8px 0;">Aucune affaire — créez-en une</div>
-            </div>
-          </div>
-          <div class="dash-card">
-            <div class="dash-card-hdr">
-              <span class="dash-card-title">Documents récents</span>
-            </div>
-            <div class="dash-card-body" id="dash-docs-list">
-              <div style="font-size:11px;color:var(--text3);padding:8px 0;">Aucun document</div>
-            </div>
-          </div>
-        </div>
-      </div>
+        <div class="dash-grid" style="grid-template-columns:repeat(2,1fr);">
+  <div class="stat-card">
+    <div class="stat-icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#525252" stroke-width="1.5">
+        <path d="M2 2h4v12H2zM6 2h4v12H6z"/>
+      </svg>
     </div>
+    <div class="stat-val" id="stat-docs">0</div>
+    <div class="stat-label">Documents indexés</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#525252" stroke-width="1.5">
+        <path d="M3 12L6 6l3 4 2-3 2 5"/>
+      </svg>
+    </div>
+    <div class="stat-val" id="stat-actes">0</div>
+    <div class="stat-label">Actes générés</div>
+  </div>
+</div>
+<div class="dash-row">
+  <div class="dash-card" style="grid-column:1/-1;">
+    <div class="dash-card-hdr">
+      <span class="dash-card-title">Documents récents</span>
+    </div>
+    <div class="dash-card-body" id="dash-docs-list">
+      <div style="font-size:11px;color:var(--text3);padding:8px 0;">Aucun document</div>
+    </div>
+  </div>
+</div>
 
     <!-- ── BIBLIOTHEQUE ─────────────────────────────── -->
     <div class="page" id="page-bibliotheque">
@@ -1391,7 +1362,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
             <button class="btn-sm primary" id="btn-redac-export" onclick="exporterRedaction()" style="display:none;">Exporter PDF</button>
           </div>
           <div class="redac-result-body" id="redac-result-body" style="padding:0;overflow:hidden;">
-            <div id="quill-editor" style="height:100%;min-height:500px;font-size:13px;"></div>
+            <div id="quill-editor" style="height:calc(100vh - 100px);min-height:500px;font-size:13px;background:#fff;"></div>
           </div>
         </div>
 
@@ -1448,7 +1419,6 @@ if (!localStorage.getItem('od_token') && localStorage.getItem('odyxia_token')) {
 }
 let TOKEN = localStorage.getItem('od_token') || '';
 let SESSION_ID = 'sess_' + Math.random().toString(36).slice(2);
-let quill = null;
 let TENANT_ID  = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 let DOC_ACTIF  = null;
 let SELECTED_DOMAIN = '';
@@ -1527,7 +1497,43 @@ async function doLogin() {
   }
 }
 
+async function doLogout() {
+  try {
+    const rt = localStorage.getItem('od_refresh');
+    if (rt) {
+      await fetch('/logout', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},
+        body: JSON.stringify({refresh_token: rt})
+      });
+    }
+  } catch(e) {}
+  localStorage.removeItem('od_token');
+  localStorage.removeItem('od_refresh');
+  localStorage.removeItem('od_token_exp');
+  location.reload();
+}
+
 // ── INIT ─────────────────────────────────────────────
+let quill = null;
+
+function initQuill() {
+  if (typeof Quill !== 'undefined' && !quill) {
+    quill = new Quill('#quill-editor', {
+      theme: 'snow',
+      modules: {
+        toolbar: [
+          ['bold', 'italic', 'underline'],
+          [{ 'header': [1, 2, 3, false] }],
+          [{ 'align': [] }],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          ['clean']
+        ]
+      }
+    });
+  }
+}
+
 async function init() {
   const now = new Date();
   const h = now.getHours();
@@ -1538,23 +1544,7 @@ async function init() {
   await chargerDocsBib();
   setTimeout(initAllResizers, 100);
   initRedaction();
-  let quill = null;
-
-function initQuill() {
-  quill = new Quill('#quill-editor', {
-    theme: 'snow',
-    modules: {
-      toolbar: [
-        ['bold', 'italic', 'underline'],
-        [{ 'header': [1, 2, 3, false] }],
-        [{ 'align': [] }],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        ['clean']
-      ]
-    }
-  });
-}
-}
+};
 
 // ── NAVIGATION ───────────────────────────────────────
 function showPage(p) {
@@ -1563,8 +1553,8 @@ function showPage(p) {
   document.getElementById('page-' + p).classList.add('active');
   document.getElementById('nav-' + p).classList.add('active');
   if (p === 'bibliotheque') chargerDocsBib();
-  if (p === 'affaires') chargerAffaires();
   if (p === 'dashboard') chargerStats();
+  if (p === 'redaction') initQuill();
 }
 
 // ── STATS DASHBOARD ──────────────────────────────────
@@ -1574,7 +1564,6 @@ async function chargerStats() {
     if (!r) return;
     document.getElementById('stat-docs').textContent = r.documents || 0;
     document.getElementById('stat-actes').textContent = 0;
-    document.getElementById('stat-convs').textContent = conversations.length;
     document.getElementById('dash-aff-count').textContent = r.dossiers || 0;
   } catch(e) {}
 }
@@ -2086,6 +2075,13 @@ async function lancerComparaison() {
         + _decisions_html;
     }
 
+    const btnSave = document.createElement('button');
+    btnSave.className = 'btn-sm primary';
+    btnSave.textContent = '💾 Enregistrer cette analyse';
+    btnSave.style.cssText = 'margin-top:12px;width:100%;';
+    btnSave.onclick = () => enregistrerComparaison(juge, jurid, result.innerText);
+    result.appendChild(btnSave);
+
     if (affaire) {
       document.getElementById('cmp-save-confirm').style.display = 'block';
       setTimeout(() => document.getElementById('cmp-save-confirm').style.display='none', 4000);
@@ -2093,6 +2089,30 @@ async function lancerComparaison() {
   } catch(e) {
     showLoading(false);
     showToast('Erreur : ' + e.message, true);
+  }
+}
+
+async function enregistrerComparaison(juge, juridiction, contenu) {
+  try {
+    const nom = 'Analyse_' + (juge || juridiction) + '_' + new Date().toLocaleDateString('fr').replace(/\//g,'-');
+    const r = await fetch('/export_pdf', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},
+      body: JSON.stringify({contenu, nom})
+    });
+    const blob = await r.blob();
+    const file = new File([blob], nom + '.pdf', {type: 'application/pdf'});
+    const formData = new FormData();
+    formData.append('fichier', file);
+    formData.append('type_doc', 'comparaison_juge');
+    await fetch('/upload_document', {
+      method: 'POST',
+      headers: {'Authorization': 'Bearer ' + TOKEN},
+      body: formData
+    });
+    showToast('Analyse enregistrée dans la bibliothèque');
+  } catch(e) {
+    showToast('Erreur enregistrement', true);
   }
 }
 
@@ -2480,7 +2500,7 @@ async function lancerRedaction() {
   }
   showLoading(true);
   const body = document.getElementById('redac-result-body');
-  body.innerHTML = '<div class="redac-result-empty"><div class="spinner"></div></div>';
+  if (quill) quill.root.innerHTML = '<div class="spinner" style="margin:40px auto;"></div>';
   try {
     const r = await apiFetch('/rediger', 'POST', {
       type: ACTE_ACTIF.key,
@@ -2492,7 +2512,6 @@ async function lancerRedaction() {
     REDAC_CONTENU = r.document;
     document.getElementById('redac-result-title').textContent = r.nom || ACTE_ACTIF.nom;
     document.getElementById('btn-redac-export').style.display = 'inline-flex';
-    document.getElementById('btn-redac-copy').style.display = 'inline-flex';
     const html2 = r.document
       .replace(/^### (.+)$/gm,'<h3>$1</h3>')
       .replace(/^## (.+)$/gm,'<h2>$1</h2>')
