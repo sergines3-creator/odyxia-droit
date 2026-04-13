@@ -517,6 +517,12 @@ def verifier_abonnement(tenant_id: str) -> dict:
         log_erreur("VERIFIER_ABONNEMENT", e)
         return {"actif": True, "plan": "inconnu", "jours_restants": 0, "message": ""}
 
+def verifier_acces_premium(tenant_id: str) -> bool:
+    """Retourne True si l'accès aux fonctionnalités premium est autorisé."""
+    abo = verifier_abonnement(tenant_id)
+    if not abo["actif"]:
+        return False
+    return abo["plan"] == "actif"
 
 @app.route("/abonnement/statut", methods=["GET"])
 @jwt_required()
@@ -958,6 +964,159 @@ def update_profil():
         log_erreur("UPDATE_PROFIL", e)
         return jsonify({"erreur": str(e)}), 500
 
+# ─── RGPD ─────────────────────────────────────────────────────────────────────
+
+@app.route("/compte/mes-donnees", methods=["GET"])
+@jwt_required()
+def mes_donnees():
+    """Droit d'accès RGPD — export complet des données de l'utilisateur."""
+    try:
+        user_id   = get_current_user_id()
+        tenant_id = get_current_tenant_id()
+
+        # Profil
+        user = supabase.table("users").select(
+            "id,email,full_name,display_name,role,created_at,mfa_enabled"
+        ).eq("id", user_id).execute()
+
+        # Profil avocat
+        avocat = supabase.table("avocats").select(
+            "pays,langue,type_compte,barreau,barreau_pays,annee_inscription,statut,essai_debut,essai_fin,accepte_comm"
+        ).eq("user_id", user_id).execute()
+
+        # Documents uploadés
+        documents = supabase.table("documents").select(
+            "id,nom,filename,created_at,storage_tier,status"
+        ).eq("tenant_id", tenant_id).neq("status", "deleted").execute()
+
+        # Sessions
+        sessions = supabase.table("sessions").select(
+            "id,updated_at"
+        ).eq("tenant_id", tenant_id).execute()
+
+        # Audit logs
+        audit = supabase.table("audit_logs").select(
+            "event,created_at,severity"
+        ).eq("tenant_id", tenant_id).eq("user_id", user_id).order(
+            "created_at", desc=True).limit(100).execute()
+
+        export = {
+            "export_date":  datetime.now(timezone.utc).isoformat(),
+            "utilisateur":  user.data[0] if user.data else {},
+            "profil_avocat": avocat.data[0] if avocat.data else {},
+            "documents":    documents.data or [],
+            "sessions":     sessions.data or [],
+            "audit_logs":   audit.data or [],
+        }
+
+        log_audit_event("RGPD_ACCES_DONNEES", tenant_id, user_id, {})
+        return jsonify(export)
+
+    except Exception as e:
+        log_erreur("MES_DONNEES", e)
+        return jsonify({"erreur": str(e)}), 500
+
+
+@app.route("/compte/supprimer", methods=["DELETE"])
+@jwt_required()
+@limiter.limit("3 per hour")
+def supprimer_compte():
+    """Droit à l'effacement RGPD — suppression complète du compte."""
+    try:
+        user_id   = get_current_user_id()
+        tenant_id = get_current_tenant_id()
+        data      = request.json or {}
+
+        # Confirmation obligatoire
+        if data.get("confirmation") != "SUPPRIMER MON COMPTE":
+            return jsonify({
+                "erreur": "Confirmation requise",
+                "message": "Envoyez {\"confirmation\": \"SUPPRIMER MON COMPTE\"}"
+            }), 400
+
+        # 1. Chunks
+        docs = supabase.table("documents").select("id").eq("tenant_id", tenant_id).execute()
+        for doc in (docs.data or []):
+            supabase.table("chunks").delete().eq("document_id", doc["id"]).execute()
+
+        # 2. Documents
+        supabase.table("documents").delete().eq("tenant_id", tenant_id).execute()
+
+        # 3. Sessions
+        supabase.table("sessions").delete().eq("tenant_id", tenant_id).execute()
+
+        # 4. Mémoires
+        supabase.table("memoires").delete().eq("tenant_id", tenant_id).execute()
+
+        # 5. Refresh tokens
+        supabase.table("refresh_tokens").delete().eq("user_id", user_id).execute()
+
+        # 6. OTP codes
+        supabase.table("otp_codes").delete().eq("email", data.get("email", "")).execute()
+
+        # 7. Avocats
+        supabase.table("avocats").delete().eq("user_id", user_id).execute()
+
+        # 8. Users
+        supabase.table("users").delete().eq("id", user_id).execute()
+
+        # 9. Tenant
+        supabase.table("tenants").delete().eq("id", tenant_id).execute()
+
+        # 10. Supabase Auth
+        try:
+            supabase.auth.admin.delete_user(user_id)
+        except Exception:
+            pass
+
+        log_audit_event("RGPD_SUPPRESSION_COMPTE", tenant_id, user_id, {
+            "supprime_le": datetime.now(timezone.utc).isoformat()
+        })
+
+        return jsonify({
+            "succes":  True,
+            "message": "Votre compte et toutes vos données ont été supprimés."
+        })
+
+    except Exception as e:
+        log_erreur("SUPPRIMER_COMPTE", e)
+        return jsonify({"erreur": str(e)}), 500
+
+
+@app.route("/compte/portabilite", methods=["GET"])
+@jwt_required()
+def portabilite_donnees():
+    """Droit à la portabilité RGPD — export JSON téléchargeable."""
+    try:
+        user_id   = get_current_user_id()
+        tenant_id = get_current_tenant_id()
+
+        user = supabase.table("users").select(
+            "email,full_name,display_name,created_at"
+        ).eq("id", user_id).execute()
+
+        documents = supabase.table("documents").select(
+            "nom,filename,created_at,storage_tier"
+        ).eq("tenant_id", tenant_id).neq("status", "deleted").execute()
+
+        export = {
+            "odyxia_droit_export": True,
+            "export_date":         datetime.now(timezone.utc).isoformat(),
+            "utilisateur":         user.data[0] if user.data else {},
+            "documents":           documents.data or [],
+        }
+
+        log_audit_event("RGPD_PORTABILITE", tenant_id, user_id, {})
+
+        return jsonify(export), 200, {
+            "Content-Disposition": f"attachment; filename=odyxia_mes_donnees_{datetime.now().strftime('%Y%m%d')}.json",
+            "Content-Type": "application/json"
+        }
+
+    except Exception as e:
+        log_erreur("PORTABILITE", e)
+        return jsonify({"erreur": str(e)}), 500
+
 
 # ─── INSCRIPTION ─────────────────────────────────────────────────────────────
 
@@ -1166,6 +1325,10 @@ def question():
             return jsonify({"erreur": "acces_expire",
                             "message": _abo["message"],
                             "plan": _abo["plan"]}), 402
+        
+        if _abo["plan"] == "trial":
+            return jsonify({"erreur": "acces_premium",
+                            "message": "Fonctionnalité disponible après la période d'essai."}), 402
 
         if not q:
             return jsonify({"erreur": "Question vide"}), 400
@@ -1481,6 +1644,9 @@ def rediger():
             return jsonify({"erreur":"acces_expire",
                             "message":_abo["message"],
                             "plan":_abo["plan"]}), 402
+        if _abo["plan"] == "trial":
+            return jsonify({"erreur": "acces_premium",
+                            "message": "Fonctionnalité disponible après la période d'essai."}), 402
 
         inj_faits = analyser_injection(
             donnees.get("faits","") or donnees.get("objet",""), champ="faits")
@@ -2081,6 +2247,12 @@ def comparaison_analyser():
         arguments_def = data.get("arguments_defense","")
         antecedents   = data.get("antecedents","")
         tenant_id     = get_current_tenant_id()
+        _abo = verifier_abonnement(tenant_id)
+        if not _abo["actif"]:
+            return jsonify({"erreur":"acces_expire", "message":_abo["message"]}), 402
+        if _abo["plan"] == "trial":
+            return jsonify({"erreur": "acces_premium",
+                            "message": "Fonctionnalité disponible après la période d'essai."}), 402
 
         for _val, _nom in [(juge,"juge"),(affaire,"affaire"),
                            (arguments_def,"arguments_defense"),(antecedents,"antecedents")]:
@@ -2537,8 +2709,22 @@ def export_pdf():
             textColor=DARK, leading=16, alignment=TA_JUSTIFY, spaceAfter=8)
 
         elements = []
-        elements.append(Paragraph(f"Odyxia Droit - {CABINET_NOM}", s_titre))
-        elements.append(Paragraph(f"{CABINET_AVOCAT} - {CABINET_VILLE}", s_sub))
+        # Récupérer le profil de l'avocat connecté
+        nom_avocat = "Maître"
+        cabinet = "Cabinet"
+        try:
+            user_id = get_current_user_id()
+            profil = supabase.table("users").select("display_name, full_name").eq("id", user_id).execute()
+            if profil.data:
+                nom_avocat = profil.data[0].get("display_name") or profil.data[0].get("full_name") or "Maître"
+            avocat_row = supabase.table("avocats").select("barreau, pays").eq("user_id", user_id).execute()
+            if avocat_row.data:
+                cabinet = avocat_row.data[0].get("barreau", "") + " — " + avocat_row.data[0].get("pays", "")
+        except Exception:
+            pass
+
+        elements.append(Paragraph(nom_avocat, s_titre))
+        elements.append(Paragraph(cabinet, s_sub))
         elements.append(Paragraph(
             f"Genere le {datetime.now().strftime('%d/%m/%Y a %H:%M')}", s_sub))
         elements.append(HRFlowable(width="100%", thickness=1, color=OR, spaceAfter=12))
