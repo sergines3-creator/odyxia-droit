@@ -131,6 +131,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .login-btn:hover{background:#333;}
 .login-err{font-size:11px;color:var(--red);margin-top:8px;display:none;}
 .login-2fa{display:none;margin-top:10px;}
+#login-2fa-wrap.show{display:block;}
 .login-setup{text-align:center;margin-top:14px;}
 .login-setup a{font-size:11px;color:#A3A3A3;text-decoration:underline;cursor:pointer;}
 
@@ -1453,8 +1454,8 @@ async function doLogin() {
     });
     const d = await r.json();
 
-    if (d.require_2fa) {
-      document.getElementById('login-2fa-wrap').style.display = 'block';
+    if (d.require_otp) {
+      document.getElementById('login-2fa-wrap').classList.add('show');
       codeEl.focus();
       if (btn) btn.disabled = false;
       return;
