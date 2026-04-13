@@ -1327,10 +1327,9 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
                 Renseignez le nom du juge, la juridiction et votre affaire pour obtenir son profil décisionnel et une stratégie d'audience.
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
+          </div><!-- fin comp-result -->
+        </div><!-- fin comp-layout -->
+      </div><!-- fin page-comparaison -->
 
     <!-- ── RÉDACTION ─────────────────────────────────── -->
       <div class="page" id="page-redaction">
@@ -1338,25 +1337,16 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
           <!-- Colonne gauche : choix acte + champs -->
           <div class="redac-form-col" id="redac-form-col">
-
             <div>
               <div class="redac-section-title">Choisir un acte</div>
-              <div class="redac-acte-list" id="redac-acte-list">
-                <!-- rempli par JS -->
-              </div>
+              <div class="redac-acte-list" id="redac-acte-list"></div>
             </div>
-
             <div id="redac-champs-zone" style="display:none;">
               <div style="height:0.5px;background:#E5E5E5;margin:4px 0 12px;"></div>
               <div class="redac-section-title" id="redac-champs-title">Champs</div>
               <div class="redac-champs" id="redac-champs"></div>
-              <button onclick="lancerRedaction()" style="
-                margin-top:12px;width:100%;padding:10px;background:#0A0A0A;color:#fff;
-                border:none;border-radius:7px;font-size:13px;font-weight:500;
-                font-family:var(--font);cursor:pointer;transition:.15s;
-              ">Générer le document</button>
+              <button onclick="lancerRedaction()" style="margin-top:12px;width:100%;padding:10px;background:#0A0A0A;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;transition:.15s;">Générer le document</button>
             </div>
-
           </div>
 
           <!-- Colonne droite : résultat -->
@@ -1372,10 +1362,10 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
           </div>
 
         </div>
-      </div>
+      </div><!-- fin page-redaction -->
 
-    </div>
-  </div>
+  </div><!-- fin main -->
+</div><!-- fin app -->
 
     <!-- ══ CHAT FLOTTANT ═══════════════════════════════════ -->
 <div id="chat-fab" onclick="toggleChat()">
