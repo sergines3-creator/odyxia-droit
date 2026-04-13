@@ -1507,17 +1507,22 @@ let quill = null;
 function initQuill() {
   if (typeof Quill !== 'undefined' && !quill) {
     quill = new Quill('#quill-editor', {
-      theme: 'snow',
-      modules: {
-        toolbar: [
-          ['bold', 'italic', 'underline'],
-          [{ 'header': [1, 2, 3, false] }],
-          [{ 'align': [] }],
-          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-          ['clean']
-        ]
-      }
-    });
+  theme: 'snow',
+  modules: {
+    toolbar: [
+      ['bold', 'italic', 'underline'],
+      [{ 'header': [1, 2, 3, false] }],
+      [{ 'align': [] }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      ['clean']
+    ],
+    history: {
+      delay: 1000,
+      maxStack: 100,
+      userOnly: true
+    }
+  }
+});
   }
 }
 
@@ -2497,6 +2502,7 @@ async function lancerRedaction() {
   showLoading(true);
   const body = document.getElementById('redac-result-body');
   if (quill) quill.root.innerHTML = '<div class="spinner" style="margin:40px auto;"></div>';
+  quill.history.clear(); // remet l'historique à zéro après injection
   try {
     const r = await apiFetch('/rediger', 'POST', {
       type: ACTE_ACTIF.key,
