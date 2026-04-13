@@ -2505,6 +2505,97 @@ def export_pdf():
         log_erreur("EXPORT PDF", e)
         return jsonify({"erreur":str(e)}), 500
 
+@app.route("/envoyer_email", methods=["POST"])
+@jwt_required()
+@limiter.limit("10 per minute")
+def envoyer_email():
+    try:
+        import resend
+        resend.api_key = os.environ.get("RESEND_API_KEY", "")
+        
+        data         = request.json
+        destinataire = data.get("destinataire", "").strip()
+        objet        = data.get("objet", "Document Odyxia Droit").strip()
+        contenu      = data.get("contenu", "")
+        nom_doc      = data.get("nom_doc", "Document")
+        
+        if not destinataire or not contenu:
+            return jsonify({"erreur": "Destinataire et contenu requis"}), 400
+        
+        # Générer le PDF
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import ParagraphStyle
+        from reportlab.lib.units import cm
+        from reportlab.lib import colors
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
+        from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
+        
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4,
+            rightMargin=2.5*cm, leftMargin=2.5*cm,
+            topMargin=2.5*cm, bottomMargin=2.5*cm)
+        
+        OR   = colors.HexColor("#1A6B9A")
+        DARK = colors.HexColor("#0B1F3A")
+        GRAY = colors.HexColor("#6B7280")
+        
+        s_titre = ParagraphStyle("titre", fontName="Helvetica-Bold", fontSize=15,
+            textColor=OR, alignment=TA_CENTER, spaceAfter=4)
+        s_sub   = ParagraphStyle("sub", fontName="Helvetica", fontSize=9,
+            textColor=GRAY, alignment=TA_CENTER, spaceAfter=2)
+        s_h1    = ParagraphStyle("h1", fontName="Helvetica-Bold", fontSize=12,
+            textColor=OR, spaceBefore=12, spaceAfter=6)
+        s_corps = ParagraphStyle("corps", fontName="Helvetica", fontSize=10,
+            textColor=DARK, leading=16, alignment=TA_JUSTIFY, spaceAfter=8)
+        
+        elements = []
+        elements.append(Paragraph(f"Odyxia Droit - {CABINET_NOM}", s_titre))
+        elements.append(Paragraph(f"{CABINET_AVOCAT} - {CABINET_VILLE}", s_sub))
+        elements.append(Paragraph(f"Genere le {datetime.now().strftime('%d/%m/%Y a %H:%M')}", s_sub))
+        elements.append(HRFlowable(width="100%", thickness=1, color=OR, spaceAfter=12))
+        elements.append(Paragraph(nom_doc.upper(), s_titre))
+        elements.append(HRFlowable(width="60%", thickness=0.5, color=OR, spaceAfter=16))
+        
+        for ligne in contenu.split("\n"):
+            ligne = ligne.strip()
+            if not ligne:
+                elements.append(Spacer(1, 6))
+            elif ligne.startswith("## ") or ligne.startswith("# "):
+                elements.append(Paragraph(ligne.lstrip("# "), s_h1))
+            else:
+                ligne = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', ligne)
+                ligne = re.sub(r'\*(.+?)\*', r'<i>\1</i>', ligne)
+                elements.append(Paragraph(ligne, s_corps))
+        
+        doc.build(elements)
+        pdf_bytes = buffer.getvalue()
+        pdf_b64   = base64.b64encode(pdf_bytes).decode()
+        
+        # Envoyer via Resend
+        resend.Emails.send({
+            "from":    f"{CABINET_NOM} <onboarding@resend.dev>",
+            "to":      [destinataire],
+            "subject": objet,
+            "html":    f"""
+                <p>Bonjour,</p>
+                <p>Veuillez trouver ci-joint le document : <strong>{nom_doc}</strong></p>
+                <p>Ce document a été généré par Odyxia Droit.</p>
+                <br/>
+                <p>Cordialement,<br/>{CABINET_AVOCAT}<br/>{CABINET_NOM}</p>
+            """,
+            "attachments": [{
+                "filename": nom_doc.replace(" ", "_") + ".pdf",
+                "content":  pdf_b64
+            }]
+        })
+        
+        log_audit_event("EMAIL_ENVOYE", get_current_tenant_id(), get_current_user_id(),
+                        {"destinataire": destinataire, "nom_doc": nom_doc})
+        return jsonify({"succes": True})
+        
+    except Exception as e:
+        log_erreur("ENVOYER_EMAIL", e)
+        return jsonify({"erreur": str(e)}), 500
 
 # ─── VEILLE ───────────────────────────────────────────────────────────────────
 

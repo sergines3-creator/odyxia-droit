@@ -1356,6 +1356,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
             <div class="redac-result-toolbar">
               <span style="font-size:12px;font-weight:500;color:#0A0A0A;flex:1;" id="redac-result-title">Document</span>
               <button class="btn-sm" id="btn-redac-email" onclick="ouvrirEnvoiEmail()" style="display:none;">✉ Envoyer</button>
+              <button class="btn-sm" id="btn-redac-save" onclick="enregistrerRedaction()" style="display:none;">💾 Enregistrer</button>
               <button class="btn-sm primary" id="btn-redac-export" onclick="exporterRedaction()" style="display:none;">Exporter PDF</button>
             </div>
             <div class="redac-result-body" id="redac-result-body" style="padding:0;overflow:hidden;">
@@ -2388,8 +2389,6 @@ const TOUS_ACTES = [
    champs:['requérant','societe','forme_sociale','capital','cause_dissolution','faits']},
   {key:'procedure_collective',   nom:'Procédure collective',         desc:'Art. 25+ AUPC 2015',
    champs:['debiteur','forme_sociale','actif','passif','date_cessation','perspectives','faits']},
-  {key:'transaction_prudhomale', nom:"Transaction prud'homale",     desc:'Rupture amiable CT CMR',
-   champs:['salarie','employeur','ancienneté','salaire','indemnites_legales','montant','faits']},
 ];
 
 const CHAMP_LABELS = {
@@ -2521,6 +2520,7 @@ async function lancerRedaction() {
     quill.root.innerHTML = '<p>' + html2 + '</p>';
     document.getElementById('btn-redac-export').style.display = 'inline-flex';
     document.getElementById('btn-redac-email').style.display = 'inline-flex';
+    document.getElementById('btn-redac-save').style.display = 'inline-flex';
     document.getElementById('redac-result-title').textContent = r.nom || ACTE_ACTIF.nom;
     showToast('Document généré');
   } catch(e) {
@@ -2563,6 +2563,59 @@ function showToast(msg, err=false) {
   t.style.borderLeftColor = err ? 'var(--red)' : '#444';
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+async function ouvrirEnvoiEmail() {
+  if (!REDAC_CONTENU) { showToast('Générez d\'abord un document', true); return; }
+  const destinataire = prompt('Email du destinataire :');
+  if (!destinataire) return;
+  const objet = prompt('Objet du mail :', ACTE_ACTIF?.nom || 'Document juridique');
+  if (!objet) return;
+  
+  showLoading(true);
+  try {
+    const contenu = quill ? quill.getText() : REDAC_CONTENU;
+    const r = await apiFetch('/envoyer_email', 'POST', {
+      destinataire,
+      objet,
+      contenu,
+      nom_doc: ACTE_ACTIF?.nom || 'Document'
+    });
+    showLoading(false);
+    if (r?.succes) {
+      showToast('Email envoyé à ' + destinataire);
+    } else {
+      showToast('Erreur : ' + (r?.erreur || 'Échec envoi'), true);
+    }
+  } catch(e) {
+    showLoading(false);
+    showToast('Erreur envoi email', true);
+  }
+}
+
+async function enregistrerRedaction() {
+  if (!REDAC_CONTENU) return;
+  try {
+    const contenu = quill ? quill.getText() : REDAC_CONTENU;
+    const nom = ACTE_ACTIF?.nom || 'Document';
+    const r = await fetch('/export_pdf', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},
+      body: JSON.stringify({contenu, nom})
+    });
+    const blob = await r.blob();
+    const file = new File([blob], nom + '.pdf', {type: 'application/pdf'});
+    const formData = new FormData();
+    formData.append('fichier', file);
+    await fetch('/upload_document', {
+      method: 'POST',
+      headers: {'Authorization': 'Bearer ' + TOKEN},
+      body: formData
+    });
+    showToast('Document enregistré dans la bibliothèque');
+  } catch(e) {
+    showToast('Erreur enregistrement', true);
+  }
 }
 </script>
 </body>
