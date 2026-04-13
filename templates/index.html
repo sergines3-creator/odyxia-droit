@@ -967,14 +967,11 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
     <label class="login-label">Mot de passe</label>
     <input class="login-input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
     <div class="login-2fa" id="login-2fa-wrap">
-      <label class="login-label">Code d'authentification</label>
+      <label class="login-label">Code envoyé par email</label>
       <input class="login-input" type="text" id="login-2fa" placeholder="000000" maxlength="6" inputmode="numeric"/>
     </div>
     <button class="login-btn" id="login-btn" onclick="doLogin()">Accéder</button>
     <div class="login-err" id="login-err">Identifiants incorrects</div>
-    <div class="login-setup">
-      <a href="/setup-2fa-page">Première connexion — configurer l'authentification</a>
-    </div>
   </div>
 </div>
 
@@ -1446,7 +1443,7 @@ async function doLogin() {
     email:    emailEl.value.trim(),
     password: passEl.value
   };
-  if (codeEl.value) body.code_2fa = codeEl.value;
+  if (codeEl.value) body.code_otp = codeEl.value;
 
   try {
     const r = await fetch('/login', {

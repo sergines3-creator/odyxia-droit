@@ -10,6 +10,8 @@ import json
 import tempfile
 import threading
 import time
+import secrets
+import hashlib as _hashlib
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
@@ -176,24 +178,93 @@ def log_security_event(event_type: str, tenant_id: str = None, user_id: str = No
     except Exception as e:
         print(f"[SECURITY ERROR] {datetime.now(timezone.utc)}: {e}")
 
-
-def verifier_totp_by_email(email: str, code: str) -> bool:
+def generer_otp(email: str) -> str:
+    """Génère un OTP à 6 chiffres, le stocke hashé en base, l'envoie par email."""
     try:
-        print(f"[TOTP] email={email} code={code}")
-        res = supabase.table("users").select("totp_secret").eq("email", email).execute()
-        print(f"[TOTP] data={res.data}")
-        user_secret = res.data[0].get("totp_secret") if res.data else None
-        print(f"[TOTP] secret={user_secret}")
-        if not user_secret:
-            return False
-        totp = pyotp.TOTP(user_secret)
-        result = totp.verify(code, valid_window=4)
-        print(f"[TOTP] result={result}")
-        return result
-    except Exception as e:
-        print(f"[TOTP] erreur={e}")
-        return False
+        # 1. Générer code cryptographiquement sûr
+        code = str(secrets.randbelow(1000000)).zfill(6)
+        code_hash = _hashlib.sha256(code.encode()).hexdigest()
+        expires_at = datetime.now(timezone.utc) + timedelta(minutes=5)
 
+        # 2. Invalider anciens codes non utilisés
+        supabase.table("otp_codes").update({"used": True}).eq(
+            "email", email).eq("used", False).execute()
+
+        # 3. Stocker le nouveau code hashé
+        supabase.table("otp_codes").insert({
+            "email":      email,
+            "code_hash":  code_hash,
+            "expires_at": expires_at.isoformat(),
+            "used":       False,
+            "attempts":   0
+        }).execute()
+
+        # 4. Envoyer via Resend
+        import resend
+        resend.api_key = os.environ.get("RESEND_API_KEY", "")
+        resend.Emails.send({
+            "from":    f"Odyxia Droit <onboarding@resend.dev>",
+            "to":      [email],
+            "subject": "Votre code de connexion Odyxia Droit",
+            "html":    f"""
+                <div style="font-family:sans-serif;max-width:400px;margin:0 auto;padding:32px;">
+                  <h2 style="font-size:20px;color:#0F172A;margin-bottom:8px;">Odyxia Droit</h2>
+                  <p style="color:#64748B;font-size:14px;margin-bottom:24px;">Votre code de connexion :</p>
+                  <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:24px;text-align:center;">
+                    <span style="font-size:36px;font-weight:600;letter-spacing:8px;color:#0F172A;">{code}</span>
+                  </div>
+                  <p style="color:#94A3B8;font-size:12px;margin-top:16px;">Ce code expire dans <strong>5 minutes</strong>. Ne le partagez jamais.</p>
+                </div>
+            """
+        })
+        return code
+    except Exception as e:
+        log_erreur("GENERER_OTP", e)
+        raise
+
+
+def verifier_otp(email: str, code: str) -> bool:
+    """Vérifie l'OTP soumis par l'utilisateur."""
+    try:
+        code_hash = _hashlib.sha256(code.encode()).hexdigest()
+        now = datetime.now(timezone.utc)
+
+        res = supabase.table("otp_codes").select(
+            "id,code_hash,expires_at,used,attempts"
+        ).eq("email", email).eq("used", False).order(
+            "created_at", desc=True).limit(1).execute()
+
+        if not res.data:
+            return False
+
+        otp = res.data[0]
+
+        # Incrémenter tentatives
+        supabase.table("otp_codes").update({
+            "attempts": otp["attempts"] + 1
+        }).eq("id", otp["id"]).execute()
+
+        # Vérifier tentatives max
+        if otp["attempts"] >= 3:
+            log_security_event("otp_max_attempts", details={"email": email})
+            return False
+
+        # Vérifier expiration
+        expires_at = datetime.fromisoformat(otp["expires_at"].replace("Z", "+00:00"))
+        if now > expires_at:
+            return False
+
+        # Vérifier le code
+        if otp["code_hash"] != code_hash:
+            return False
+
+        # Invalider le code
+        supabase.table("otp_codes").update({"used": True}).eq("id", otp["id"]).execute()
+        return True
+
+    except Exception as e:
+        log_erreur("VERIFIER_OTP", e)
+        return False
 
 def get_session(session_id: str, tenant_id: str) -> list:
     try:
@@ -718,15 +789,15 @@ def setup_2fa_verify():
 def login():
     try:
         import hashlib
-        data = request.json
-        email = data.get("email", "").strip().lower()
+        data     = request.json
+        email    = data.get("email", "").strip().lower()
         password = data.get("password", "")
-        code_2fa = data.get("code_2fa", "").strip()
+        code_otp = data.get("code_otp", "").strip()
 
         if not email or not password:
             return jsonify({"erreur": "Identifiants requis"}), 400
 
-        # 1. Vérification Supabase
+        # 1. Vérification email + password
         try:
             auth_response = supabase.auth.sign_in_with_password({"email": email, "password": password})
             user_id = auth_response.user.id if auth_response.user else None
@@ -737,50 +808,52 @@ def login():
             log_security_event("login_failed", details={"reason": "auth_echec", "email": email})
             return jsonify({"erreur": "Identifiants incorrects"}), 401
 
-        # 2. Gestion de la 2FA
-        # ATTENTION : En production, ne renvoyez 'require_2fa' que si l'utilisateur a vraiment activé la 2FA
-        if not code_2fa:
-            return jsonify({"require_2fa": True}), 200
+        # 2. Si pas de code OTP → envoyer le code
+        if not code_otp:
+            try:
+                generer_otp(email)
+                return jsonify({"require_otp": True}), 200
+            except Exception as e:
+                return jsonify({"erreur": "Erreur envoi code : " + str(e)[:100]}), 500
 
-        if not verifier_totp_by_email(email, code_2fa):
-            log_security_event("login_failed", details={"reason": "2fa_echec", "user_id": user_id})
-            return jsonify({"erreur": "Code de sécurité invalide"}), 401
+        # 3. Vérifier le code OTP
+        if not verifier_otp(email, code_otp):
+            log_security_event("login_failed", details={"reason": "otp_echec", "email": email})
+            return jsonify({"erreur": "Code incorrect ou expiré"}), 401
 
-        # 3. Isolation des données (Multi-ténance)
+        # 4. Récupérer tenant_id
         try:
             user_row = supabase.table("users").select("tenant_id").eq("id", user_id).execute()
             tenant_id = user_row.data[0]["tenant_id"] if user_row.data else os.environ.get("DEFAULT_TENANT_ID")
         except Exception:
             tenant_id = os.environ.get("DEFAULT_TENANT_ID")
 
-        # 4. Génération des tokens (Session persistante)
+        # 5. Générer tokens
         access_token = create_access_token(identity=user_id, additional_claims={"tenant_id": tenant_id})
         refresh_tok  = create_refresh_token(identity=user_id)
 
-        # Stockage sécurisé du hash
         token_hash = hashlib.sha256(refresh_tok.encode()).hexdigest()
         expires_at = datetime.utcnow() + timedelta(days=30)
-        
+
         supabase.table("refresh_tokens").insert({
-            "user_id": user_id,
-            "tenant_id": tenant_id,
+            "user_id":    user_id,
+            "tenant_id":  tenant_id,
             "token_hash": token_hash,
             "expires_at": expires_at.isoformat(),
             "user_agent": request.headers.get("User-Agent", "")[:200],
             "ip_address": request.remote_addr
         }).execute()
 
+        log_security_event("login_success", tenant_id, user_id, {"email": email})
         return jsonify({
-            "token": access_token,
+            "token":         access_token,
             "refresh_token": refresh_tok,
-            "expires_in": 900
+            "expires_in":    900
         })
 
     except Exception as e:
         log_erreur("LOGIN_GLOBAL", e)
-        # On ne renvoie pas str(e) au client pour la sécurité
         return jsonify({"erreur": "Service temporairement indisponible"}), 500
-
 
 @app.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True)
