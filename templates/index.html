@@ -1106,8 +1106,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
             <input type="text" id="bib-search" placeholder="Rechercher un document..." oninput="filtrerDocs(this.value)"/>
           </div>
           <button class="btn-sm" id="btn-carte-mentale" onclick="afficherCarteMentale()" style="display:none;">🗺 Carte mentale</button>
-          <button class="btn-sm" id="btn-rediger-bib" onclick="showRedaction(null)" style="display:none;">Rédiger un acte</button>
-          <button class="btn-sm primary" id="btn-export-bib" onclick="exporterPDF()" style="display:none;">Exporter PDF</button>
+          <button class="btn-sm" id="btn-export-carte" onclick="exporterCartePNG()" style="display:none;">⬇ Exporter carte</button>
           <input type="file" id="file-input-bib" accept=".pdf" style="display:none" onchange="uploadFichier(this.files[0],null)"/>
         </div>
 
@@ -1391,14 +1390,6 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
     <div class="msg-ai">Bonjour Maître. Je suis votre assistant juridique ODYXIA, spécialisé en droit OHADA, CEMAC et camerounais. Posez-moi vos questions — je puise mes réponses directement dans votre base documentaire.</div>
   </div>
 
-  <div class="mind-panel" id="mind-panel">
-    <div class="mind-panel-hdr" onclick="toggleMindPanel()">
-      <span class="mind-panel-label">Carte mentale</span>
-      <span id="mind-toggle-lbl" style="font-size:9px;color:#0A0A0A;">Réduire ▴</span>
-    </div>
-    <div class="mind-panel-body" id="mind-panel-body"></div>
-  </div>
-
   <div class="chat-input-bar">
     <div class="chat-input-wrap">
       <input id="chat-input" placeholder="Votre question juridique..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();envoyerMessage();}"/>
@@ -1422,7 +1413,6 @@ let TENANT_ID  = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 let DOC_ACTIF  = null;
 let SELECTED_DOMAIN = '';
 let chatOpen = false;
-let mindOpen = false;
 
 // ── SPLASH ───────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
@@ -1563,7 +1553,6 @@ async function chargerStats() {
     if (!r) return;
     document.getElementById('stat-docs').textContent = r.documents || 0;
     document.getElementById('stat-actes').textContent = 0;
-    document.getElementById('dash-aff-count').textContent = r.dossiers || 0;
   } catch(e) {}
 }
 
@@ -1661,6 +1650,7 @@ async function afficherCarteMentale() {
     body.style.display = 'block';
     body.innerHTML = buildMindMapSVG(r.carte);
     document.getElementById('mm-viewer-lbl').textContent = 'Masquer la carte mentale';
+    document.getElementById('btn-export-carte').style.display = 'inline-flex';
   } catch(e) {
     showLoading(false);
     showToast('Erreur carte mentale', true);
@@ -1678,63 +1668,108 @@ function toggleCarteMentaleViewer() {
 
 function buildMindMapSVG(carte) {
   const branches = carte.branches || [];
-  const W = 720, H = 260;
-  const cx = W/2, cy = 56;
-  const bw = 160, bh = 48;  // Boîtes larges et hautes pour 2 lignes
-  const cols  = ['#FEF3C7','#DCFCE7','#EFF6FF','#FEE2E2','#F3E8FF','#FFF7ED'];
-  const tcols = ['#92400E','#15803D','#374151','#991B1B','#6B21A8','#9A3412'];
   const n = branches.length;
+  const W = 900, H = 400;
+  const cx = W / 2, cy = H / 2;
+  const cols  = ['#FEF3C7','#DCFCE7','#EFF6FF','#FEE2E2','#F3E8FF','#FFF7ED'];
+  const tcols = ['#92400E','#15803D','#1E40AF','#991B1B','#6B21A8','#9A3412'];
 
-  // Découper le texte en max 2 lignes de ~22 chars
-  function wrapText(str, maxChars) {
-    if (!str) return [''];
-    if (str.length <= maxChars) return [str];
-    const words = str.split(' ');
-    let line1 = '', line2 = '';
-    for (const w of words) {
-      if ((line1 + ' ' + w).trim().length <= maxChars) {
-        line1 = (line1 + ' ' + w).trim();
-      } else if ((line2 + ' ' + w).trim().length <= maxChars) {
-        line2 = (line2 + ' ' + w).trim();
-      } else {
-        line2 = line2 ? line2.slice(0,-1)+'…' : w.slice(0,maxChars-1)+'…';
-        break;
-      }
-    }
-    return line2 ? [line1, line2] : [line1];
-  }
-
-  let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:' + H + 'px;">'
-    + '<rect x="' + (cx-100) + '" y="' + (cy-16) + '" width="200" height="32" rx="8" fill="#0A0A0A"/>'
-    + '<text x="' + cx + '" y="' + (cy+5) + '" text-anchor="middle" font-size="13" font-weight="600" fill="#FFFFFF" font-family="DM Sans,system-ui">' + (carte.racine||'').slice(0,26) + '</text>';
+  let svg = `<svg id="mind-map-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:${H}px;cursor:pointer;">`;
+  
+  // Racine
+  svg += `<rect x="${cx-110}" y="${cy-18}" width="220" height="36" rx="10" fill="#0A0A0A"/>`;
+  svg += `<text x="${cx}" y="${cy+6}" text-anchor="middle" font-size="13" font-weight="600" fill="#fff" font-family="DM Sans,system-ui">${(carte.racine||'').slice(0,30)}</text>`;
 
   const leftBranches  = branches.filter((_, i) => i < Math.ceil(n/2));
   const rightBranches = branches.filter((_, i) => i >= Math.ceil(n/2));
 
-  function drawBranches(list, side) {
-    const total   = list.length;
-    const spacing = Math.max((H - 30) / Math.max(total, 1), bh + 10);
-    list.forEach((b, idx) => {
-      const by  = 16 + idx * spacing;
-      const bx  = side === 'left' ? 8 : W - 8 - bw;
-      const lx1 = side === 'left' ? cx - 100 : cx + 100;
-      const lx2 = side === 'left' ? bx + bw  : bx;
-      const ci  = (branches.indexOf(b)) % cols.length;
-      const lines = wrapText(b.label||'', 22);
-      const y1 = by + bh/2 - (lines.length > 1 ? 8 : 0);
+  function drawBranch(b, idx, side, total) {
+    const ci = idx % cols.length;
+    const bw = 150, bh = 32;
+    const spacing = Math.max((H - 60) / Math.max(total, 1), bh + 14);
+    const by = 30 + idx * spacing;
+    const bx = side === 'left' ? 10 : W - 10 - bw;
+    const lx1 = side === 'left' ? cx - 110 : cx + 110;
+    const lx2 = side === 'left' ? bx + bw : bx;
 
-      svg += '<line x1="' + lx1 + '" y1="' + cy + '" x2="' + lx2 + '" y2="' + (by+bh/2) + '" stroke="#BFDBFE" stroke-width="1.5"/>'
-           + '<rect x="' + bx + '" y="' + by + '" width="' + bw + '" height="' + bh + '" rx="7" fill="' + cols[ci] + '" stroke="#E2E8F0" stroke-width="0.5"/>';
-      lines.forEach((line, li) => {
-        svg += '<text x="' + (bx+bw/2) + '" y="' + (y1+li*16) + '" text-anchor="middle" dominant-baseline="central" font-size="10.5" font-weight="500" fill="' + tcols[ci] + '" font-family="DM Sans,system-ui">' + line + '</text>';
-      });
+    // Ligne vers racine
+    svg += `<line x1="${lx1}" y1="${cy}" x2="${lx2}" y2="${by + bh/2}" stroke="#CBD5E1" stroke-width="1.5"/>`;
+    
+    // Boîte branche
+    const bid = `branch-${side}-${idx}`;
+    svg += `<g id="${bid}" onclick="toggleFeuilles('${bid}')" style="cursor:pointer;">`;
+    svg += `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="7" fill="${cols[ci]}" stroke="#E2E8F0" stroke-width="0.5"/>`;
+    svg += `<text x="${bx+bw/2}" y="${by+bh/2+4}" text-anchor="middle" font-size="11" font-weight="500" fill="${tcols[ci]}" font-family="DM Sans,system-ui">${(b.label||'').slice(0,22)}</text>`;
+    svg += `</g>`;
+
+    // Feuilles (cachées par défaut)
+    const feuilles = b.feuilles || [];
+    feuilles.forEach((f, fi) => {
+      const fw = 130, fh = 24;
+      const fx = side === 'left' ? bx - fw - 8 : bx + bw + 8;
+      const fy = by + (fi - (feuilles.length-1)/2) * (fh + 6);
+      const flx1 = side === 'left' ? bx : bx + bw;
+      const flx2 = side === 'left' ? fx + fw : fx;
+
+      svg += `<g class="feuille-${bid}" style="display:none;" onclick="afficherPassages('${(f||'').replace(/'/g,'').slice(0,40)}')">`;
+      svg += `<line x1="${flx1}" y1="${by+bh/2}" x2="${flx2}" y2="${fy+fh/2}" stroke="#E2E8F0" stroke-width="1"/>`;
+      svg += `<rect x="${fx}" y="${fy}" width="${fw}" height="${fh}" rx="5" fill="#F8FAFC" stroke="${cols[ci]}" stroke-width="0.5"/>`;
+      svg += `<text x="${fx+fw/2}" y="${fy+fh/2+4}" text-anchor="middle" font-size="9" fill="#475569" font-family="DM Sans,system-ui">${(f||'').slice(0,22)}</text>`;
+      svg += `</g>`;
     });
   }
 
-  drawBranches(leftBranches,  'left');
-  drawBranches(rightBranches, 'right');
-  svg += '</svg>';
+  leftBranches.forEach((b, i)  => drawBranch(b, i, 'left',  leftBranches.length));
+  rightBranches.forEach((b, i) => drawBranch(b, i, 'right', rightBranches.length));
+
+  svg += `</svg>`;
   return svg;
+}
+
+function toggleFeuilles(bid) {
+  const feuilles = document.querySelectorAll(`.feuille-${bid}`);
+  const visible = feuilles[0]?.style.display !== 'none';
+  feuilles.forEach(f => f.style.display = visible ? 'none' : 'inline');
+}
+
+async function afficherPassages(terme) {
+  if (!DOC_ACTIF || !terme) return;
+  showLoading(true);
+  try {
+    const r = await apiFetch('/question', 'POST', {
+      question: `Montre-moi les passages du document concernant : ${terme}`,
+      session_id: 'carte_' + Date.now()
+    });
+    showLoading(false);
+    if (r?.reponse) {
+      const viewer = document.getElementById('bib-viewer');
+      const existing = viewer.querySelector('.mind-passages');
+      if (existing) existing.remove();
+      const div = document.createElement('div');
+      div.className = 'mind-passages viewer-content';
+      div.style.cssText = 'margin-top:12px;border-top:0.5px solid #E5E5E5;padding-top:12px;';
+      div.innerHTML = '<div style="font-size:10px;font-weight:600;color:#A3A3A3;text-transform:uppercase;margin-bottom:8px;">Passages — ' + terme + '</div>'
+        + '<div style="font-size:12px;color:#0A0A0A;line-height:1.7;">' 
+        + r.reponse.replace(/\n/g,'<br/>') + '</div>';
+      viewer.querySelector('.viewer-content')?.appendChild(div) || viewer.appendChild(div);
+    }
+  } catch(e) {
+    showLoading(false);
+    showToast('Erreur', true);
+  }
+}
+
+function exporterCartePNG() {
+  const svg = document.getElementById('mind-map-svg');
+  if (!svg) { showToast('Générez d\'abord une carte', true); return; }
+  const data = new XMLSerializer().serializeToString(svg);
+  const blob = new Blob([data], {type: 'image/svg+xml'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = (DOC_ACTIF?.nom || 'carte') + '_mindmap.svg';
+  a.click();
+  showToast('Carte exportée');
 }
 
 // ── UPLOAD ────────────────────────────────────────────
@@ -1768,7 +1803,6 @@ async function uploadFichier(file, dossierId) {
     showToast('Erreur upload', true);
   }
   document.getElementById('file-input-bib').value = '';
-  document.getElementById('file-input-aff').value = '';
 }
 
 function handleDrop(e, ctx) {
@@ -1824,7 +1858,7 @@ async function redigerActe(type, faits) {
   try {
     const r = await apiFetch('/rediger', 'POST', {
       type,
-      donnees: {faits, dossier: AFFAIRE_ACTIVE?.nom || ''},
+      donnees: {faits},
       session_id: SESSION_ID
     });
     showLoading(false);
@@ -2116,28 +2150,9 @@ async function enregistrerComparaison(juge, juridiction, contenu) {
 }
 
 // ── CHAT FLOTTANT ─────────────────────────────────────
-async function chargerContexteMemoire() {
-  try {
-    const r = await apiFetch('/memoire/contexte');
-    if (r && r.count > 0) {
-      const resumes = r.memoires.map(m =>
-        '[' + (m.domaine || 'Juridique') + '] ' + m.resume
-      ).join(' | ');
-      CONTEXTE_MEMOIRE = resumes;
-      console.log('[MEMOIRE] Contexte chargé — ' + r.count + ' session(s)');
-    }
-  } catch(e) {}
-}
-
 function toggleChat() {
   chatOpen = !chatOpen;
   document.getElementById('chat-panel').classList.toggle('show', chatOpen);
-}
-
-function toggleMindPanel() {
-  mindOpen = !mindOpen;
-  document.getElementById('mind-panel').classList.toggle('open', mindOpen);
-  document.getElementById('mind-toggle-lbl').textContent = mindOpen ? 'Réduire ▴' : 'Agrandir ▾';
 }
 
 async function envoyerMessage() {
@@ -2180,7 +2195,6 @@ async function envoyerMessage() {
           if (ev.type==='sources') sources = ev.sources||[];
           if (ev.type==='token')   { reponse += ev.text; renderMsg(msgEl, reponse, sources); }
           if (ev.type==='fin')     {
-            if (reponse.length > 300) genererCarteMentaleAuto(reponse);
           }
         } catch {}
       }
@@ -2243,21 +2257,8 @@ async function sauvegarderMemoireAsync(sessionId, historique) {
   } catch(e) {}
 }
 
-async function genererCarteMentaleAuto(reponse) {
-  if (!DOC_ACTIF) return;
-  try {
-    const r = await apiFetch('/carte_mentale', 'POST', {document_id: DOC_ACTIF.id});
-    if (r?.carte) {
-      document.getElementById('mind-panel').classList.add('open');
-      document.getElementById('mind-panel-body').innerHTML = buildMindMapSVG(r.carte);
-      mindOpen = true;
-    }
-  } catch {}
-}
-
 async function nouvelleConversation() {
   SESSION_ID = 'sess_' + Math.random().toString(36).slice(2);
-  convActuelle = null;
   document.getElementById('chat-messages').innerHTML =
     '<div class="msg-ai">Nouvelle conversation démarrée. Comment puis-je vous aider ?</div>';
   document.getElementById('mind-panel').classList.remove('open');
@@ -2331,7 +2332,7 @@ function showLoading(show) {
   document.getElementById('loading').classList.toggle('show', show);
 }
 
-function chargerDashboard() { chargerStats(); chargerAffaires(); }
+function chargerDashboard() { chargerStats(); }
 
 // ── ONGLET RÉDACTION ─────────────────────────────────
 const TOUS_ACTES = [
