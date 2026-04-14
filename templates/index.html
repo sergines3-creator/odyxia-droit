@@ -2410,22 +2410,74 @@ async function nouvelleConversation() {
 
 // ── API ───────────────────────────────────────────────
 async function apiFetch(url, method='GET', body=null) {
+  // Vérifier si token proche de l'expiration → refresh silencieux
+  const exp = localStorage.getItem('od_token_exp');
+  if (exp && Date.now() > parseInt(exp) - 60000) {
+    await refreshToken();
+  }
+
   const opts = {method, headers:{'Authorization':'Bearer '+TOKEN}};
   if (body) { opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(body); }
   const r = await fetch(url, opts);
+
   if (r.status === 401) {
-    localStorage.removeItem('od_token');
-    document.getElementById('app').classList.remove('show');
-    document.getElementById('chat-fab').classList.remove('show');
-    document.getElementById('login-screen').classList.add('show');
-    showToast('Session expirée — reconnectez-vous', true);
+    // Tenter un refresh avant de déconnecter
+    const refreshed = await refreshToken();
+    if (refreshed) {
+      // Réessayer la requête avec le nouveau token
+      opts.headers['Authorization'] = 'Bearer ' + TOKEN;
+      const r2 = await fetch(url, opts);
+      if (r2.status === 401) {
+        deconnecter();
+        throw new Error('Session expirée');
+      }
+      const text2 = await r2.text();
+      if (!text2 || !text2.trim()) return null;
+      try { return JSON.parse(text2); } catch(e) { return null; }
+    }
+    deconnecter();
     throw new Error('Session expirée');
   }
+
   const text = await r.text();
   if (!text || !text.trim()) return null;
   try { return JSON.parse(text); } catch(e) { console.error('JSON parse error:', text.slice(0,200)); return null; }
 }
 
+async function refreshToken() {
+  try {
+    const rt = localStorage.getItem('od_refresh');
+    if (!rt) return false;
+    const r = await fetch('/refresh', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + rt
+      }
+    });
+    if (!r.ok) return false;
+    const d = await r.json();
+    if (d.token) {
+      TOKEN = d.token;
+      localStorage.setItem('od_token', TOKEN);
+      localStorage.setItem('od_token_exp', Date.now() + (d.expires_in || 900) * 1000);
+      return true;
+    }
+    return false;
+  } catch(e) {
+    return false;
+  }
+}
+
+function deconnecter() {
+  localStorage.removeItem('od_token');
+  localStorage.removeItem('od_refresh');
+  localStorage.removeItem('od_token_exp');
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('chat-fab').classList.remove('show');
+  document.getElementById('login-screen').classList.add('show');
+  showToast('Session expirée — reconnectez-vous', true);
+}
 
 // ── RESIZER PANNEAUX ─────────────────────────────────
 function initResizer(resizerId, colId) {

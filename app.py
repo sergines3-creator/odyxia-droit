@@ -753,7 +753,17 @@ def refresh():
         if expires_at < datetime.now(timezone.utc):
             return jsonify({"erreur": "Token expire"}), 401
 
-        new_access_token = create_access_token(identity=identity)
+        # Récupérer tenant_id depuis la base
+        try:
+            user_row = supabase.table("users").select("tenant_id").eq("id", identity).execute()
+            tenant_id = user_row.data[0]["tenant_id"] if user_row.data else ""
+        except Exception:
+            tenant_id = ""
+
+        new_access_token = create_access_token(
+            identity=identity,
+            additional_claims={"tenant_id": tenant_id}
+        )
         log_security_event("token_refreshed", details={"user_id": identity})
         return jsonify({"token": new_access_token, "expires_in": 900})
 
