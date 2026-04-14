@@ -26,8 +26,6 @@ from datetime import datetime, timedelta, timezone
 from anthropic import Anthropic
 from supabase import create_client
 import requests
-import pyotp
-import qrcode
 import base64
 from io import BytesIO
 
@@ -654,141 +652,7 @@ def login_page():
         cabinet_nom=CABINET_NOM,
         cabinet_avocat=CABINET_AVOCAT,
         cabinet_ville=CABINET_VILLE
-    )
-
-@app.route("/setup-2fa-page")
-def setup_2fa_page():
-    return render_template("setup_2fa.html")
-
-@app.route("/setup-2fa", methods=["GET"])
-def setup_2fa():
-    try:
-        user_id = get_jwt_identity()
-        
-        # Vérifier si l'utilisateur a déjà un secret
-        res = supabase.table("users").select("totp_secret").eq("id", user_id).execute()
-        existing_secret = res.data[0].get("totp_secret") if res.data else None
-        
-        # Générer un nouveau secret si inexistant
-        if not existing_secret:
-            secret = pyotp.random_base32()
-            supabase.table("users").update({"totp_secret": secret}).eq("id", user_id).execute()
-        else:
-            secret = existing_secret
-        
-        # Récupérer le display_name pour le QR code
-        profil = supabase.table("users").select("display_name, full_name, email").eq("id", user_id).single().execute()
-        nom_avocat = (profil.data.get("display_name") or profil.data.get("full_name") or profil.data.get("email", "Avocat")) if profil.data else "Avocat"
-        
-        totp = pyotp.TOTP(secret)
-        uri  = totp.provisioning_uri(
-            name=nom_avocat,
-            issuer_name="Odyxia Droit"
-        )
-        qr = qrcode.make(uri)
-        buffer = BytesIO()
-        qr.save(buffer, format="PNG")
-        qr_b64 = base64.b64encode(buffer.getvalue()).decode()
-        
-        return jsonify({
-            "qr_code": f"data:image/png;base64,{qr_b64}",
-            "secret":  secret,
-            "uri":     uri,
-            "nom":     nom_avocat
-        })
-    except Exception as e:
-        log_erreur("SETUP_2FA", e)
-        return jsonify({"erreur": str(e)}), 500
-    
-@app.route("/setup-2fa-init", methods=["POST"])
-@limiter.limit("10 per minute")
-def setup_2fa_init():
-    """Route publique : login email/password → génère QR code individuel."""
-    try:
-        data     = request.json
-        email    = data.get("email", "").strip().lower()
-        password = data.get("password", "")
-
-        if not email or not password:
-            return jsonify({"erreur": "Email et mot de passe requis"}), 400
-
-        # 1. Authentification Supabase
-        try:
-            auth_response = supabase.auth.sign_in_with_password({"email": email, "password": password})
-            user_id = auth_response.user.id if auth_response.user else None
-        except Exception:
-            user_id = None
-
-        if not user_id:
-            return jsonify({"erreur": "Identifiants incorrects"}), 401
-
-        # 2. Générer/récupérer le secret TOTP
-        res = supabase.table("users").select("totp_secret, display_name, full_name, id").eq("id", user_id).execute()
-
-        if not res.data:
-            # L'utilisateur n'existe pas dans users — on le crée
-            supabase.table("users").insert({
-                "id":        user_id,
-                "email":     email,
-                "role":      "owner",
-                "is_active": True,
-            }).execute()
-            db_user_id = user_id
-            existing_secret = None
-        else:
-            db_user_id = res.data[0]["id"]
-            existing_secret = res.data[0].get("totp_secret")
-
-        if not existing_secret:
-            secret = pyotp.random_base32()
-            supabase.table("users").update({"totp_secret": secret}).eq("id", db_user_id).execute()
-        else:
-            secret = existing_secret
-
-        nom = (res.data[0].get("display_name") or res.data[0].get("full_name") or email) if res.data else email
-
-        # 3. Générer le QR code
-        totp = pyotp.TOTP(secret)
-        uri  = totp.provisioning_uri(name=nom, issuer_name="Odyxia Droit")
-        qr   = qrcode.make(uri)
-        buf  = BytesIO()
-        qr.save(buf, format="PNG")
-        qr_b64 = base64.b64encode(buf.getvalue()).decode()
-
-        return jsonify({
-            "qr_code":  f"data:image/png;base64,{qr_b64}",
-            "secret":   secret,
-            "user_id":  user_id,
-            "nom":      nom
-        })
-    except Exception as e:
-        log_erreur("SETUP_2FA_INIT", e)
-        return jsonify({"erreur": str(e)}), 500
-
-
-@app.route("/setup-2fa-verify", methods=["POST"])
-@limiter.limit("10 per minute")
-def setup_2fa_verify():
-    """Vérifie le code TOTP et confirme la configuration."""
-    try:
-        data    = request.json
-        user_id = data.get("user_id", "")
-        code    = data.get("code", "").strip()
-
-        if not user_id or not code:
-            return jsonify({"erreur": "Données manquantes"}), 400
-
-        res = supabase.table("users").select("email").eq("id", user_id).execute()
-        email = res.data[0]["email"] if res.data else None
-        if not email or not verifier_totp_by_email(email, code):
-            return jsonify({"erreur": "Code incorrect — réessayez"}), 401
-
-        supabase.table("users").update({"mfa_enabled": True}).eq("id", user_id).execute()
-        log_security_event("2fa_configured", user_id=user_id)
-        return jsonify({"succes": True})
-    except Exception as e:
-        log_erreur("SETUP_2FA_VERIFY", e)
-        return jsonify({"erreur": str(e)}), 500    
+    )    
 
 @app.route("/login", methods=["POST"])
 @limiter.limit("10 per minute")
@@ -896,7 +760,6 @@ def refresh():
         log_erreur("REFRESH", e)
         return jsonify({"erreur": str(e)}), 500
 
-
 @app.route("/logout", methods=["POST"])
 @jwt_required()
 @limiter.limit("20 per minute")
@@ -942,7 +805,6 @@ def get_profil():
     except Exception as e:
         log_erreur("GET_PROFIL", e)
         return jsonify({"display_name": "Maître"}), 500
-
 
 @app.route("/profil", methods=["PUT"])
 @jwt_required()
