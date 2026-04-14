@@ -1740,6 +1740,7 @@ async function afficherCarteMentale() {
     if (!section) return;
     section.style.display = 'block';
     body.style.display = 'block';
+    body.style.cssText = 'overflow-x:auto;overflow-y:auto;min-height:500px;';
     body.innerHTML = buildMindMapSVG(r.carte);
     document.getElementById('mm-viewer-lbl').textContent = 'Masquer la carte mentale';
     document.getElementById('btn-export-carte').style.display = 'inline-flex';
@@ -1789,7 +1790,7 @@ function buildMindMapSVG(carte) {
   const H = totalH + 100;
   const CY = H / 2;
 
-  let svg = `<svg id="mind-map-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:'DM Sans',sans-serif;">`;
+  let svg = `<svg id="mind-map-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="min-width:1200px;width:100%;font-family:'DM Sans',sans-serif;">`;
 
   // Racine
   const racine = (carte.racine || '').slice(0, 35);
