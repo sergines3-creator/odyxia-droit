@@ -1396,7 +1396,6 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
           <label>Pays</label>
           <input type="text" id="profil-pays" placeholder="Cameroun"/>
         </div>
-        <button onclick="sauvegarderProfil()" style="width:100%;padding:10px;background:#0A0A0A;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;">Sauvegarder</button>
       </div>
     </div>
 
@@ -1439,6 +1438,11 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
   </div>
 </div>
+<!-- Bouton sauvegarder -->
+    <div style="margin-top:16px;">
+      <button onclick="sauvegarderProfil()" style="width:100%;padding:12px;background:#0A0A0A;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;transition:.15s;">Sauvegarder le profil</button>
+      <div id="profil-save-confirm" style="display:none;margin-top:8px;padding:8px 12px;background:#DCFCE7;border:0.5px solid #86EFAC;border-radius:6px;font-size:11px;color:#16A34A;text-align:center;">✓ Profil sauvegardé avec succès</div>
+    </div>
 
 </div><!-- fin page-dashboard -->
 
@@ -2746,8 +2750,12 @@ async function sauvegarderProfil() {
       barreau:      document.getElementById('profil-barreau').value.trim(),
       pays:         document.getElementById('profil-pays').value.trim()
     });
-    if (r?.succes) showToast('Profil sauvegardé');
-    else showToast('Erreur sauvegarde', true);
+    if (r?.succes) {
+      document.getElementById('profil-save-confirm').style.display = 'block';
+      setTimeout(() => document.getElementById('profil-save-confirm').style.display = 'none', 3000);
+    } else {
+      showToast('Erreur sauvegarde', true);
+    }
   } catch(e) { showToast('Erreur', true); }
 }
 
