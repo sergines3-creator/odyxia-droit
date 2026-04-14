@@ -652,7 +652,7 @@ def login_page():
         cabinet_nom=CABINET_NOM,
         cabinet_avocat=CABINET_AVOCAT,
         cabinet_ville=CABINET_VILLE
-    )    
+    ) 
 
 @app.route("/login", methods=["POST"])
 @limiter.limit("10 per minute")
@@ -723,6 +723,7 @@ def login():
 
     except Exception as e:
         log_erreur("LOGIN_GLOBAL", e)
+        print(f"[LOGIN ERROR] {str(e)}")
         return jsonify({"erreur": "Service temporairement indisponible"}), 500
 
 @app.route("/refresh", methods=["POST"])
