@@ -2757,16 +2757,37 @@ def export_pdf():
         # Récupérer le profil de l'avocat connecté
         nom_avocat = "Maître"
         cabinet = "Cabinet"
+        logo_url = None
+        tampon_url = None
         try:
             user_id = get_current_user_id()
             profil = supabase.table("users").select("display_name, full_name").eq("id", user_id).execute()
             if profil.data:
                 nom_avocat = profil.data[0].get("display_name") or profil.data[0].get("full_name") or "Maître"
-            avocat_row = supabase.table("avocats").select("barreau, pays").eq("user_id", user_id).execute()
+            avocat_row = supabase.table("avocats").select("barreau, pays, logo_url, tampon_url").eq("user_id", user_id).execute()
             if avocat_row.data:
                 cabinet = avocat_row.data[0].get("barreau", "") + " — " + avocat_row.data[0].get("pays", "")
+                logo_url = avocat_row.data[0].get("logo_url")
+                tampon_url = avocat_row.data[0].get("tampon_url")
         except Exception:
             pass
+
+        elements = []
+
+        # Logo si disponible
+        if logo_url:
+            try:
+                from reportlab.platypus import Image as RLImage
+                import urllib.request
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_logo:
+                    urllib.request.urlretrieve(logo_url, tmp_logo.name)
+                    logo_img = RLImage(tmp_logo.name, width=80, height=80)
+                    logo_img.hAlign = 'CENTER'
+                    elements.append(logo_img)
+                    elements.append(Spacer(1, 8))
+                    os.unlink(tmp_logo.name)
+            except Exception:
+                pass
 
         elements.append(Paragraph(nom_avocat, s_titre))
         elements.append(Paragraph(cabinet, s_sub))
@@ -2789,25 +2810,40 @@ def export_pdf():
 
         elements.append(Spacer(1, 20))
         elements.append(HRFlowable(width="100%", thickness=0.5, color=OR))
-        elements.append(Paragraph(
-            f"Odyxia Droit - {CABINET_NOM} - Document confidentiel", s_sub))
 
+        # Tampon si disponible
+        if tampon_url:
+            try:
+                from reportlab.platypus import Image as RLImage
+                import urllib.request
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_tampon:
+                    urllib.request.urlretrieve(tampon_url, tmp_tampon.name)
+                    tampon_img = RLImage(tmp_tampon.name, width=100, height=100)
+                    tampon_img.hAlign = 'RIGHT'
+                    elements.append(Spacer(1, 8))
+                    elements.append(tampon_img)
+                    os.unlink(tmp_tampon.name)
+            except Exception:
+                pass
+
+        elements.append(Paragraph(
+            f"Odyxia Droit - {nom_avocat} - Document confidentiel", s_sub))
         doc.build(elements)
         buffer.seek(0)
 
-        log_audit_event("PDF_EXPORTED", tenant_id, get_current_user_id(), {"nom":nom})
+        log_audit_event("PDF_EXPORTED", tenant_id, get_current_user_id(), {"nom": nom})
         try:
-            log_audit(ACTION_EXPORT_PDF, {"nom":nom})
+            log_audit(ACTION_EXPORT_PDF, {"nom": nom})
         except Exception:
             pass
 
         return send_file(buffer, as_attachment=True,
-            download_name=nom.replace(" ","_")+".pdf",
+            download_name=nom.replace(" ", "_") + ".pdf",
             mimetype="application/pdf")
 
     except Exception as e:
         log_erreur("EXPORT PDF", e)
-        return jsonify({"erreur":str(e)}), 500
+        return jsonify({"erreur": str(e)}), 500
 
 @app.route("/envoyer_email", methods=["POST"])
 @jwt_required()
