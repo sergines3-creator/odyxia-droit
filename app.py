@@ -825,6 +825,189 @@ def update_profil():
     except Exception as e:
         log_erreur("UPDATE_PROFIL", e)
         return jsonify({"erreur": str(e)}), 500
+    
+# ─── PROFIL CABINET ───────────────────────────────────────────────────────────
+
+@app.route("/cabinet/upload-asset", methods=["POST"])
+@jwt_required()
+@limiter.limit("20 per minute")
+def upload_asset_cabinet():
+    """Upload logo, tampon ou signature du cabinet."""
+    try:
+        user_id   = get_current_user_id()
+        tenant_id = get_current_tenant_id()
+
+        if "fichier" not in request.files:
+            return jsonify({"erreur": "Aucun fichier reçu"}), 400
+
+        fichier    = request.files["fichier"]
+        type_asset = request.form.get("type", "")  # logo, tampon, signature
+
+        if type_asset not in ["logo", "tampon", "signature"]:
+            return jsonify({"erreur": "Type invalide — logo, tampon ou signature"}), 400
+
+        ext = fichier.filename.lower().split(".")[-1]
+        if ext not in ["png", "jpg", "jpeg"]:
+            return jsonify({"erreur": "Format PNG ou JPG uniquement"}), 400
+
+        fichier_bytes = fichier.read()
+        if len(fichier_bytes) > 5 * 1024 * 1024:
+            return jsonify({"erreur": "Fichier trop volumineux — max 5 Mo"}), 400
+
+        # Nom unique
+        asset_id  = str(uuid.uuid4())
+        filename  = f"{tenant_id}/{type_asset}_{asset_id}.{ext}"
+        mime_type = "image/png" if ext == "png" else "image/jpeg"
+
+        # Upload dans Supabase Storage
+        supabase.storage.from_("cabinet-assets").upload(
+            path=filename,
+            file=fichier_bytes,
+            file_options={"content-type": mime_type}
+        )
+
+        # URL signée (valide 10 ans)
+        url_res = supabase.storage.from_("cabinet-assets").create_signed_url(
+            filename, 315360000)
+        asset_url = url_res.get("signedURL") or url_res.get("signedUrl", "")
+
+        # Sauvegarder dans avocats
+        avocat = supabase.table("avocats").select(
+            "signatures,logo_url,tampon_url"
+        ).eq("user_id", user_id).execute()
+
+        if type_asset == "logo":
+            supabase.table("avocats").update({
+                "logo_url": asset_url
+            }).eq("user_id", user_id).execute()
+
+        elif type_asset == "tampon":
+            supabase.table("avocats").update({
+                "tampon_url": asset_url
+            }).eq("user_id", user_id).execute()
+
+        elif type_asset == "signature":
+            sigs = []
+            if avocat.data:
+                sigs = avocat.data[0].get("signatures") or []
+            sigs.append({
+                "id":  asset_id,
+                "url": asset_url,
+                "nom": fichier.filename
+            })
+            supabase.table("avocats").update({
+                "signatures": sigs
+            }).eq("user_id", user_id).execute()
+
+        log_audit_event("ASSET_UPLOADED", tenant_id, user_id,
+                        {"type": type_asset, "filename": filename})
+
+        return jsonify({
+            "succes":    True,
+            "url":       asset_url,
+            "type":      type_asset,
+            "asset_id":  asset_id
+        })
+
+    except Exception as e:
+        log_erreur("UPLOAD_ASSET", e)
+        return jsonify({"erreur": str(e)}), 500
+
+
+@app.route("/cabinet/profil", methods=["GET"])
+@jwt_required()
+def get_cabinet_profil():
+    """Récupère le profil complet du cabinet."""
+    try:
+        user_id = get_current_user_id()
+
+        user = supabase.table("users").select(
+            "email,full_name,display_name"
+        ).eq("id", user_id).execute()
+
+        avocat = supabase.table("avocats").select(
+            "barreau,pays,type_compte,logo_url,tampon_url,signatures"
+        ).eq("user_id", user_id).execute()
+
+        return jsonify({
+            "user":   user.data[0] if user.data else {},
+            "avocat": avocat.data[0] if avocat.data else {}
+        })
+
+    except Exception as e:
+        log_erreur("GET_CABINET_PROFIL", e)
+        return jsonify({"erreur": str(e)}), 500
+
+
+@app.route("/cabinet/profil", methods=["PUT"])
+@jwt_required()
+@limiter.limit("10 per minute")
+def update_cabinet_profil():
+    """Met à jour le profil du cabinet."""
+    try:
+        user_id   = get_current_user_id()
+        tenant_id = get_current_tenant_id()
+        data      = request.json
+
+        if data.get("display_name","").strip():
+            supabase.table("users").update({
+                "display_name": data["display_name"].strip()
+            }).eq("id", user_id).execute()
+
+        avocat_update = {}
+        if data.get("barreau","").strip():
+            avocat_update["barreau"] = data["barreau"].strip()
+        if data.get("pays","").strip():
+            avocat_update["pays"] = data["pays"].strip()
+
+        if avocat_update:
+            supabase.table("avocats").update(
+                avocat_update
+            ).eq("user_id", user_id).execute()
+
+        log_audit_event("CABINET_PROFIL_UPDATED", tenant_id, user_id, data)
+        return jsonify({"succes": True})
+
+    except Exception as e:
+        log_erreur("UPDATE_CABINET_PROFIL", e)
+        return jsonify({"erreur": str(e)}), 500
+
+
+@app.route("/cabinet/supprimer-asset", methods=["DELETE"])
+@jwt_required()
+def supprimer_asset():
+    """Supprime un asset (signature, logo, tampon)."""
+    try:
+        user_id    = get_current_user_id()
+        data       = request.json
+        type_asset = data.get("type", "")
+        asset_id   = data.get("asset_id", "")
+
+        if type_asset == "signature":
+            avocat = supabase.table("avocats").select("signatures").eq(
+                "user_id", user_id).execute()
+            if avocat.data:
+                sigs = [s for s in (avocat.data[0].get("signatures") or [])
+                        if s.get("id") != asset_id]
+                supabase.table("avocats").update({
+                    "signatures": sigs
+                }).eq("user_id", user_id).execute()
+
+        elif type_asset == "logo":
+            supabase.table("avocats").update({
+                "logo_url": None
+            }).eq("user_id", user_id).execute()
+
+        elif type_asset == "tampon":
+            supabase.table("avocats").update({
+                "tampon_url": None
+            }).eq("user_id", user_id).execute()
+
+        return jsonify({"succes": True})
+
+    except Exception as e:
+        log_erreur("SUPPRIMER_ASSET", e)
+        return jsonify({"erreur": str(e)}), 500
 
 # ─── RGPD ─────────────────────────────────────────────────────────────────────
 
