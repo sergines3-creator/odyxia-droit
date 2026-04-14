@@ -1770,13 +1770,6 @@ function buildMindMapSVG(carte) {
   const FW = 160, FH = 36;
   const VGAP = 14;
   const HGAP = 60;
-  const CX = 600;
-
-  // Calculer hauteur totale nécessaire
-  function branchHeight(b) {
-    const feuilles = b.feuilles || [];
-    return Math.max(BH, feuilles.length * (FH + VGAP) - VGAP);
-  }
 
   const leftBranches  = branches.filter((_, i) => i < Math.ceil(n/2));
   const rightBranches = branches.filter((_, i) => i >= Math.ceil(n/2));
@@ -1786,7 +1779,8 @@ function buildMindMapSVG(carte) {
   }
 
   const totalH = Math.max(totalHeight(leftBranches), totalHeight(rightBranches));
-  const W = CX * 2 + 40;
+  const W = 1200;
+  const CX = W / 2;
   const H = totalH + 100;
   const CY = H / 2;
 
