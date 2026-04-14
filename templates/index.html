@@ -1769,7 +1769,7 @@ function buildMindMapSVG(carte) {
   const FW = 160, FH = 36;
   const VGAP = 14;
   const HGAP = 60;
-  const CX = 500;
+  const CX = 600;
 
   // Calculer hauteur totale nécessaire
   function branchHeight(b) {
@@ -1785,7 +1785,7 @@ function buildMindMapSVG(carte) {
   }
 
   const totalH = Math.max(totalHeight(leftBranches), totalHeight(rightBranches));
-  const W = CX + BW + HGAP + FW + 40;
+  const W = CX * 2 + 40;
   const H = totalH + 100;
   const CY = H / 2;
 
