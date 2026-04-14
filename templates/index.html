@@ -1051,9 +1051,17 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
     <div class="sb-sep"></div>
 <div class="nav-item" onclick="showPage('profil')" id="nav-profil">
   <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-    <circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/>
+    <path d="M2 2h4v12H2zM6 2h4v12H6zM10 4l4 2-4 2"/>
   </svg>
-  Mon profil
+  Paramètres rédaction
+</div>
+
+<div class="sb-sep"></div>
+
+<!-- Infos avocat en bas -->
+<div id="sb-avocat-info" style="margin-top:auto;padding:10px 12px;margin:4px 8px;border-radius:6px;background:#1C1C1C;">
+  <div id="sb-avocat-nom" style="font-size:12px;font-weight:500;color:#D4D4D4;">Chargement...</div>
+  <div id="sb-avocat-barreau" style="font-size:10px;color:#6B6B6B;margin-top:2px;">Barreau</div>
 </div>
 
     <div class="sb-sep"></div>
@@ -1376,8 +1384,8 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 <div class="page" id="page-profil">
   <div style="flex:1;overflow-y:auto;padding:20px;height:100%;">
     <div class="dash-welcome">
-      <h1 style="font-family:var(--serif);font-size:24px;font-weight:500;color:var(--navy);">Mon profil cabinet</h1>
-      <p style="font-size:12px;color:var(--text2);margin-top:4px;">Gérez vos informations, logo, tampon et signatures</p>
+      <h1 style="font-family:var(--serif);font-size:24px;font-weight:500;color:var(--navy);">Paramètres rédaction</h1>
+      <p style="font-size:12px;color:var(--text2);margin-top:4px;">Logo, tampon et signatures pour vos documents générés</p>
     </div>
 
     <!-- Informations -->
@@ -1614,6 +1622,7 @@ async function init() {
   await chargerDocsBib();
   setTimeout(initAllResizers, 100);
   initRedaction();
+  await chargerProfil();
 };
 
 // ── NAVIGATION ───────────────────────────────────────
@@ -2740,6 +2749,12 @@ async function chargerProfil() {
         + `<button onclick="insererSignatureDansQuill('${sig.url}')" style="position:absolute;bottom:2px;right:2px;background:#0A0A0A;border:none;border-radius:3px;font-size:9px;color:#fff;cursor:pointer;padding:1px 4px;">Insérer</button>`;
       sigList.appendChild(div);
     });
+  
+    // Afficher infos dans sidebar
+    const sbNomEl = document.getElementById('sb-avocat-nom');
+    const sbBarEl = document.getElementById('sb-avocat-barreau');
+    if (sbNomEl) sbNomEl.textContent = u.display_name || u.full_name || 'Maître';
+    if (sbBarEl) sbBarEl.textContent = a.barreau || 'Barreau';
   } catch(e) {}
 }
 

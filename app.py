@@ -2663,6 +2663,75 @@ def stats_cabinet():
         log_erreur("STATS", e)
         return jsonify({"erreur":str(e)}), 500
 
+@app.route("/admin/rappels-trial", methods=["POST"])
+@limiter.limit("5 per hour")
+def rappels_trial():
+    try:
+        import resend
+        secret = request.json.get("admin_secret", "")
+        if secret != os.environ.get("ADMIN_SECRET", ""):
+            return jsonify({"erreur": "Non autorisé"}), 403
+
+        resend.api_key = os.environ.get("RESEND_API_KEY", "")
+        maintenant = datetime.now(timezone.utc)
+        dans_4_jours = maintenant + timedelta(days=4)
+        dans_3_jours = maintenant + timedelta(days=3)
+
+        # Chercher comptes trial expirant dans 3-4 jours
+        result = supabase.table("tenants").select(
+            "id,name,trial_end"
+        ).eq("plan", "trial").eq("status", "active").gte(
+            "trial_end", dans_3_jours.isoformat()
+        ).lte("trial_end", dans_4_jours.isoformat()).execute()
+
+        envoyes = 0
+        for tenant in (result.data or []):
+            # Récupérer email du owner
+            user = supabase.table("users").select("email,display_name,full_name").eq(
+                "tenant_id", tenant["id"]).eq("role", "owner").execute()
+            if not user.data:
+                continue
+
+            email = user.data[0].get("email", "")
+            nom   = user.data[0].get("display_name") or user.data[0].get("full_name") or "Maître"
+            trial_end = datetime.fromisoformat(
+                tenant["trial_end"].replace("Z", "+00:00"))
+            jours = (trial_end - maintenant).days
+
+            resend.Emails.send({
+                "from":    f"Odyxia Droit <onboarding@resend.dev>",
+                "to":      [email],
+                "subject": f"Votre essai Odyxia Droit expire dans {jours} jours",
+                "html":    f"""
+                    <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:32px;">
+                      <h2 style="font-size:20px;color:#0F172A;">Bonjour {nom},</h2>
+                      <p style="color:#64748B;font-size:14px;margin:16px 0;">
+                        Votre période d'essai gratuite <strong>Odyxia Droit</strong> expire dans 
+                        <strong>{jours} jours</strong>, le {trial_end.strftime('%d/%m/%Y')}.
+                      </p>
+                      <p style="color:#64748B;font-size:14px;">
+                        Pour continuer à accéder à vos documents, analyses et actes générés, 
+                        activez votre abonnement avant cette date.
+                      </p>
+                      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:20px;margin:24px 0;">
+                        <p style="font-size:13px;color:#0F172A;font-weight:500;margin-bottom:8px;">Abonnement mensuel</p>
+                        <p style="font-size:24px;font-weight:600;color:#0F172A;">Sur devis</p>
+                        <p style="font-size:12px;color:#64748B;">Contactez-nous pour activer votre compte</p>
+                      </div>
+                      <p style="color:#94A3B8;font-size:12px;margin-top:24px;">
+                        Odyxia Droit — Intelligence Juridique OHADA · CEMAC<br/>
+                        Douala, Cameroun
+                      </p>
+                    </div>
+                """
+            })
+            envoyes += 1
+
+        return jsonify({"succes": True, "rappels_envoyes": envoyes})
+
+    except Exception as e:
+        log_erreur("RAPPELS_TRIAL", e)
+        return jsonify({"erreur": str(e)}), 500
 
 # ─── TIMELINE ─────────────────────────────────────────────────────────────────
 
