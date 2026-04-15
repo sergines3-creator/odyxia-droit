@@ -1741,7 +1741,30 @@ async function afficherCarteMentale() {
     section.style.display = 'block';
     body.style.display = 'block';
     body.style.cssText = 'overflow-x:auto;overflow-y:auto;min-height:500px;display:block;width:100%;';
-    body.innerHTML = buildMindMapSVG(r.carte);
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'overflow:auto;cursor:grab;user-select:none;min-height:500px;';
+    wrapper.innerHTML = buildMindMapSVG(r.carte);
+    body.innerHTML = '';
+    body.appendChild(wrapper);
+
+    // Pan avec clic gauche maintenu
+    let isDragging = false, startX, startY, scrollLeft, scrollTop;
+    wrapper.addEventListener('mousedown', e => {
+      isDragging = true;
+      wrapper.style.cursor = 'grabbing';
+      startX = e.pageX - wrapper.offsetLeft;
+      startY = e.pageY - wrapper.offsetTop;
+      scrollLeft = wrapper.scrollLeft;
+      scrollTop  = wrapper.scrollTop;
+    });
+    wrapper.addEventListener('mouseleave', () => { isDragging = false; wrapper.style.cursor = 'grab'; });
+    wrapper.addEventListener('mouseup',    () => { isDragging = false; wrapper.style.cursor = 'grab'; });
+    wrapper.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      e.preventDefault();
+      wrapper.scrollLeft = scrollLeft - (e.pageX - wrapper.offsetLeft - startX);
+      wrapper.scrollTop  = scrollTop  - (e.pageY - wrapper.offsetTop  - startY);
+    });
     document.getElementById('mm-viewer-lbl').textContent = 'Masquer la carte mentale';
     document.getElementById('btn-export-carte').style.display = 'inline-flex';
   } catch(e) {
