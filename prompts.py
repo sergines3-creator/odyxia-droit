@@ -252,12 +252,13 @@ IDENTITE_ODYXIA = get_identite_odyxia("CM")
 # 1. CHAT JURIDIQUE RAG
 # ─────────────────────────────────────────────────────────────────────────────
 
-def prompt_chat(question: str, contexte_documents: str) -> str:
+def prompt_chat(question: str, contexte_documents: str, code_pays: str = "CM") -> str:
     """
     Prompt principal du chat juridique.
     Contextualise la réponse avec les documents indexés du dossier.
     """
-    return f"""{IDENTITE_ODYXIA}
+    identite = get_identite_odyxia(code_pays)
+    return f"""{identite}
 
 ━━━ DOCUMENTS DU DOSSIER ━━━
 {contexte_documents if contexte_documents else "Aucun document indexé — répondre sur la base du droit général applicable."}
@@ -277,7 +278,7 @@ Ton style :
 
 **Fondement juridique**
 Cite les textes applicables avec leur référence exacte [Source · Page X].
-Hiérarchise : droit OHADA > droit CEMAC > droit national camerounais.
+Hiérarchise : droit OHADA > droit CEMAC > droit national du {get_pays_config(code_pays)['pays']}.
 
 **Analyse**
 Développe le raisonnement juridique. Identifie les enjeux, les nuances, 
