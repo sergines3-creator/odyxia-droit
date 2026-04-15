@@ -593,9 +593,12 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 }
 .msg-ai{
   align-self:flex-start;background:#FFFFFF;border:0.5px solid #E5E5E5;
-  border-radius:0 10px 10px 10px;padding:10px 12px;font-size:12px;
-  color:#0A0A0A;max-width:88%;line-height:1.7;
+  border-radius:0 10px 10px 10px;padding:14px 16px;font-size:12px;
+  color:#0A0A0A;max-width:88%;line-height:1.9;
 }
+.msg-ai p{margin-bottom:10px;}
+.msg-ai strong{color:#0A0A0A;font-weight:600;}
+.msg-ai br{display:block;margin-bottom:6px;}
 .msg-ai strong{color:#0A0A0A;font-weight:500;}
 .sources-row{margin-top:6px;display:flex;flex-wrap:wrap;gap:3px;}
 .source-chip{
@@ -2420,11 +2423,11 @@ function creerBulleAI() {
 
 function renderMsg(el, txt, sources) {
   const box = document.getElementById('chat-messages');
-  let html = txt
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g, '<br/>');
+  let html = '<p>' + txt
+  .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  .replace(/\*(.+?)\*/g, '<em>$1</em>')
+  .replace(/\n\n/g, '</p><p>')
+  .replace(/\n/g, '<br/>') + '</p>';
   if (sources.length) {
     html += '<div class="sources-row">' + [...new Set(sources)].map(s => '<span class="source-chip">' + s + '</span>').join('') + '</div>';
   }
