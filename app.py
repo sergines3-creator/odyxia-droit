@@ -134,6 +134,19 @@ def get_current_user_id() -> str:
 
 from datetime import datetime, timezone
 
+def get_current_pays_code() -> str:
+    """Récupère le code pays de l'avocat connecté."""
+    try:
+        user_id = get_current_user_id()
+        if user_id:
+            result = supabase.table("avocats").select("code_pays").eq(
+                "user_id", user_id).execute()
+            if result.data and result.data[0].get("code_pays"):
+                return result.data[0]["code_pays"]
+    except Exception:
+        pass
+    return "CM"
+
 def log_audit_event(event: str, tenant_id: str, user_id: str, meta: dict, severity: str = "info"):
     """Journalise les actions métiers avec isolation par tenant."""
     try:
@@ -1317,7 +1330,8 @@ def creer_compte():
 # ─── CHAT ─────────────────────────────────────────────────────────────────────
 
 def _preparer_contexte_chat(q: str, session_id: str,
-                            tenant_id: str, dossier_id: str = None):
+                            tenant_id: str, dossier_id: str = None,
+                            code_pays: str = "CM"):
     # 1. Récupération sécurisée de l'historique (limité au tenant)
     historique_session = get_session(session_id, tenant_id)
     
@@ -1357,7 +1371,8 @@ def _preparer_contexte_chat(q: str, session_id: str,
         messages.append({"role": "assistant", "content": echange["reponse"]})
 
     # 4. Injection du Prompt Système (C'est ici qu'on définit les règles juridiques)
-    system_prompt = prompt_chat(q, contexte_global)
+    from prompts import get_identite_odyxia
+    system_prompt = prompt_chat(q, contexte_global, code_pays)
     
     # Message actuel
     messages.append({"role": "user", "content": q})
@@ -1395,8 +1410,9 @@ def question():
             log_security_event("prompt_injection_alerte", tenant_id,
                 get_current_user_id(), {"score":inj.score,"patterns":inj.patterns})
 
+        code_pays = get_current_pays_code()
         system_prompt, messages, sources, historique_session = \
-            _preparer_contexte_chat(q, session_id, tenant_id, dossier_id)
+            _preparer_contexte_chat(q, session_id, tenant_id, dossier_id, code_pays)
 
         response = client.messages.create(
             model="claude-sonnet-4-20250514",

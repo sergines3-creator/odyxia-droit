@@ -14,48 +14,226 @@ CABINET_NOM    = os.environ.get("CABINET_NOM", "Cabinet Juridique")
 CABINET_AVOCAT = os.environ.get("CABINET_AVOCAT", "Maître")
 CABINET_VILLE  = os.environ.get("CABINET_VILLE", "Douala, Cameroun")
 
-# ─────────────────────────────────────────────────────────────────────────────
-# IDENTITÉ COMMUNE — injectée dans tous les prompts
-# ─────────────────────────────────────────────────────────────────────────────
-
-# ─── Configuration pays — modifier ici pour adapter à un autre État OHADA ────
-PAYS_CONFIG = {
-    "pays":         "Cameroun",
-    "barreau":      "Barreau du Cameroun",
-    "code_penal":   "Code Pénal camerounais (Loi n°2016/007)",
-    "cpp":          "Code de Procédure Pénale camerounais (Loi n°2005/007)",
-    "cpc":          "Code de Procédure Civile et Commerciale camerounais",
-    "code_travail": "Code du Travail camerounais (Loi n°92/007 du 14 août 1992)",
-    "code_fiscal":  "CGI + Livre des Procédures Fiscales (LPF) Cameroun",
-    "droit_foncier":"Ordonnance n°74/1 du 6 juillet 1974 (régime foncier)",
-    "tribunal_admin":"Tribunal Administratif (Loi n°2006/022 du 29 décembre 2006)",
-    "juridictions": "TGI · Tribunal de Commerce · Cour d'Appel · Cour Suprême",
-    "monnaie":      "FCFA",
+# ─── Configuration multi-pays OHADA ──────────────────────────────────────────
+PAYS_CONFIGS = {
+    "CM": {
+        "pays":             "Cameroun",
+        "barreau":          "Barreau du Cameroun",
+        "code_penal":       "Code Pénal camerounais (Loi n°2016/007)",
+        "cpp":              "Code de Procédure Pénale camerounais (Loi n°2005/007)",
+        "cpc":              "Code de Procédure Civile et Commerciale camerounais",
+        "code_travail":     "Code du Travail camerounais (Loi n°92/007 du 14 août 1992)",
+        "code_fiscal":      "CGI + Livre des Procédures Fiscales (LPF) Cameroun",
+        "droit_foncier":    "Ordonnance n°74/1 du 6 juillet 1974 (régime foncier)",
+        "tribunal_admin":   "Tribunal Administratif (Loi n°2006/022 du 29 décembre 2006)",
+        "juridictions":     "TGI · Tribunal de Commerce · Cour d'Appel · Cour Suprême",
+        "monnaie":          "FCFA",
+        "capitale":         "Yaoundé",
+        "ville_principale": "Douala",
+    },
+    "CI": {
+        "pays":             "Côte d'Ivoire",
+        "barreau":          "Barreau de Côte d'Ivoire",
+        "code_penal":       "Code Pénal ivoirien (Loi n°2019-574 du 26 juin 2019)",
+        "cpp":              "Code de Procédure Pénale ivoirien (Loi n°2018-975)",
+        "cpc":              "Code de Procédure Civile, Commerciale et Administrative ivoirien",
+        "code_travail":     "Code du Travail ivoirien (Loi n°2015-532 du 20 juillet 2015)",
+        "code_fiscal":      "Code Général des Impôts Côte d'Ivoire",
+        "droit_foncier":    "Loi n°98-750 du 23 décembre 1998 relative au domaine foncier rural",
+        "tribunal_admin":   "Tribunal Administratif d'Abidjan",
+        "juridictions":     "TGI · Tribunal de Commerce · Cour d'Appel · Cour de Cassation",
+        "monnaie":          "FCFA",
+        "capitale":         "Yamoussoukro",
+        "ville_principale": "Abidjan",
+    },
+    "BF": {
+        "pays":             "Burkina Faso",
+        "barreau":          "Barreau du Burkina Faso",
+        "code_penal":       "Code Pénal burkinabè (Loi n°025-2018/AN du 31 mai 2018)",
+        "cpp":              "Code de Procédure Pénale burkinabè (Loi n°047-2019/AN)",
+        "cpc":              "Code de Procédure Civile burkinabè",
+        "code_travail":     "Code du Travail burkinabè (Loi n°028-2008/AN du 13 mai 2008)",
+        "code_fiscal":      "Code Général des Impôts Burkina Faso",
+        "droit_foncier":    "Loi n°034-2009/AN du 16 juin 2009 portant régime foncier rural",
+        "tribunal_admin":   "Tribunal Administratif de Ouagadougou",
+        "juridictions":     "TGI · Tribunal de Commerce · Cour d'Appel · Cour de Cassation",
+        "monnaie":          "FCFA",
+        "capitale":         "Ouagadougou",
+        "ville_principale": "Ouagadougou",
+    },
+    "SN": {
+        "pays":             "Sénégal",
+        "barreau":          "Ordre des Avocats du Sénégal",
+        "code_penal":       "Code Pénal sénégalais (Loi n°65-60 du 21 juillet 1965)",
+        "cpp":              "Code de Procédure Pénale sénégalais",
+        "cpc":              "Code de Procédure Civile sénégalais",
+        "code_travail":     "Code du Travail sénégalais (Loi n°97-17 du 1er décembre 1997)",
+        "code_fiscal":      "Code Général des Impôts Sénégal",
+        "droit_foncier":    "Loi n°64-46 du 17 juin 1964 relative au domaine national",
+        "tribunal_admin":   "Tribunal Administratif de Dakar",
+        "juridictions":     "TGI · Tribunal du Commerce · Cour d'Appel · Cour Suprême",
+        "monnaie":          "FCFA",
+        "capitale":         "Dakar",
+        "ville_principale": "Dakar",
+    },
+    "BJ": {
+        "pays":             "Bénin",
+        "barreau":          "Barreau du Bénin",
+        "code_penal":       "Code Pénal béninois (Loi n°2018-16 du 28 décembre 2018)",
+        "cpp":              "Code de Procédure Pénale béninois",
+        "cpc":              "Code de Procédure Civile béninois",
+        "code_travail":     "Code du Travail béninois (Loi n°98-004 du 27 janvier 1998)",
+        "code_fiscal":      "Code Général des Impôts Bénin",
+        "droit_foncier":    "Loi n°2013-01 du 14 août 2013 portant Code Foncier et Domanial",
+        "tribunal_admin":   "Tribunal Administratif de Cotonou",
+        "juridictions":     "TGI · Tribunal de Commerce · Cour d'Appel · Cour Suprême",
+        "monnaie":          "FCFA",
+        "capitale":         "Porto-Novo",
+        "ville_principale": "Cotonou",
+    },
+    "TG": {
+        "pays":             "Togo",
+        "barreau":          "Barreau du Togo",
+        "code_penal":       "Code Pénal togolais (Loi n°2015-010 du 24 novembre 2015)",
+        "cpp":              "Code de Procédure Pénale togolais",
+        "cpc":              "Code de Procédure Civile togolais",
+        "code_travail":     "Code du Travail togolais (Loi n°2006-010 du 13 décembre 2006)",
+        "code_fiscal":      "Code Général des Impôts Togo",
+        "droit_foncier":    "Code Foncier et Domanial togolais (Loi n°2018-005)",
+        "tribunal_admin":   "Tribunal Administratif de Lomé",
+        "juridictions":     "TGI · Tribunal de Commerce · Cour d'Appel · Cour Suprême",
+        "monnaie":          "FCFA",
+        "capitale":         "Lomé",
+        "ville_principale": "Lomé",
+    },
+    "ML": {
+        "pays":             "Mali",
+        "barreau":          "Barreau du Mali",
+        "code_penal":       "Code Pénal malien (Loi n°01-079 du 20 août 2001)",
+        "cpp":              "Code de Procédure Pénale malien",
+        "cpc":              "Code de Procédure Civile, Commerciale et Sociale malien",
+        "code_travail":     "Code du Travail malien (Loi n°2017-021 du 12 juin 2017)",
+        "code_fiscal":      "Code Général des Impôts Mali",
+        "droit_foncier":    "Code Domanial et Foncier malien (Loi n°2017-001)",
+        "tribunal_admin":   "Tribunal Administratif de Bamako",
+        "juridictions":     "TGI · Tribunal de Commerce · Cour d'Appel · Cour Suprême",
+        "monnaie":          "FCFA",
+        "capitale":         "Bamako",
+        "ville_principale": "Bamako",
+    },
+    "NE": {
+        "pays":             "Niger",
+        "barreau":          "Barreau du Niger",
+        "code_penal":       "Code Pénal nigérien (Loi n°2003-025 du 13 juin 2003)",
+        "cpp":              "Code de Procédure Pénale nigérien",
+        "cpc":              "Code de Procédure Civile nigérien",
+        "code_travail":     "Code du Travail nigérien (Loi n°2012-45 du 25 septembre 2012)",
+        "code_fiscal":      "Code Général des Impôts Niger",
+        "droit_foncier":    "Code Rural nigérien (Ordonnance n°93-015 du 2 mars 1993)",
+        "tribunal_admin":   "Tribunal Administratif de Niamey",
+        "juridictions":     "TGI · Tribunal de Commerce · Cour d'Appel · Cour Suprême",
+        "monnaie":          "FCFA",
+        "capitale":         "Niamey",
+        "ville_principale": "Niamey",
+    },
+    "GN": {
+        "pays":             "Guinée",
+        "barreau":          "Barreau de Guinée",
+        "code_penal":       "Code Pénal guinéen (Loi n°L/2016/059/AN du 26 octobre 2016)",
+        "cpp":              "Code de Procédure Pénale guinéen",
+        "cpc":              "Code de Procédure Civile guinéen",
+        "code_travail":     "Code du Travail guinéen (Loi n°L/2014/072/CNT du 10 janvier 2014)",
+        "code_fiscal":      "Code Général des Impôts Guinée",
+        "droit_foncier":    "Code Foncier et Domanial guinéen",
+        "tribunal_admin":   "Tribunal Administratif de Conakry",
+        "juridictions":     "TGI · Tribunal de Commerce · Cour d'Appel · Cour Suprême",
+        "monnaie":          "Franc guinéen (GNF)",
+        "capitale":         "Conakry",
+        "ville_principale": "Conakry",
+    },
+    "CD": {
+        "pays":             "République Démocratique du Congo",
+        "barreau":          "Barreau de Kinshasa/Gombe",
+        "code_penal":       "Code Pénal congolais (Décret du 30 janvier 1940)",
+        "cpp":              "Code de Procédure Pénale congolais",
+        "cpc":              "Code de Procédure Civile congolais",
+        "code_travail":     "Code du Travail congolais (Loi n°015/2002 du 16 octobre 2002)",
+        "code_fiscal":      "Code Général des Impôts RDC",
+        "droit_foncier":    "Loi Foncière congolaise (Loi n°73-021 du 20 juillet 1973)",
+        "tribunal_admin":   "Conseil d'État de la RDC",
+        "juridictions":     "TGI · Tribunal de Commerce · Cour d'Appel · Cour de Cassation",
+        "monnaie":          "Franc congolais (CDF)",
+        "capitale":         "Kinshasa",
+        "ville_principale": "Kinshasa",
+    },
+    "CG": {
+        "pays":             "République du Congo",
+        "barreau":          "Barreau du Congo",
+        "code_penal":       "Code Pénal congolais (Loi n°1-63 du 13 janvier 1963)",
+        "cpp":              "Code de Procédure Pénale congolais",
+        "cpc":              "Code de Procédure Civile congolais",
+        "code_travail":     "Code du Travail congolais (Loi n°45-75 du 15 mars 1975)",
+        "code_fiscal":      "Code Général des Impôts Congo",
+        "droit_foncier":    "Loi foncière congolaise",
+        "tribunal_admin":   "Cour Administrative de Brazzaville",
+        "juridictions":     "TGI · Tribunal de Commerce · Cour d'Appel · Cour Suprême",
+        "monnaie":          "FCFA",
+        "capitale":         "Brazzaville",
+        "ville_principale": "Brazzaville",
+    },
+    "GA": {
+        "pays":             "Gabon",
+        "barreau":          "Barreau du Gabon",
+        "code_penal":       "Code Pénal gabonais (Loi n°042/2018 du 5 juillet 2019)",
+        "cpp":              "Code de Procédure Pénale gabonais",
+        "cpc":              "Code de Procédure Civile gabonais",
+        "code_travail":     "Code du Travail gabonais (Loi n°3/94 du 21 novembre 1994)",
+        "code_fiscal":      "Code Général des Impôts Gabon",
+        "droit_foncier":    "Code Domanial gabonais",
+        "tribunal_admin":   "Tribunal Administratif de Libreville",
+        "juridictions":     "TGI · Tribunal de Commerce · Cour d'Appel · Cour de Cassation",
+        "monnaie":          "FCFA",
+        "capitale":         "Libreville",
+        "ville_principale": "Libreville",
+    },
 }
 
-# Injecté dans les prompts de droit national (hors OHADA pur)
-AVERTISSEMENT_NATIONAL = (
-    "\n━━━ PÉRIMÈTRE JURIDIQUE ━━━\n"
-    "Ce document est rédigé selon le droit national du " + PAYS_CONFIG["pays"] + ".\n"
-    "Les Actes Uniformes OHADA (AUPSRVE, AUSCGIE, AUPC, AUS, AUA) sont identiques\n"
-    "dans les 17 États membres et s'appliquent sans adaptation.\n"
-    "Les autres textes (" + PAYS_CONFIG["code_penal"] + ", " + PAYS_CONFIG["cpp"] + ",\n"
-    + PAYS_CONFIG["code_travail"] + ", " + PAYS_CONFIG["code_fiscal"] + ") sont\n"
-    "spécifiques au " + PAYS_CONFIG["pays"] + " et devront être adaptés pour tout autre État OHADA.\n"
-)
+# Pays par défaut
+PAYS_CONFIG = PAYS_CONFIGS["CM"]
 
-IDENTITE_ODYXIA = f"""Tu es Odyxia Droit, assistant juridique IA de niveau expert au service de {CABINET_NOM}.
+def get_pays_config(code_pays: str = "CM") -> dict:
+    """Retourne la configuration du pays selon le code ISO."""
+    return PAYS_CONFIGS.get(code_pays.upper(), PAYS_CONFIGS["CM"])
+
+def get_avertissement_national(code_pays: str = "CM") -> str:
+    p = get_pays_config(code_pays)
+    return (
+        "\n━━━ PÉRIMÈTRE JURIDIQUE ━━━\n"
+        f"Ce document est rédigé selon le droit national du {p['pays']}.\n"
+        "Les Actes Uniformes OHADA (AUPSRVE, AUSCGIE, AUPC, AUS, AUA) sont identiques\n"
+        "dans les 17 États membres et s'appliquent sans adaptation.\n"
+        f"Les autres textes ({p['code_penal']}, {p['cpp']},\n"
+        f"{p['code_travail']}, {p['code_fiscal']}) sont\n"
+        f"spécifiques au {p['pays']} et devront être adaptés pour tout autre État OHADA.\n"
+    )
+
+AVERTISSEMENT_NATIONAL = get_avertissement_national("CM")
+
+def get_identite_odyxia(code_pays: str = "CM") -> str:
+    p = get_pays_config(code_pays)
+    return f"""Tu es Odyxia Droit, assistant juridique IA de niveau expert au service de {CABINET_NOM}.
 
 Ton expertise couvre :
 - Le droit OHADA dans toute sa profondeur (Actes Uniformes, jurisprudence CCJA, doctrine)
 - Le droit CEMAC et les textes communautaires (règlements, directives, décisions)
-- Le droit camerounais : CP (Loi 2016/007), CPP (Loi 2005/007),
-  Code du Travail (Loi 92/007), CGI/LPF, Ordonnance foncière 74/1
-- Distinction nette : droit OHADA unifié (17 États) vs droit national camerounais
+- Le droit national du {p['pays']} : {p['code_penal']}, {p['cpp']},
+  {p['code_travail']}, {p['code_fiscal']}, {p['droit_foncier']}
+- Distinction nette : droit OHADA unifié (17 États) vs droit national du {p['pays']}
 - Le droit des affaires africain dans sa dimension comparée et pratique
+- Les juridictions du {p['pays']} : {p['juridictions']}
 
-Ton niveau : juriste senior de 20 ans d'expérience au barreau, ex-conseil juridique 
-d'entreprises multinationales opérant en zone OHADA.
+Ton niveau : juriste senior de 20 ans d'expérience au barreau du {p['pays']},
+ex-conseil juridique d'entreprises multinationales opérant en zone OHADA.
 
 Tes principes absolus :
 - Chaque affirmation est étayée par un texte précis ou une décision identifiée
@@ -63,7 +241,11 @@ Tes principes absolus :
 - Tu identifies toujours les zones d'incertitude juridique sans les masquer
 - Tu raisonnes en stratège autant qu'en technicien du droit
 - Tu utilises un français juridique rigoureux, précis et accessible
+- Tu adaptes systématiquement tes réponses au droit national du {p['pays']}
+  tout en maîtrisant le socle OHADA commun aux 17 États membres
 """
+
+IDENTITE_ODYXIA = get_identite_odyxia("CM")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
