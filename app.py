@@ -12,6 +12,7 @@ import threading
 import time
 import secrets
 import hashlib as _hashlib
+import sentry_sdk
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
@@ -28,6 +29,16 @@ from supabase import create_client
 import requests
 import base64
 from io import BytesIO
+from sentry_sdk.integrations.flask import FlaskIntegration
+
+sentry_sdk.init(
+    dsn=os.environ.get("SENTRY_DSN", ""),
+    integrations=[FlaskIntegration()],
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+    environment=os.environ.get("SENTRY_ENV", "production"),
+    send_default_pii=False  # Ne pas envoyer les données personnelles
+)
 
 from encryption import chiffrer, dechiffrer, est_chiffre, extraire_index
 from audit_logger import (
