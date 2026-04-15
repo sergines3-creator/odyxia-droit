@@ -1381,10 +1381,6 @@ def question():
             return jsonify({"erreur": "acces_expire",
                             "message": _abo["message"],
                             "plan": _abo["plan"]}), 402
-        
-        if _abo["plan"] == "trial":
-            return jsonify({"erreur": "acces_premium",
-                            "message": "Fonctionnalité disponible après la période d'essai."}), 402
 
         if not q:
             return jsonify({"erreur": "Question vide"}), 400
@@ -1700,9 +1696,6 @@ def rediger():
             return jsonify({"erreur":"acces_expire",
                             "message":_abo["message"],
                             "plan":_abo["plan"]}), 402
-        if _abo["plan"] == "trial":
-            return jsonify({"erreur": "acces_premium",
-                            "message": "Fonctionnalité disponible après la période d'essai."}), 402
 
         inj_faits = analyser_injection(
             donnees.get("faits","") or donnees.get("objet",""), champ="faits")
@@ -2306,9 +2299,6 @@ def comparaison_analyser():
         _abo = verifier_abonnement(tenant_id)
         if not _abo["actif"]:
             return jsonify({"erreur":"acces_expire", "message":_abo["message"]}), 402
-        if _abo["plan"] == "trial":
-            return jsonify({"erreur": "acces_premium",
-                            "message": "Fonctionnalité disponible après la période d'essai."}), 402
 
         for _val, _nom in [(juge,"juge"),(affaire,"affaire"),
                            (arguments_def,"arguments_defense"),(antecedents,"antecedents")]:
