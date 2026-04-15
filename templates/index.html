@@ -714,7 +714,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 }
 .bib-search-box input{border:none;outline:none;background:transparent;font-size:12px;font-family:var(--font);color:#0A0A0A;flex:1;}
 .bib-search-box input::placeholder{color:#A3A3A3;}
-.bib-body{flex:1;display:flex;overflow:hidden;}
+.bib-body{flex:1;display:flex;overflow:hidden;width:100%;}
 .bib-list-col{
   width:280px;flex-shrink:0;background:#FAFAFA;
   border-right:0.5px solid #E5E5E5;display:flex;flex-direction:column;overflow:hidden;
@@ -745,7 +745,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .bib-b-wait{background:#FEF9C3;color:#854D0E;}
 
 /* Viewer */
-.bib-viewer-col{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#fff;}
+.bib-viewer-col{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#fff;min-width:0;width:100%;}
 .bib-viewer-hdr{
   padding:16px 20px;border-bottom:0.5px solid #E5E5E5;flex-shrink:0;
   display:flex;align-items:flex-start;gap:14px;
@@ -1742,7 +1742,7 @@ async function afficherCarteMentale() {
     body.style.display = 'block';
     body.style.cssText = 'overflow-x:auto;overflow-y:auto;min-height:500px;display:block;width:100%;';
     const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'position:relative;overflow:hidden;cursor:grab;user-select:none;height:500px;background:#FAFAFA;border-radius:8px;';
+    wrapper.style.cssText = 'position:relative;overflow:hidden;cursor:grab;user-select:none;height:600px;background:#FAFAFA;border-radius:8px;';
 
     const inner = document.createElement('div');
     inner.style.cssText = 'position:absolute;top:0;left:0;transform-origin:top left;';
@@ -1818,8 +1818,8 @@ function buildMindMapSVG(carte) {
   const tcols  = ['#92400E','#15803D','#1E40AF','#991B1B','#6B21A8','#9A3412'];
   const strokes= ['#F59E0B','#22C55E','#3B82F6','#EF4444','#A855F7','#F97316'];
 
-  const BW=180, BH=44, FW=160, FH=36, VGAP=14, HGAP=80;
-  const W=900, CX=450;
+  const BW=180, BH=44, FW=160, FH=36, VGAP=14, HGAP=100;
+  const W=1400, CX=700;
 
   const leftBranches  = branches.filter((_,i) => i < Math.ceil(n/2));
   const rightBranches = branches.filter((_,i) => i >= Math.ceil(n/2));
