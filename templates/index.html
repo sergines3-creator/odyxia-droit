@@ -1740,7 +1740,7 @@ async function afficherCarteMentale() {
     if (!section) return;
     section.style.display = 'block';
     body.style.display = 'block';
-    body.style.cssText = 'overflow-x:auto;overflow-y:auto;min-height:500px;';
+    body.style.cssText = 'overflow-x:auto;overflow-y:auto;min-height:500px;display:block;width:100%;';
     body.innerHTML = buildMindMapSVG(r.carte);
     document.getElementById('mm-viewer-lbl').textContent = 'Masquer la carte mentale';
     document.getElementById('btn-export-carte').style.display = 'inline-flex';
@@ -1767,7 +1767,7 @@ function buildMindMapSVG(carte) {
   const strokes= ['#F59E0B','#22C55E','#3B82F6','#EF4444','#A855F7','#F97316'];
 
   const BW=180, BH=44, FW=160, FH=36, VGAP=14, HGAP=80;
-  const W=1200, CX=600;
+  const W=900, CX=450;
 
   const leftBranches  = branches.filter((_,i) => i < Math.ceil(n/2));
   const rightBranches = branches.filter((_,i) => i >= Math.ceil(n/2));
