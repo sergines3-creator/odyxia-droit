@@ -1,25 +1,44 @@
-﻿# rebuild
+﻿# requirements.txt
+# ODYXIA Droit — Dépendances Python
+# Mis à jour : Voyage AI supprimé, SBERT + Redis ajoutés (6 réformes)
+
+# ── Framework ──────────────────────────────────────────────────────
 flask==3.1.0
 flask-cors==5.0.0
-anthropic==0.49.0
-supabase==2.15.0
-gunicorn==23.0.0
-pymupdf==1.25.3
-reportlab==4.2.5
-beautifulsoup4==4.13.3
-requests==2.32.3
 flask-jwt-extended==4.7.1
 flask-limiter==3.9.2
 flask-talisman==1.1.0
-python-dotenv==1.1.0
+gunicorn==23.0.0
+
+# ── IA ─────────────────────────────────────────────────────────────
+anthropic==0.49.0
+
+# Reforme 1 — SBERT local (remplace Voyage AI)
+sentence-transformers>=2.2.0
+
+# ── Base de données ────────────────────────────────────────────────
+supabase==2.15.0
+
+# Reforme 3 — Cache Redis
+redis>=4.0.0
+
+# ── PDF et OCR ─────────────────────────────────────────────────────
+pymupdf==1.25.3
+reportlab==4.2.5
+pytesseract==0.3.13
+Pillow==10.4.0
+
+# ── Securite ───────────────────────────────────────────────────────
 bcrypt==4.3.0
+cryptography==44.0.2
+
+# ── Utilitaires ────────────────────────────────────────────────────
+python-dotenv==1.1.0
+requests==2.32.3
+beautifulsoup4==4.13.3
+zstandard==0.23.0
 pyotp==2.9.0
 qrcode[pil]==8.1
 schedule==1.2.2
-cryptography==44.0.2
-voyageai==0.3.7
-zstandard==0.23.0
-pytesseract==0.3.13
-Pillow==10.4.0
 resend==2.4.0
 sentry-sdk[flask]==2.19.0

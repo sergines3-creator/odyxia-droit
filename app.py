@@ -69,8 +69,7 @@ SUPABASE_URL   = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY   = os.environ.get("SUPABASE_KEY")
 ANTHROPIC_KEY  = os.environ.get("ANTHROPIC_API_KEY")
 VOYAGE_API_KEY = os.environ.get("VOYAGE_API_KEY")
-VOYAGE_MODEL   = "voyage-law-2"
-VOYAGE_URL_API = "https://api.voyageai.com/v1/embeddings"
+# VOYAGE_API_KEY supprimé — remplacé par SBERT local (Réforme 1)
 TOTP_SECRET    = os.environ.get("TOTP_SECRET", "")
 
 CABINET_NOM    = os.environ.get("CABINET_NOM",    "Odyxia Droit")
@@ -100,6 +99,113 @@ limiter = Limiter(
 )
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# ── CLIENT ODYXIA IA ──────────────────────────────────────
+ODYXIA_IA_URL = os.environ.get("ODYXIA_IA_URL", "http://127.0.0.1:5001")
+ODYXIA_IA_EMAIL = os.environ.get("ODYXIA_IA_EMAIL", "avocat@cm.com")
+ODYXIA_IA_PASSWORD = os.environ.get("ODYXIA_IA_PASSWORD", "test123")
+_odyxia_token = None
+
+def get_odyxia_token():
+    """Récupère ou rafraîchit le token Odyxia IA."""
+    global _odyxia_token
+    try:
+        res = requests.post(
+            f"{ODYXIA_IA_URL}/login",
+            json={"email": ODYXIA_IA_EMAIL, "password": ODYXIA_IA_PASSWORD},
+            timeout=5
+        )
+        if res.status_code == 200:
+            _odyxia_token = res.json().get("token")
+    except Exception as e:
+        print(f"[ODYXIA IA] Login failed: {e}")
+    return _odyxia_token
+
+def odyxia_question(question: str, pays: str = "CM") -> str:
+    """Envoie une question à l'API Odyxia IA et retourne la réponse texte."""
+    global _odyxia_token
+    try:
+        if not _odyxia_token:
+            get_odyxia_token()
+
+        res = requests.post(
+            f"{ODYXIA_IA_URL}/question",
+            json={"question": question, "pays": pays},
+            headers={"Authorization": f"Bearer {_odyxia_token}"},
+            timeout=30
+        )
+
+        if res.status_code == 401:
+            get_odyxia_token()
+            res = requests.post(
+                f"{ODYXIA_IA_URL}/question",
+                json={"question": question, "pays": pays},
+                headers={"Authorization": f"Bearer {_odyxia_token}"},
+                timeout=30
+            )
+
+        data = res.json()
+        return data.get("reponse") or data.get("definition") or str(data)
+
+    except Exception as e:
+        print(f"[ODYXIA IA] Erreur: {e}")
+        return f"Erreur Odyxia IA: {str(e)[:100]}"
+
+def odyxia_analyser(faits: str, pays: str = "CM") -> dict:
+    """Analyse juridique via Odyxia IA."""
+    global _odyxia_token
+    try:
+        if not _odyxia_token:
+            get_odyxia_token()
+
+        res = requests.post(
+            f"{ODYXIA_IA_URL}/analyser",
+            json={"faits": faits, "pays": pays},
+            headers={"Authorization": f"Bearer {_odyxia_token}"},
+            timeout=30
+        )
+
+        if res.status_code == 401:
+            get_odyxia_token()
+            res = requests.post(
+                f"{ODYXIA_IA_URL}/analyser",
+                json={"faits": faits, "pays": pays},
+                headers={"Authorization": f"Bearer {_odyxia_token}"},
+                timeout=30
+            )
+
+        return res.json()
+
+    except Exception as e:
+        return {"erreur": str(e)[:100]}
+
+def odyxia_rediger(type_acte: str, donnees: dict, pays: str = "CM") -> dict:
+    """Rédaction d'acte via Odyxia IA."""
+    global _odyxia_token
+    try:
+        if not _odyxia_token:
+            get_odyxia_token()
+
+        res = requests.post(
+            f"{ODYXIA_IA_URL}/rediger",
+            json={"type_acte": type_acte, "donnees": donnees, "pays": pays},
+            headers={"Authorization": f"Bearer {_odyxia_token}"},
+            timeout=30
+        )
+
+        if res.status_code == 401:
+            get_odyxia_token()
+            res = requests.post(
+                f"{ODYXIA_IA_URL}/rediger",
+                json={"type_acte": type_acte, "donnees": donnees, "pays": pays},
+                headers={"Authorization": f"Bearer {_odyxia_token}"},
+                timeout=30
+            )
+
+        return res.json()
+
+    except Exception as e:
+        return {"erreur": str(e)[:100]}
 client   = Anthropic(api_key=ANTHROPIC_KEY)
 
 # ─── BLUEPRINTS ───────────────────────────────────────────────────────────────
@@ -331,6 +437,148 @@ MOTS_VIDES = {
 }
 
 
+# ─── CACHE (Réforme 3) ────────────────────────────────────────────────────────
+_cache_mem    = {}
+_redis_client = None
+
+def _get_redis():
+    global _redis_client
+    if _redis_client is not None:
+        return _redis_client if _redis_client is not False else None
+    try:
+        import redis as _redis
+        r = _redis.Redis(
+            host=os.environ.get("REDIS_HOST", "localhost"),
+            port=int(os.environ.get("REDIS_PORT", 6379)),
+            db=0, socket_timeout=1, socket_connect_timeout=1
+        )
+        r.ping()
+        _redis_client = r
+        print("[CACHE] Redis connecté")
+        return r
+    except Exception:
+        _redis_client = False
+        return None
+
+def cache_get(cle: str):
+    try:
+        r = _get_redis()
+        if r:
+            val = r.get(f"odyxia:{cle}")
+            return val.decode("utf-8") if val else None
+        return _cache_mem.get(cle)
+    except Exception:
+        return None
+
+def cache_set(cle: str, valeur: str, ttl: int = 3600):
+    try:
+        r = _get_redis()
+        if r:
+            r.setex(f"odyxia:{cle}", ttl, valeur)
+        else:
+            if len(_cache_mem) >= 500:
+                _cache_mem.pop(next(iter(_cache_mem)))
+            _cache_mem[cle] = valeur
+    except Exception:
+        pass
+
+def cache_key(question: str, tenant_id: str, dossier_id: str = None) -> str:
+    import hashlib as _hc
+    contenu = f"{tenant_id}:{dossier_id or ''}:{question.strip().lower()}"
+    return _hc.sha256(contenu.encode()).hexdigest()[:32]
+
+
+
+def _chunker_semantique(texte: str, taille: int = 400, overlap: int = 50) -> list:
+    """
+    Réforme 2 — Chunking sémantique avec chevauchement.
+    Remplace le découpage fixe par 800 chars.
+    taille : mots cibles par chunk | overlap : mots de chevauchement
+    """
+    if not texte or not texte.strip():
+        return []
+    texte = re.sub(r'\n{3,}', '\n\n', texte)
+    texte = re.sub(r' {2,}', ' ', texte)
+    paragraphes = [p.strip() for p in texte.split('\n\n') if p.strip()]
+    if not paragraphes:
+        paragraphes = [texte.strip()]
+
+    chunks  = []
+    buffer  = []
+    nb_mots = 0
+
+    for para in paragraphes:
+        mots_para = para.split()
+        if len(mots_para) > taille * 1.5:
+            phrases = re.split(r'(?<=[.!?;])\s+', para)
+            for phrase in phrases:
+                mots_phrase = phrase.split()
+                if not mots_phrase:
+                    continue
+                if nb_mots + len(mots_phrase) > taille and buffer:
+                    ct = ' '.join(buffer)
+                    if len(ct) > 80:
+                        chunks.append(ct)
+                    buffer  = buffer[-overlap:] if overlap else []
+                    nb_mots = len(buffer)
+                buffer  += mots_phrase
+                nb_mots += len(mots_phrase)
+        else:
+            if nb_mots + len(mots_para) > taille and buffer:
+                ct = ' '.join(buffer)
+                if len(ct) > 80:
+                    chunks.append(ct)
+                buffer  = buffer[-overlap:] if overlap else []
+                nb_mots = len(buffer)
+            buffer  += mots_para
+            nb_mots += len(mots_para)
+
+    if buffer:
+        ct = ' '.join(buffer)
+        if len(ct) > 80:
+            chunks.append(ct)
+    return chunks
+
+
+
+
+# ─── RERANKING (Réforme 5) ───────────────────────────────────────────────────
+_reranker_model = None
+
+def _get_reranker():
+    global _reranker_model
+    if _reranker_model is not None:
+        return _reranker_model if _reranker_model is not False else None
+    try:
+        from sentence_transformers import CrossEncoder
+        _reranker_model = CrossEncoder(
+            "cross-encoder/ms-marco-MiniLM-L-6-v2", max_length=512
+        )
+        print("[RERANKER] Cross-encoder prêt")
+        return _reranker_model
+    except Exception as e:
+        print(f"[RERANKER] Non disponible : {e}")
+        _reranker_model = False
+        return None
+
+def reranker_chunks(question: str, chunks: list, top_k: int = 5) -> list:
+    """Rerank les chunks par cross-encoder. Fallback cosine si absent."""
+    if not chunks:
+        return []
+    if len(chunks) <= top_k:
+        return chunks
+    model = _get_reranker()
+    if model is None:
+        return chunks[:top_k]
+    try:
+        paires = [(question, c.get("contenu", "")[:500]) for c in chunks]
+        scores = model.predict(paires)
+        return [c for c, _ in sorted(zip(chunks, scores), key=lambda x: x[1], reverse=True)[:top_k]]
+    except Exception as e:
+        print(f"[RERANKER] Erreur : {e}")
+        return chunks[:top_k]
+
+
 def rechercher_chunks(question: str, limite: int = 10,
                       dossier_id: str = None, tenant_id: str = None) -> list:
     tous_chunks = []
@@ -418,28 +666,62 @@ def rechercher_chunks(question: str, limite: int = 10,
     return tous_chunks[:limite]
 
 
-# ─── VOYAGE AI ────────────────────────────────────────────────────────────────
+
+# ─── SBERT LOCAL (remplace Voyage AI) ────────────────────────────────────────
+# RÉFORME 1 : SBERT local — gratuit, tourne sur Hetzner
+# Remplace Voyage AI ($0.10/M tokens) par SBERT (~420Mo RAM, $0)
+#
+# POINT CRITIQUE — dimension embeddings :
+# Voyage-law-2 → 1024 dims | SBERT → 384 dims
+# Les anciens chunks ont des embeddings 1024 dims.
+# Re-vectoriser tous les chunks :
+#   python3 re_vectoriser.py
+#
+# Ajouter dans requirements.txt : sentence-transformers>=2.2.0
+
+_sbert_model = None
+
+def get_sbert_model():
+    """Charge SBERT une seule fois en mémoire (lazy loading)."""
+    global _sbert_model
+    if _sbert_model is None:
+        from sentence_transformers import SentenceTransformer
+        print("[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...")
+        _sbert_model = SentenceTransformer(
+            "paraphrase-multilingual-MiniLM-L12-v2"
+        )
+        print(f"[SBERT] Prêt — dim={_sbert_model.get_sentence_embedding_dimension()}")
+    return _sbert_model
 
 def get_query_embedding(question: str):
+    """Génère l embedding d une question via SBERT local."""
     try:
-        if not VOYAGE_API_KEY:
-            return None
-        res = requests.post(
-            VOYAGE_URL_API,
-            headers={"Authorization": f"Bearer {VOYAGE_API_KEY}",
-                     "Content-Type": "application/json"},
-            json={"input": [question[:4096]], "model": VOYAGE_MODEL,
-                  "input_type": "query"},
-            timeout=10
+        model = get_sbert_model()
+        embedding = model.encode(
+            question[:512], normalize_embeddings=True, show_progress_bar=False
         )
-        res.raise_for_status()
-        return res.json()["data"][0]["embedding"]
+        return embedding.tolist()
     except Exception as e:
-        print(f"[VOYAGE] Erreur : {e}")
+        print(f"[SBERT] Erreur query : {e}")
         return None
 
+def _vectoriser_document_sbert_batch(textes: list):
+    """Vectorise un batch de textes en une seule passe."""
+    try:
+        model = get_sbert_model()
+        embeddings = model.encode(
+            [t[:512] for t in textes],
+            normalize_embeddings=True,
+            batch_size=32,
+            show_progress_bar=False,
+        )
+        return [e.tolist() for e in embeddings]
+    except Exception as e:
+        print(f"[SBERT] Erreur batch : {e}")
+        return [None] * len(textes)
 
 def _vectoriser_document(doc_id: str, tenant_id: str):
+    """Vectorise tous les chunks d un document avec SBERT batch."""
     try:
         result = supabase.table("chunks").select(
             "id,content,contenu_index"
@@ -447,35 +729,24 @@ def _vectoriser_document(doc_id: str, tenant_id: str):
         chunks = result.data
         if not chunks:
             return
-        BATCH = 20
+        textes = []
+        for c in chunks:
+            texte = c.get("contenu_index") or c.get("content") or ""
+            if texte.startswith("ENC:"):
+                texte = "document juridique confidentiel"
+            textes.append(texte.strip() or "document juridique")
+        embeddings = _vectoriser_document_sbert_batch(textes)
+        BATCH = 50
         for i in range(0, len(chunks), BATCH):
-            lot    = chunks[i:i+BATCH]
-            textes = []
-            for c in lot:
-                texte = c.get("contenu_index") or c.get("content") or c.get("contenu","")
-                if texte.startswith("ENC:"):
-                    texte = "document juridique confidentiel"
-                textes.append(texte.strip() or "document juridique")
-            try:
-                emb_res = requests.post(
-                    VOYAGE_URL_API,
-                    headers={"Authorization": f"Bearer {VOYAGE_API_KEY}",
-                             "Content-Type": "application/json"},
-                    json={"input": textes, "model": VOYAGE_MODEL, "input_type": "document"},
-                    timeout=30
-                )
-                emb_res.raise_for_status()
-                embeddings = [item["embedding"] for item in emb_res.json()["data"]]
-                for j, chunk in enumerate(lot):
+            lot = chunks[i:i + BATCH]
+            for chunk, emb in zip(lot, embeddings[i:i + BATCH]):
+                if emb:
                     supabase.table("chunks").update(
-                        {"embedding": embeddings[j]}
+                        {"embedding": emb}
                     ).eq("id", chunk["id"]).execute()
-                time.sleep(0.2)
-            except Exception as e:
-                print(f"[VOYAGE] Erreur lot : {e}")
-        print(f"[VOYAGE] Vectorisation terminee {doc_id[:8]}")
+        print(f"[SBERT] Vectorisation terminée {doc_id[:8]} — {len(chunks)} chunks")
     except Exception as e:
-        print(f"[VOYAGE] Erreur globale : {e}")
+        print(f"[SBERT] Erreur vectorisation : {e}")
 
 
 # ─── ABONNEMENT ──────────────────────────────────────────────────────────────
@@ -659,6 +930,55 @@ def obtenir_stats_connexions(tenant_id, debut, fin):
     except Exception as e:
         log_erreur("STATS_CONNEXIONS", e)
         return 0, 0
+
+
+# ─── PROMPT JURIDIQUE AFRICAIN (Réforme 6) ───────────────────────────────────
+_CONTEXTE_PAYS = {
+    "CM": "Cameroun — Code du travail (Loi n92/007), Code pénal CM, droit CEMAC",
+    "GA": "Gabon — Code du travail gabonais, Code civil gabonais, droit CEMAC",
+    "CI": "Côte d Ivoire — Code du travail ivoirien, droit UEMOA",
+    "SN": "Sénégal — Code du travail sénégalais, droit UEMOA",
+    "BJ": "Bénin — Code du travail béninois, droit UEMOA",
+    "ML": "Mali — Code du travail malien, droit UEMOA",
+    "BF": "Burkina Faso — Code du travail burkinabè, droit UEMOA",
+    "TG": "Togo — Code du travail togolais, droit UEMOA",
+    "NE": "Niger — Code du travail nigérien, droit UEMOA",
+    "TD": "Tchad — Code du travail tchadien, droit CEMAC",
+    "CG": "Congo-Brazzaville — Code du travail congolais, droit CEMAC",
+    "GN": "Guinée — Code du travail guinéen, droit OHADA",
+    "GQ": "Guinée Équatoriale — droit CEMAC, droit OHADA",
+    "CF": "Centrafrique — droit CEMAC, droit OHADA",
+}
+
+_SYSTEM_PROMPT_BASE = """Tu es Odyxia, assistant juridique expert en droit africain francophone.
+CADRE : droit OHADA (17 États), droit CEMAC/COBAC, droits nationaux africains.
+Hiérarchie : OHADA -> droit communautaire -> droit national.
+RÈGLES ABSOLUES :
+1. Citer toujours l article et la loi applicables
+2. Distinguer droit OHADA (supranational) et droit national
+3. Si absent des documents : dire "Je ne trouve pas cette information dans vos documents"
+4. Ne jamais inventer de jurisprudence ou d articles
+5. Signaler si un délai est légal vs conventionnel
+6. Recommander de consulter un avocat pour les décisions importantes
+STYLE : réponses structurées, langue juridique précise, sources entre crochets."""
+
+def _construire_system_prompt_odyxia(chunks: list, pays: str = "CM") -> str:
+    """Construit le prompt système avec contexte RAG et pays."""
+    pays_info = _CONTEXTE_PAYS.get(pays, "Zone OHADA — droit africain francophone")
+    system = f"{_SYSTEM_PROMPT_BASE}\nCONTEXTE NATIONAL : {pays_info}\n"
+    if chunks:
+        contexte_parts = []
+        doc_cache = {}
+        for i, chunk in enumerate(chunks, 1):
+            doc_id = chunk.get("document_id", "")
+            if doc_id not in doc_cache:
+                doc_cache[doc_id] = obtenir_nom_document(doc_id)
+            nom = doc_cache[doc_id]
+            page = chunk.get("page_numero", 1)
+            contexte_parts.append(f"[Source {i} — {nom}, p.{page}]\n{chunk.get('contenu', '')}")
+        system += "\n\nDOCUMENTS DISPONIBLES :\n" + "\n\n".join(contexte_parts)
+    return system
+
 
 # ─── ROUTES PUBLIQUES ─────────────────────────────────────────────────────────
 
@@ -1425,14 +1745,7 @@ def question():
         system_prompt, messages, sources, historique_session = \
             _preparer_contexte_chat(q, session_id, tenant_id, dossier_id, code_pays)
 
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=2000,
-            system=system_prompt,
-            messages=messages
-        )
-
-        reponse_texte = response.content[0].text
+        reponse_texte = odyxia_question(q, pays=get_current_pays_code())
         historique_session.append({"question": q, "reponse": reponse_texte})
         save_session(session_id, historique_session, tenant_id)
         log_audit_event("RAG_QUERY", tenant_id, get_current_user_id(),
@@ -1444,20 +1757,19 @@ def question():
         return jsonify({"reponse": "Erreur : " + str(e), "sources": []}), 500
 
 
+
 @app.route("/question_stream", methods=["POST"])
 @jwt_required()
 @limiter.limit("30 per minute")
 def question_stream():
     try:
-        # 1. Extraction et validation
-        user_id = get_jwt_identity()
-        tenant_id = get_current_tenant_id() # Doit venir du JWT
-        data = request.json
-        q = data.get("question", "").strip()
+        user_id    = get_jwt_identity()
+        tenant_id  = get_current_tenant_id()
+        data       = request.json
+        q          = data.get("question", "").strip()
         session_id = data.get("session_id", "default")
         dossier_id = data.get("dossier_id")
 
-        # 2. Vérification d'accès (Abonnement)
         _abo = verifier_abonnement(tenant_id)
         if not _abo["actif"]:
             return jsonify({"erreur": "acces_expire", "message": _abo["message"]}), 402
@@ -1465,56 +1777,89 @@ def question_stream():
         if not q:
             return jsonify({"erreur": "La question est requise"}), 400
 
-        # 3. Sécurité : Détection d'injection
         inj = analyser_injection(q, champ="question_stream")
         if inj.bloque:
             log_security_event("prompt_injection_bloquee", tenant_id, user_id, {"score": inj.score})
             return jsonify({"erreur": "Contenu non autorisé"}), 400
 
-        # 4. Préparation du contexte
-        system_prompt, messages, sources, historique_session = \
-            _preparer_contexte_chat(q, session_id, tenant_id, dossier_id)
+        # Réforme 3 — vérifier le cache
+        cle_cache = cache_key(q, tenant_id, dossier_id)
+        cached    = cache_get(cle_cache)
+        if cached:
+            def generer_cache():
+                yield f"data: {json.dumps({'type': 'sources', 'sources': []}, ensure_ascii=False)}\n\n"
+                yield f"data: {json.dumps({'type': 'token', 'text': cached}, ensure_ascii=False)}\n\n"
+                yield f"data: {json.dumps({'type': 'fin', 'complet': cached}, ensure_ascii=False)}\n\n"
+            return Response(
+                stream_with_context(generer_cache()),
+                mimetype="text/event-stream",
+                headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
+            )
 
+        # Réforme 2+5 — RAG avec chunking sémantique + reranking
+        chunks_bruts      = rechercher_chunks(q, dossier_id=dossier_id, tenant_id=tenant_id)
+        chunks_rerankes   = reranker_chunks(q, chunks_bruts, top_k=5)
+        historique_session = get_session(session_id, tenant_id)
+        pays_code          = get_current_pays_code()
+
+        # Réforme 6 — Prompt juridique africain
+        system_prompt = _construire_system_prompt_odyxia(chunks_rerankes, pays_code)
+        sources       = []
+        doc_cache     = {}
+        for chunk in chunks_rerankes:
+            doc_id = chunk.get("document_id", "")
+            if doc_id not in doc_cache:
+                doc_cache[doc_id] = obtenir_nom_document(doc_id)
+            ref = f"{doc_cache[doc_id]} (p.{chunk.get('page_numero', 1)})"
+            if ref not in sources:
+                sources.append(ref)
+
+        messages = []
+        for e in historique_session[-3:]:
+            messages.append({"role": "user",      "content": e.get("question", "")})
+            messages.append({"role": "assistant", "content": e.get("reponse", "")})
+        messages.append({"role": "user", "content": q})
+
+        # Réforme 4 — Streaming natif Claude
         def generer():
-            reponse_complete = ""
             try:
-                # Envoi immédiat des sources pour rassurer l'utilisateur
-                yield f"data: {json.dumps({'type':'sources','sources':list(set(sources))}, ensure_ascii=False)}\n\n"
-
+                yield f"data: {json.dumps({'type': 'sources', 'sources': list(set(sources))}, ensure_ascii=False)}\n\n"
+                reponse_complete = ""
                 with client.messages.stream(
                     model="claude-sonnet-4-20250514",
-                    max_tokens=2000,
+                    max_tokens=1500,
                     system=system_prompt,
-                    messages=messages
+                    messages=messages,
                 ) as stream:
                     for token in stream.text_stream:
                         reponse_complete += token
-                        yield f"data: {json.dumps({'type':'token','text':token}, ensure_ascii=False)}\n\n"
-
-                # Sauvegarde sécurisée même si la connexion client coupe après le stream
+                        yield f"data: {json.dumps({'type': 'token', 'text': token}, ensure_ascii=False)}\n\n"
                 try:
-                    historique_session.append({"question": q, "reponse": reponse_complete, "at": datetime.utcnow().isoformat()})
+                    historique_session.append({
+                        "question": q, "reponse": reponse_complete,
+                        "at": datetime.utcnow().isoformat()
+                    })
                     save_session(session_id, historique_session, tenant_id)
+                    # Réforme 3 — mise en cache
+                    cache_set(cle_cache, reponse_complete, ttl=3600)
                 except Exception as e_save:
                     log_erreur("SAVE_SESSION_STREAM", e_save)
-
-                yield f"data: {json.dumps({'type':'fin','complet':reponse_complete}, ensure_ascii=False)}\n\n"
-
+                yield f"data: {json.dumps({'type': 'fin', 'complet': reponse_complete}, ensure_ascii=False)}\n\n"
             except Exception as e:
-                log_erreur("STREAM_CORE", e)
-                yield f"data: {json.dumps({'type':'erreur','message': 'Une interruption est survenue'}, ensure_ascii=False)}\n\n"
+                log_erreur("STREAM_CLAUDE", e)
+                yield f"data: {json.dumps({'type': 'erreur', 'message': 'Interruption du service'}, ensure_ascii=False)}\n\n"
 
-        return Response(stream_with_context(generer()),
-                        mimetype="text/event-stream",
-                        headers={
-                            "Cache-Control": "no-cache",
-                            "X-Accel-Buffering": "no",
-                            "Connection": "keep-alive"
-                        })
+        return Response(
+            stream_with_context(generer()),
+            mimetype="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no", "Connection": "keep-alive"}
+        )
 
     except Exception as e:
         log_erreur("QUESTION_STREAM_GLOBAL", e)
         return jsonify({"erreur": "Erreur interne du service de streaming"}), 500
+
+
 
 
 @app.route("/nouvelle-conversation", methods=["POST"])
@@ -1560,13 +1905,7 @@ def sauvegarder_memoire():
             "Conversation: " + texte_conv
         )
 
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=200,
-            messages=[{"role":"user","content":prompt_resume}]
-        )
-
-        texte     = response.content[0].text.strip()
+        texte = odyxia_question(prompt_resume)
         resume    = ""
         mots_cles = []
         domaine   = ""
@@ -1642,12 +1981,8 @@ def synthese_document():
 
         nom_doc  = obtenir_nom_document(document_id)
         prompt   = prompt_synthese_document(texte_complet, nom_doc)
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1000,
-            messages=[{"role":"user","content":prompt}]
-        )
-        raw      = response.content[0].text.strip().replace("```json","").replace("```","").strip()
+        raw      = odyxia_question(prompt)
+        raw      = raw.replace("```json","").replace("```","").strip()
         synthese = json.loads(raw)
         return jsonify({"succes":True,"synthese":synthese,"document_id":document_id})
     except Exception as e:
@@ -1688,13 +2023,9 @@ def carte_mentale():
 
         nom_doc      = obtenir_nom_document(document_id)
         prompt_texte = prompt_carte_mentale(texte_complet, nom_doc)
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1500,
-            messages=[{"role":"user","content":prompt_texte}]
-        )
-        raw   = response.content[0].text.strip().replace("```json","").replace("```","").strip()
-        carte = json.loads(raw)
+        raw          = odyxia_question(prompt_texte)
+        raw          = raw.replace("```json","").replace("```","").strip()
+        carte        = json.loads(raw)
         return jsonify({"succes":True,"document_id":document_id,"nom":nom_doc,"carte":carte})
 
     except json.JSONDecodeError as e:
@@ -1754,13 +2085,14 @@ def rediger():
             type_doc, donnees,
             contexte or "Aucun document indexe dans ce dossier.")
 
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=4000,
-            messages=[{"role":"user","content":prompt_texte}]
-        )
-
-        document_genere = response.content[0].text
+        pays_code       = get_current_pays_code()
+        resultat_ia     = odyxia_rediger(type_doc, donnees, pays=pays_code)
+        document_genere = resultat_ia.get("acte", {}).get("preambule", "") + "\n\n"
+        for art in resultat_ia.get("acte", {}).get("articles", []):
+            document_genere += f"## Article {art.get('numero')} — {art.get('titre')}\n{art.get('contenu')}\n\n"
+        document_genere += resultat_ia.get("acte", {}).get("clauses_finales", "")
+        if not document_genere.strip():
+            document_genere = odyxia_question(prompt_texte, pays=pays_code)
         config          = PROMPTS_REDACTION[type_doc]
 
         log_audit_event("DOCUMENT_GENERATED", tenant_id, get_current_user_id(),
@@ -2029,41 +2361,46 @@ def upload_document():
             }
         }).execute()
 
+
         def traiter_pdf_async(pages_texte, doc_id, tenant_id, file_hash, est_sensible, est_manuscrit):
             try:
                 chunks_a_inserer = []
+                chunk_global_idx = 0
                 for page_data in pages_texte:
-                    texte = page_data["texte"]
-                    for j in range(0, len(texte), 800):
-                        chunk_texte = texte[j:j+800].strip()
-                        if len(chunk_texte) > 50:
-                            if est_sensible:
-                                contenu_final = chiffrer(chunk_texte)
-                                index_final   = extraire_index(chunk_texte)
-                            else:
-                                contenu_final = chunk_texte
-                                index_final   = chunk_texte
-                            chunks_a_inserer.append({
-                                "tenant_id":     tenant_id,
-                                "document_id":   doc_id,
-                                "content":       contenu_final,
-                                "contenu":       contenu_final,
-                                "contenu_index": index_final,
-                                "page_number":   page_data["page"],
-                                "page_numero":   page_data["page"],
-                                "chunk_index":   j // 800,
-                                "source_type":   "document",
-                                "source_hash":   file_hash,
-                                "char_count":    len(chunk_texte),
-                                "metadata":      {"sensible": est_sensible, "manuscrit": est_manuscrit}
-                            })
+                    # Réforme 2 — chunking sémantique
+                    chunks_texte = _chunker_semantique(page_data["texte"], taille=400, overlap=50)
+                    for chunk_texte in chunks_texte:
+                        if len(chunk_texte.strip()) < 80:
+                            continue
+                        if est_sensible:
+                            contenu_final = chiffrer(chunk_texte)
+                            index_final   = extraire_index(chunk_texte)
+                        else:
+                            contenu_final = chunk_texte
+                            index_final   = chunk_texte
+                        chunks_a_inserer.append({
+                            "tenant_id"    : tenant_id,
+                            "document_id"  : doc_id,
+                            "content"      : contenu_final,
+                            "contenu"      : contenu_final,
+                            "contenu_index": index_final,
+                            "page_number"  : page_data["page"],
+                            "page_numero"  : page_data["page"],
+                            "chunk_index"  : chunk_global_idx,
+                            "source_type"  : "document",
+                            "source_hash"  : file_hash,
+                            "char_count"   : len(chunk_texte),
+                            "metadata"     : {"sensible": est_sensible, "manuscrit": est_manuscrit, "chunker": "semantique_v2"}
+                        })
+                        chunk_global_idx += 1
                 for i in range(0, len(chunks_a_inserer), 100):
                     supabase.table("chunks").insert(chunks_a_inserer[i:i+100]).execute()
+                # Réforme 1 — vectorisation SBERT batch
                 _vectoriser_document(doc_id, tenant_id)
                 supabase.table("documents").update({"status": "ready"}).eq("id", doc_id).execute()
-                print(f"[UPLOAD] {doc_id[:8]} — {len(chunks_a_inserer)} chunks insérés")
+                print(f"[UPLOAD-V2] {doc_id[:8]} — {len(chunks_a_inserer)} chunks sémantiques")
             except Exception as e:
-                print(f"[UPLOAD ERROR] {e}")
+                print(f"[UPLOAD-V2 ERROR] {e}")
                 supabase.table("documents").update({"status": "error"}).eq("id", doc_id).execute()
 
         threading.Thread(
@@ -2354,14 +2691,16 @@ def comparaison_analyser():
         if not decisions:
             return jsonify({"succes":False,"message":"Aucune decision trouvee.","decisions":[]})
 
-        prompt_texte = prompt_analyse_comparative(juge, juridiction, domaine, periode, decisions)
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=2000,
-            messages=[{"role":"user","content":prompt_texte}]
+        pays_code = get_current_pays_code()
+        from api import odyxia_comparer  # si dans même dossier
+        resultat  = odyxia_question(
+            f"Analyse comparative du juge {juge} juridiction {juridiction} domaine {domaine}",
+            pays=pays_code
         )
-        raw     = response.content[0].text.strip().replace("```json","").replace("```","").strip()
-        analyse = json.loads(raw)
+        try:
+            analyse = json.loads(resultat)
+        except Exception:
+            analyse = {"resume": resultat, "tendances": [], "strategie": resultat}
 
         log_audit_event("COMPARAISON", tenant_id, get_current_user_id(),
                         {"juge":juge,"juridiction":juridiction,"domaine":domaine})
@@ -2795,13 +3134,12 @@ def timeline_dossier():
         texte = texte[:9000]
 
         prompt_texte = prompt_timeline_dossier(texte, dossier_id)
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1500,
-            messages=[{"role":"user","content":prompt_texte}]
-        )
-        raw      = response.content[0].text.strip().replace("```json","").replace("```","").strip()
-        timeline = json.loads(raw)
+        raw          = odyxia_question(prompt_texte)
+        raw          = raw.replace("```json","").replace("```","").strip()
+        try:
+            timeline = json.loads(raw)
+        except Exception:
+            timeline = {"evenements": [], "resume": raw}
         return jsonify({"succes":True,"dossier_id":dossier_id,"timeline":timeline})
 
     except json.JSONDecodeError:
