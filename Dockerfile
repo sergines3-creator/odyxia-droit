@@ -68,11 +68,10 @@ COPY audit_logger.py  .
 COPY prompt_injection.py .
 
 # Blueprints optionnels
-COPY predict_endpoint.py . 2>/dev/null || true
+
 
 # Templates et fichiers statiques
 COPY templates/    ./templates/
-COPY static/       ./static/
 
 # Dossiers de travail
 RUN mkdir -p /app/logs /tmp/odyxia

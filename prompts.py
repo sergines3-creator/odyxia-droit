@@ -991,17 +991,21 @@ Réponds UNIQUEMENT avec ce JSON strict, sans markdown ni backticks :
   "branches": [
     {{
       "label": "Branche 1 — 1 à 4 mots",
+      "page": 1,
+      "extrait": "titre ou première phrase de cette section dans le document",
       "feuilles": [
-        "Feuille 1 — fait ou élément précis",
-        "Feuille 2",
-        "Feuille 3"
+        {{"label": "Feuille 1 — fait précis", "page": 1, "extrait": "texte source de cette feuille"}},
+        {{"label": "Feuille 2", "page": 2, "extrait": "texte source"}},
+        {{"label": "Feuille 3", "page": 3, "extrait": "texte source"}}
       ]
     }},
     {{
       "label": "Branche 2",
+      "page": 2,
+      "extrait": "première phrase de cette section",
       "feuilles": [
-        "Feuille 1",
-        "Feuille 2"
+        {{"label": "Feuille 1", "page": 2, "extrait": "texte source"}},
+        {{"label": "Feuille 2", "page": 3, "extrait": "texte source"}}
       ]
     }}
   ]

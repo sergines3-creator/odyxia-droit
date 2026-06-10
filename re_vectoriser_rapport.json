@@ -1,0 +1,13 @@
+{
+  "date": "2026-06-09T21:35:05.717901",
+  "total": 8192,
+  "traites": 8192,
+  "erreurs": 0,
+  "duree_secondes": 633.6,
+  "vitesse_moy": 12.9,
+  "modele_sbert": "paraphrase-multilingual-MiniLM-L12-v2",
+  "dimension": 384,
+  "tenant": "tous",
+  "force": true,
+  "dry_run": false
+}

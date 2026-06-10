@@ -1888,11 +1888,11 @@ function buildMindMapSVG(carte) {
           const flx2 = side==='left' ? fx+FW : fx;
           const fMidY = fy+FH/2;
 
-          svg += `<g class="feuille-${bid}" style="display:none;" onclick="afficherPassages('${(f||'').replace(/'/g,'&apos;').slice(0,50)}');event.stopPropagation();">`;
+          svg += `<g class="feuille-${bid}" style="display:none;" onclick="afficherPassages(typeof f==='object'?f.label||'':f||'', typeof f==='object'?f.page:null, typeof f==='object'?f.extrait||'':'');event.stopPropagation();">`;
           svg += `<line x1="${flx1}" y1="${bMidY}" x2="${flx2}" y2="${fMidY}" stroke="${strokes[ci]}" stroke-width="1" opacity="0.4"/>`;
-          svg += `<rect x="${fx}" y="${fy}" width="${FW}" height="${FH}" rx="6" fill="#fff" stroke="${strokes[ci]}" stroke-width="1"/>`;
+          svg += `<rect x="${fx}" y="${fy}" width="${FW}" height="${FH}" rx="6" fill="#fff" stroke="${strokes[ci]}" stroke-width="1" style="cursor:pointer"/>`;
 
-          const ftxt = f||'';
+          const ftxt = (typeof f==='object' ? f.label : f)||'';
           if (ftxt.length<=26) {
             svg += `<text x="${fx+FW/2}" y="${fy+FH/2+5}" text-anchor="middle" font-size="11" fill="#374151">${ftxt}</text>`;
           } else {
@@ -1919,31 +1919,22 @@ function toggleFeuilles(bid) {
   feuilles.forEach(f => f.style.display = visible ? 'none' : 'inline');
 }
 
-async function afficherPassages(terme) {
-  if (!DOC_ACTIF || !terme) return;
-  showLoading(true);
-  try {
-    const r = await apiFetch('/question', 'POST', {
-      question: `Montre-moi les passages du document concernant : ${terme}`,
-      session_id: 'carte_' + Date.now()
-    });
-    showLoading(false);
-    if (r?.reponse) {
-      const viewer = document.getElementById('bib-viewer');
-      const existing = viewer.querySelector('.mind-passages');
-      if (existing) existing.remove();
-      const div = document.createElement('div');
-      div.className = 'mind-passages viewer-content';
-      div.style.cssText = 'margin-top:12px;border-top:0.5px solid #E5E5E5;padding-top:12px;';
-      div.innerHTML = '<div style="font-size:10px;font-weight:600;color:#A3A3A3;text-transform:uppercase;margin-bottom:8px;">Passages — ' + terme + '</div>'
-        + '<div style="font-size:12px;color:#0A0A0A;line-height:1.7;">' 
-        + r.reponse.replace(/\n/g,'<br/>') + '</div>';
-      viewer.querySelector('.viewer-content')?.appendChild(div) || viewer.appendChild(div);
-    }
-  } catch(e) {
-    showLoading(false);
-    showToast('Erreur', true);
+function afficherPassages(terme, page, extrait) {
+  if (!terme) return;
+  const viewer = document.getElementById('bib-viewer');
+  if (!viewer) return;
+  const existing = viewer.querySelector('.mind-passages');
+  if (existing) existing.remove();
+  const div = document.createElement('div');
+  div.className = 'mind-passages';
+  div.style.cssText = 'margin-top:12px;border-top:0.5px solid #E5E5E5;padding-top:12px;';
+  let html = '<div style="font-size:10px;font-weight:600;color:#A3A3A3;text-transform:uppercase;margin-bottom:8px;">📍 ' + terme + (page ? ' — Page ' + page : '') + '</div>';
+  if (extrait) {
+    html += '<div style="font-size:12px;color:#0A0A0A;line-height:1.7;background:#F8F8F8;padding:10px;border-radius:6px;border-left:3px solid #1A6B9A;">' + extrait + '</div>';
   }
+  div.innerHTML = html;
+  const vc = viewer.querySelector('.viewer-content');
+  if (vc) vc.appendChild(div); else viewer.appendChild(div);
 }
 
 function exporterCartePNG() {
@@ -1980,8 +1971,27 @@ async function uploadFichier(file, dossierId) {
     showLoading(false);
     if (d.succes) {
       const chunks = d.chunks || 0;
-      showToast('"' + file.name + '" indexé — ' + chunks + ' passage' + (chunks > 1 ? 's' : '') + ' extraits');
-      await chargerDocsBib();
+      showToast('"' + file.name + '" uploadé — indexation en cours...');
+      // Polling jusqu à ce que le document soit vectorisé
+      const docId = d.document_id;
+      let tentatives = 0;
+      const polling = setInterval(async () => {
+        tentatives++;
+        try {
+          const status = await apiFetch('/document_status/' + docId, 'GET');
+          if (status && status.pret) {
+            clearInterval(polling);
+            await chargerDocsBib();
+            showToast('"' + file.name + '" prêt — ' + status.chunks + ' passages indexés ✓');
+          } else if (status) {
+            showToast('Indexation ' + (status.pct || 0) + '%...');
+          }
+        } catch(e) {}
+        if (tentatives >= 30) {
+          clearInterval(polling);
+          await chargerDocsBib();
+        }
+      }, 3000);
     } else {
       showToast('Erreur : ' + (d.erreur || 'Upload échoué'), true);
     }
@@ -2009,13 +2019,12 @@ async function supprimerDocById(id, btn) {
   try {
     await apiFetch('/supprimer_document', 'DELETE', {id});
     showToast('Document supprimé');
-    const row = btn.closest('.bib-doc-row');
-    if (row) row.remove();
     if (DOC_ACTIF?.id === id) {
       DOC_ACTIF = null;
       document.getElementById('bib-viewer').innerHTML = '<div class="bib-empty-viewer"><div style="font-size:13px;font-weight:500;color:#D4D4D4;">Sélectionnez un document</div></div>';
       ['btn-carte-mentale','btn-rediger-bib','btn-export-bib'].forEach(i => { const el = document.getElementById(i); if(el) el.style.display='none'; });
     }
+    await chargerDocsBib();
   } catch(e) { showToast('Erreur : ' + e.message, true); }
 }
 
@@ -2153,7 +2162,16 @@ async function lancerAnalyse() {
     const reponse = r.reponse || '';
     const sources = r.sources || [];
 
-    const _reponse_html = reponse.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br/>');
+    const _reponse_html = reponse
+    .replace(/^### (.+)$/gm, '<h4 style="font-size:13px;font-weight:600;color:#1A6B9A;margin:10px 0 4px;">$1</h4>')
+    .replace(/^## (.+)$/gm,  '<h3 style="font-size:14px;font-weight:700;color:#0B1F3A;margin:14px 0 6px;border-bottom:1px solid #E5E5E5;padding-bottom:4px;">$1</h3>')
+    .replace(/^# (.+)$/gm,   '<h2 style="font-size:15px;font-weight:700;color:#0B1F3A;margin:16px 0 8px;">$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,   '<em>$1</em>')
+    .replace(/^- (.+)$/gm,   '<li style="margin:2px 0;">$1</li>')
+    .replace(/(<li.*<\/li>)/gs, '<ul style="padding-left:18px;margin:6px 0;">$1</ul>')
+    .replace(/\n\n/g, '</p><p style="margin:6px 0;">')
+    .replace(/\n/g, '<br/>');
     const _sources_html = sources.length ? '<div class="sources-row">' + sources.map(s => '<span class="source-chip">' + s + '</span>').join('') + '</div>' : '';
     result.innerHTML =
       '<div class="result-card">'
@@ -2424,9 +2442,13 @@ function creerBulleAI() {
 function renderMsg(el, txt, sources) {
   const box = document.getElementById('chat-messages');
   let html = '<p>' + txt
+  .replace(/^### (.+)$/gm, '<h4 style="font-size:13px;font-weight:600;color:#1A6B9A;margin:8px 0 3px;">$1</h4>')
+  .replace(/^## (.+)$/gm,  '<h3 style="font-size:14px;font-weight:700;color:#0B1F3A;margin:12px 0 5px;border-bottom:1px solid #E5E5E5;padding-bottom:3px;">$1</h3>')
+  .replace(/^# (.+)$/gm,   '<h2 style="font-size:15px;font-weight:700;color:#0B1F3A;margin:14px 0 6px;">$1</h2>')
   .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
   .replace(/\*(.+?)\*/g, '<em>$1</em>')
-  .replace(/\n\n/g, '</p><p>')
+  .replace(/^- (.+)$/gm,   '<li style="margin:2px 0;">$1</li>')
+  .replace(/\n\n/g, '</p><p style="margin:5px 0;">')
   .replace(/\n/g, '<br/>') + '</p>';
   if (sources.length) {
     html += '<div class="sources-row">' + [...new Set(sources)].map(s => '<span class="source-chip">' + s + '</span>').join('') + '</div>';

@@ -80,7 +80,7 @@ CABINET_VILLE  = os.environ.get("CABINET_VILLE",  "Douala, Cameroun")
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-CORS(app)
+CORS(app, origins=["https://odyxiadroit.com", "https://www.odyxiadroit.com"])
 Talisman(app,
     force_https=False,
     strict_transport_security=True,
@@ -331,7 +331,7 @@ def generer_otp(email: str) -> str:
         import resend
         resend.api_key = os.environ.get("RESEND_API_KEY", "")
         resend.Emails.send({
-            "from":    f"Odyxia Droit <onboarding@resend.dev>",
+            "from":    f"Odyxia Droit <noreply@odyxiadroit.com>",
             "to":      [email],
             "subject": "Votre code de connexion Odyxia Droit",
             "html":    f"""
@@ -663,6 +663,19 @@ def rechercher_chunks(question: str, limite: int = 10,
         except Exception:
             pass
 
+    # Fallback corpus OHADA si moins de 3 chunks trouvés
+    if len(tous_chunks) < 3:
+        try:
+            ohada_result = supabase.rpc("match_chunks", {
+                "query_embedding": get_query_embedding(question) or [],
+                "match_threshold": 0.3,
+                "match_count": limite,
+                "tenant_id": "00000000-0000-0000-0000-000000000001"
+            }).execute()
+            if ohada_result.data:
+                ajouter(ohada_result.data)
+        except Exception:
+            pass
     return tous_chunks[:limite]
 
 
@@ -960,7 +973,14 @@ RÈGLES ABSOLUES :
 4. Ne jamais inventer de jurisprudence ou d articles
 5. Signaler si un délai est légal vs conventionnel
 6. Recommander de consulter un avocat pour les décisions importantes
-STYLE : réponses structurées, langue juridique précise, sources entre crochets."""
+LONGUEUR ET STYLE — ADAPTATIF :
+- Question simple ou définition : réponse concise en 2-4 phrases
+- Question intermédiaire : réponse structurée avec titres et articles cités
+- Question complexe ou analyse : réponse exhaustive avec plan structuré,
+  articles applicables, jurisprudence, exceptions, délais et recommandations pratiques
+- Toujours terminer par un résumé en 1-2 phrases si la réponse est longue
+- Utiliser des titres en gras pour les réponses longues
+- Sources citées entre crochets [Document, page X]"""
 
 def _construire_system_prompt_odyxia(chunks: list, pays: str = "CM") -> str:
     """Construit le prompt système avec contexte RAG et pays."""
@@ -1741,16 +1761,30 @@ def question():
             log_security_event("prompt_injection_alerte", tenant_id,
                 get_current_user_id(), {"score":inj.score,"patterns":inj.patterns})
 
-        code_pays = get_current_pays_code()
-        system_prompt, messages, sources, historique_session = \
-            _preparer_contexte_chat(q, session_id, tenant_id, dossier_id, code_pays)
-
-        reponse_texte = odyxia_question(q, pays=get_current_pays_code())
+        code_pays  = get_current_pays_code()
+        chunks_q   = rechercher_chunks(q, dossier_id=dossier_id, tenant_id=tenant_id)
+        chunks_r   = reranker_chunks(q, chunks_q, top_k=5)
+        sys_prompt = _construire_system_prompt_odyxia(chunks_r, code_pays)
+        historique_session = get_session(session_id, tenant_id)
+        msgs = []
+        for e in historique_session[-3:]:
+            msgs.append({"role":"user","content":e.get("question","")})
+            msgs.append({"role":"assistant","content":e.get("reponse","")})
+        msgs.append({"role":"user","content":q})
+        response_q = client.messages.create(
+            model="claude-sonnet-4-20250514", max_tokens=4000,
+            system=sys_prompt, messages=msgs
+        )
+        reponse_texte = response_q.content[0].text.strip()
+        sources_q = []
+        for c in chunks_r:
+            ref = f"{obtenir_nom_document(c.get('document_id',''))} (p.{c.get('page_numero',1)})"
+            if ref not in sources_q: sources_q.append(ref)
         historique_session.append({"question": q, "reponse": reponse_texte})
         save_session(session_id, historique_session, tenant_id)
         log_audit_event("RAG_QUERY", tenant_id, get_current_user_id(),
-                        {"session_id":session_id,"sources_count":len(sources)})
-        return jsonify({"reponse": reponse_texte, "sources": list(set(sources))})
+                        {"session_id":session_id,"sources_count":len(sources_q)})
+        return jsonify({"reponse": reponse_texte, "sources": list(set(sources_q))})
 
     except Exception as e:
         log_erreur("QUESTION", e)
@@ -1827,7 +1861,7 @@ def question_stream():
                 reponse_complete = ""
                 with client.messages.stream(
                     model="claude-sonnet-4-20250514",
-                    max_tokens=1500,
+                    max_tokens=4000,
                     system=system_prompt,
                     messages=messages,
                 ) as stream:
@@ -1905,7 +1939,8 @@ def sauvegarder_memoire():
             "Conversation: " + texte_conv
         )
 
-        texte = odyxia_question(prompt_resume)
+        response_r = client.messages.create(model="claude-sonnet-4-20250514", max_tokens=4000, messages=[{"role":"user","content":prompt_resume}])
+        texte = response_r.content[0].text.strip()
         resume    = ""
         mots_cles = []
         domaine   = ""
@@ -1981,7 +2016,8 @@ def synthese_document():
 
         nom_doc  = obtenir_nom_document(document_id)
         prompt   = prompt_synthese_document(texte_complet, nom_doc)
-        raw      = odyxia_question(prompt)
+        response_s = client.messages.create(model="claude-sonnet-4-20250514", max_tokens=2000, messages=[{"role":"user","content":prompt}])
+        raw      = response_s.content[0].text.strip()
         raw      = raw.replace("```json","").replace("```","").strip()
         synthese = json.loads(raw)
         return jsonify({"succes":True,"synthese":synthese,"document_id":document_id})
@@ -2019,11 +2055,12 @@ def carte_mentale():
             c.get("content") or c.get("contenu","")
             for c in result.data
             if not est_chiffre(c.get("content") or c.get("contenu",""))
-        ])[:10000]
+        ])[:50000]
 
         nom_doc      = obtenir_nom_document(document_id)
         prompt_texte = prompt_carte_mentale(texte_complet, nom_doc)
-        raw          = odyxia_question(prompt_texte)
+        response = client.messages.create(model="claude-sonnet-4-20250514", max_tokens=2000, messages=[{"role":"user","content":prompt_texte}])
+        raw          = response.content[0].text.strip()
         raw          = raw.replace("```json","").replace("```","").strip()
         carte        = json.loads(raw)
         return jsonify({"succes":True,"document_id":document_id,"nom":nom_doc,"carte":carte})
@@ -2086,13 +2123,8 @@ def rediger():
             contexte or "Aucun document indexe dans ce dossier.")
 
         pays_code       = get_current_pays_code()
-        resultat_ia     = odyxia_rediger(type_doc, donnees, pays=pays_code)
-        document_genere = resultat_ia.get("acte", {}).get("preambule", "") + "\n\n"
-        for art in resultat_ia.get("acte", {}).get("articles", []):
-            document_genere += f"## Article {art.get('numero')} — {art.get('titre')}\n{art.get('contenu')}\n\n"
-        document_genere += resultat_ia.get("acte", {}).get("clauses_finales", "")
-        if not document_genere.strip():
-            document_genere = odyxia_question(prompt_texte, pays=pays_code)
+        response_d = client.messages.create(model="claude-sonnet-4-20250514", max_tokens=2000, messages=[{"role":"user","content":prompt_texte}])
+        document_genere = response_d.content[0].text.strip()
         config          = PROMPTS_REDACTION[type_doc]
 
         log_audit_event("DOCUMENT_GENERATED", tenant_id, get_current_user_id(),
@@ -2692,11 +2724,9 @@ def comparaison_analyser():
             return jsonify({"succes":False,"message":"Aucune decision trouvee.","decisions":[]})
 
         pays_code = get_current_pays_code()
-        from api import odyxia_comparer  # si dans même dossier
-        resultat  = odyxia_question(
-            f"Analyse comparative du juge {juge} juridiction {juridiction} domaine {domaine}",
-            pays=pays_code
-        )
+        prompt_comp = f"Analyse comparative du juge {juge} juridiction {juridiction} domaine {domaine} en droit africain OHADA."
+        response_comp = client.messages.create(model="claude-sonnet-4-20250514", max_tokens=4000, messages=[{"role":"user","content":prompt_comp}])
+        resultat  = response_comp.content[0].text.strip()
         try:
             analyse = json.loads(resultat)
         except Exception:
@@ -3065,7 +3095,7 @@ def rappels_trial():
             jours = (trial_end - maintenant).days
 
             resend.Emails.send({
-                "from":    f"Odyxia Droit <onboarding@resend.dev>",
+                "from":    f"Odyxia Droit <noreply@odyxiadroit.com>",
                 "to":      [email],
                 "subject": f"Votre essai Odyxia Droit expire dans {jours} jours",
                 "html":    f"""
@@ -3134,7 +3164,8 @@ def timeline_dossier():
         texte = texte[:9000]
 
         prompt_texte = prompt_timeline_dossier(texte, dossier_id)
-        raw          = odyxia_question(prompt_texte)
+        response = client.messages.create(model="claude-sonnet-4-20250514", max_tokens=2000, messages=[{"role":"user","content":prompt_texte}])
+        raw          = response.content[0].text.strip()
         raw          = raw.replace("```json","").replace("```","").strip()
         try:
             timeline = json.loads(raw)
@@ -3348,7 +3379,7 @@ def envoyer_email():
         
         # Envoyer via Resend
         resend.Emails.send({
-            "from":    f"{CABINET_NOM} <onboarding@resend.dev>",
+            "from":    f"{CABINET_NOM} <noreply@odyxiadroit.com>",
             "to":      [destinataire],
             "subject": objet,
             "html":    f"""
@@ -3474,7 +3505,39 @@ def veille_synchroniser():
 
 # ─── HEALTH ───────────────────────────────────────────────────────────────────
 
+
+
+@app.route("/document_status/<doc_id>", methods=["GET"])
+@jwt_required()
+def document_status(doc_id):
+    """Vérifie si un document est entièrement vectorisé — pour le polling frontend."""
+    try:
+        tenant_id = get_current_tenant_id()
+        doc = supabase.table("documents").select("id,status,nom").eq(
+            "id", doc_id).eq("tenant_id", tenant_id).execute()
+        if not doc.data:
+            return jsonify({"erreur": "Document non trouvé"}), 404
+        total = supabase.table("chunks").select("id", count="exact").eq(
+            "document_id", doc_id).execute()
+        vectorises = supabase.table("chunks").select("id", count="exact").eq(
+            "document_id", doc_id).not_.is_("embedding", "null").execute()
+        nb_total = total.count or 0
+        nb_vecto = vectorises.count or 0
+        pret = nb_total > 0 and nb_total == nb_vecto
+        return jsonify({
+            "doc_id"    : doc_id,
+            "nom"       : doc.data[0].get("nom",""),
+            "status"    : doc.data[0].get("status",""),
+            "chunks"    : nb_total,
+            "vectorises": nb_vecto,
+            "pret"      : pret,
+            "pct"       : round(nb_vecto/nb_total*100) if nb_total else 0,
+        })
+    except Exception as e:
+        return jsonify({"erreur": str(e)}), 500
+
 @app.route("/health", methods=["GET"])
+@limiter.exempt
 def health():
     status = {"status":"ok","service":"odyxia-droit","supabase":"ok"}
     try:
