@@ -7,4 +7,9 @@ venv/
 *.egg-info/
 dist/
 build/
-embeddings_voyage_fast.py
+embeddings_voyage_fast.pylogs/
+*.log
+re_vectoriser_rapport.json
+__pycache__/
+*.pyc
+.env

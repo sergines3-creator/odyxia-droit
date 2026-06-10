@@ -101,9 +101,9 @@ limiter = Limiter(
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ── CLIENT ODYXIA IA ──────────────────────────────────────
-ODYXIA_IA_URL = os.environ.get("ODYXIA_IA_URL", "http://127.0.0.1:5001")
-ODYXIA_IA_EMAIL = os.environ.get("ODYXIA_IA_EMAIL", "avocat@cm.com")
-ODYXIA_IA_PASSWORD = os.environ.get("ODYXIA_IA_PASSWORD", "test123")
+ODYXIA_IA_URL = os.environ.get("ODYXIA_IA_URL", "")
+ODYXIA_IA_EMAIL = os.environ.get("ODYXIA_IA_EMAIL", "")
+ODYXIA_IA_PASSWORD = os.environ.get("ODYXIA_IA_PASSWORD", "")
 _odyxia_token = None
 
 def get_odyxia_token():
@@ -1546,7 +1546,7 @@ def page_inscription():
 
 
 @app.route("/inscription", methods=["POST"])
-@limiter.limit("5 per minute")
+@limiter.limit("3 per hour")
 def creer_compte():
     try:
         data = request.json
