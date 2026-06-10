@@ -3267,11 +3267,17 @@ def export_pdf():
             ligne = ligne.strip()
             if not ligne:
                 elements.append(Spacer(1, 6))
+            elif ligne.startswith("### "):
+                elements.append(Paragraph(ligne[4:], s_h1))
             elif ligne.startswith("## ") or ligne.startswith("# "):
                 elements.append(Paragraph(ligne.lstrip("# "), s_h1))
+            elif ligne.startswith("---"):
+                from reportlab.platypus import HRFlowable as HRF
+                elements.append(HRF(width="100%", thickness=0.5, color=OR, spaceAfter=6))
             else:
                 ligne = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', ligne)
-                ligne = re.sub(r'\*(.+?)\*',     r'<i>\1</i>', ligne)
+                ligne = re.sub(r'\*(.+?)\*',       r'<i>\1</i>', ligne)
+                ligne = re.sub(r'^- ',               '• ',          ligne)
                 elements.append(Paragraph(ligne, s_corps))
 
         elements.append(Spacer(1, 20))
@@ -3366,11 +3372,17 @@ def envoyer_email():
             ligne = ligne.strip()
             if not ligne:
                 elements.append(Spacer(1, 6))
+            elif ligne.startswith("### "):
+                elements.append(Paragraph(ligne[4:], s_h1))
             elif ligne.startswith("## ") or ligne.startswith("# "):
                 elements.append(Paragraph(ligne.lstrip("# "), s_h1))
+            elif ligne.startswith("---"):
+                from reportlab.platypus import HRFlowable as HRF2
+                elements.append(HRF2(width="100%", thickness=0.5, color=OR, spaceAfter=6))
             else:
                 ligne = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', ligne)
-                ligne = re.sub(r'\*(.+?)\*', r'<i>\1</i>', ligne)
+                ligne = re.sub(r'\*(.+?)\*',       r'<i>\1</i>', ligne)
+                ligne = re.sub(r'^- ',               '• ',          ligne)
                 elements.append(Paragraph(ligne, s_corps))
         
         doc.build(elements)

@@ -3123,3 +3123,828 @@ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF
   File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
     input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
 EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8282.06it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,711
+  Déjà vectorisés   : 8,488
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 11803.08it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.1s
+
+  Total chunks      : 8,711
+  Déjà vectorisés   : 8,488
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 9388.30it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.3s
+
+  Total chunks      : 8,711
+  Déjà vectorisés   : 8,488
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 12416.75it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.1s
+
+  Total chunks      : 8,711
+  Déjà vectorisés   : 8,488
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8594.89it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.3s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 9616.42it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 10391.12it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 21129.73it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.3s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8433.19it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 9385.24it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 7814.06it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 9480.54it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 9747.70it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.4s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 7610.64it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 9463.12it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.3s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8648.41it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 7355.70it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 7826.66it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8087.85it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.3s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 11053.72it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.1s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8093.50it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 9762.98it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.3s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 9420.93it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.3s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 10902.98it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.3s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 11095.60it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 11556.00it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8005.55it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8306.96it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.1s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8657.38it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 10788.54it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.3s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8484.45it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.3s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 12973.75it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RE-VECTORISATION ODYXIA DROIT
+  Voyage AI (1024 dims) → SBERT (384 dims)
+=================================================================
+[SUPABASE] Connexion OK
+[SBERT] Chargement paraphrase-multilingual-MiniLM-L12-v2...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8146.03it/s]
+/root/odyxia-droit/re_vectoriser.py:73: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = model.get_sentence_embedding_dimension()
+[SBERT] Prêt — dim=384, chargé en 4.2s
+
+  Total chunks      : 8,714
+  Déjà vectorisés   : 8,491
+  À traiter         : 223
+
+  Durée estimée     : ~2s (0.0 min)
+  Batch SBERT       : 32 chunks
+
+  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...Traceback (most recent call last):
+  File "/root/odyxia-droit/re_vectoriser.py", line 350, in <module>
+    main()
+  File "/root/odyxia-droit/re_vectoriser.py", line 259, in main
+    input("\n  Appuyez sur Entrée pour démarrer (Ctrl+C pour annuler)...")
+EOFError: EOF when reading a line
