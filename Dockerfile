@@ -101,9 +101,12 @@ HEALTHCHECK --interval=30s --timeout=15s --start-period=90s --retries=3 \
 CMD ["gunicorn", \
      "app:app", \
      "--bind", "0.0.0.0:5000", \
-     "--workers", "2", \
-     "--threads", "2", \
+     "--workers", "3", \
+     "--threads", "4", \
      "--timeout", "120", \
+     "--worker-class", "gthread", \
+     "--max-requests", "1000", \
+     "--max-requests-jitter", "100", \
      "--access-logfile", "-", \
      "--error-logfile", "-", \
      "--log-level", "info"]
