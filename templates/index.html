@@ -1166,100 +1166,6 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 }
 .save-version-restore:hover{background:#F5F5F5;}
 
-
-/* ── NOUVEAU DASHBOARD ─────────────────────────────────────────────── */
-.dash-welcome-new{
-  padding:20px 24px 0;
-}
-.dash-greeting{
-  font-size:18px;font-weight:600;color:#0A0A0A;
-  font-family:var(--serif,Georgia,serif);
-}
-.dash-date-str{font-size:11px;color:#A3A3A3;margin-top:2px;}
-.dash-abonnement{
-  display:inline-flex;align-items:center;gap:6px;
-  margin-top:8px;padding:4px 10px;border-radius:20px;
-  background:#F0FDF4;border:0.5px solid #86EFAC;
-  font-size:10px;font-weight:500;color:#16A34A;
-}
-.dash-abonnement.warn{
-  background:#FFF7ED;border-color:#FCD34D;color:#D97706;
-}
-.dash-abonnement.expired{
-  background:#FEF2F2;border-color:#FCA5A5;color:#DC2626;
-}
-.dash-kpis{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
-  padding:16px 24px;
-}
-.dash-kpi{
-  background:#fff;border:0.5px solid #E5E5E5;border-radius:8px;
-  padding:14px 16px;cursor:default;
-}
-.dash-kpi-val{
-  font-size:24px;font-weight:700;color:#0A0A0A;
-  font-family:var(--serif,Georgia,serif);
-}
-.dash-kpi-label{font-size:10px;color:#A3A3A3;margin-top:3px;font-weight:500;}
-.dash-kpi-sub{font-size:10px;color:#6B7280;margin-top:2px;}
-.dash-shortcuts{
-  display:flex;gap:8px;padding:0 24px 16px;flex-wrap:wrap;
-}
-.dash-shortcut{
-  display:flex;align-items:center;gap:6px;
-  padding:8px 14px;border-radius:6px;border:0.5px solid #E5E5E5;
-  background:#fff;cursor:pointer;font-size:12px;font-weight:500;
-  color:#0A0A0A;transition:all .15s;white-space:nowrap;
-}
-.dash-shortcut:hover{background:#0A0A0A;color:#fff;border-color:#0A0A0A;}
-.dash-two-col{
-  display:grid;grid-template-columns:1fr 1fr;gap:12px;
-  padding:0 24px 24px;
-}
-.dash-panel{
-  background:#fff;border:0.5px solid #E5E5E5;border-radius:8px;
-  overflow:hidden;
-}
-.dash-panel-hdr{
-  padding:12px 16px;border-bottom:0.5px solid #E5E5E5;
-  display:flex;justify-content:space-between;align-items:center;
-}
-.dash-panel-title{font-size:11px;font-weight:600;color:#0A0A0A;}
-.dash-panel-link{font-size:10px;color:#6B7280;cursor:pointer;}
-.dash-panel-link:hover{color:#0A0A0A;}
-.dash-panel-body{padding:8px 0;}
-.dash-item{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 16px;border-bottom:0.5px solid #F5F5F5;
-  cursor:pointer;transition:background .1s;
-}
-.dash-item:last-child{border-bottom:none;}
-.dash-item:hover{background:#F9F9F9;}
-.dash-item-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:#E5E5E5;flex-shrink:0;
-}
-.dash-item-dot.active{background:#22C55E;}
-.dash-item-dot.warn{background:#F59E0B;}
-.dash-item-info{flex:1;min-width:0;}
-.dash-item-name{
-  font-size:12px;font-weight:500;color:#0A0A0A;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
-.dash-item-sub{font-size:10px;color:#A3A3A3;margin-top:1px;}
-.dash-item-date{font-size:10px;color:#A3A3A3;flex-shrink:0;}
-.dash-empty{
-  padding:20px 16px;text-align:center;
-  font-size:11px;color:#A3A3A3;
-}
-.dash-alert{
-  margin:0 24px 12px;padding:10px 14px;
-  border-radius:6px;border:0.5px solid #FCD34D;
-  background:#FFFBEB;font-size:11px;color:#92400E;
-  display:none;
-}
-.dash-alert.visible{display:block;}
-
 </style>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.6/quill.snow.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.6/quill.min.js"></script>
@@ -1315,8 +1221,7 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
         <div class="hdr-avocat" id="hdr-avocat">{{ cabinet_avocat }}</div>
       </div>
     </div>
-    <div class="hdr-sep"></div>
-    <span class="hdr-pays" id="hdr-pays">OHADA · CMR</span>
+    <span class="hdr-pays" id="hdr-pays"></span>
     <div class="hdr-dossier" id="hdr-dossier">
       <span class="hdr-dossier-label">Affaire :</span>
       <span class="hdr-dossier-name" id="hdr-dossier-name">—</span>
@@ -1376,12 +1281,13 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
       </div>
     </div>
 
+    <div class="sb-sep"></div>
+
 <div class="sb-sep"></div>
 
 <!-- Infos avocat en bas -->
 <div id="sb-avocat-info" style="margin-top:auto;padding:10px 12px;margin:4px 8px;border-radius:6px;background:#1C1C1C;">
-  <div id="sb-avocat-nom" style="font-size:12px;font-weight:500;color:#D4D4D4;">Chargement...</div>
-  <div id="sb-avocat-barreau" style="font-size:10px;color:#6B6B6B;margin-top:2px;">Barreau</div>
+  <div id="sb-avocat-nom" style="font-size:12px;font-weight:500;color:#D4D4D4;"></div>
 </div>
 
     <div class="sb-sep"></div>
@@ -1392,71 +1298,337 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
     <!-- ── TABLEAU DE BORD ──────────────────────────── -->
     <div class="page active" id="page-dashboard">
-  <!-- Alerte abonnement -->
-  <div class="dash-alert" id="dash-alert"></div>
-
-  <!-- Bienvenue -->
-  <div class="dash-welcome-new">
-    <div class="dash-greeting" id="dash-greeting-new">Bonjour, Maître</div>
-    <div class="dash-date-str" id="dash-date-new"></div>
-    <div class="dash-abonnement" id="dash-abo-badge" style="display:none;"></div>
-  </div>
-
-  <!-- KPIs -->
-  <div class="dash-kpis">
-    <div class="dash-kpi">
-      <div class="dash-kpi-val" id="kpi-docs">—</div>
-      <div class="dash-kpi-label">Documents indexés</div>
-    </div>
-    <div class="dash-kpi">
-      <div class="dash-kpi-val" id="kpi-dossiers">—</div>
-      <div class="dash-kpi-label">Dossiers actifs</div>
-    </div>
-    <div class="dash-kpi">
-      <div class="dash-kpi-val" id="kpi-actes">—</div>
-      <div class="dash-kpi-label">Actes générés</div>
-      <div class="dash-kpi-sub">ce mois</div>
-    </div>
-    <div class="dash-kpi">
-      <div class="dash-kpi-val" id="kpi-jours">—</div>
-      <div class="dash-kpi-label">Jours d'abonnement</div>
-      <div class="dash-kpi-sub">restants</div>
-    </div>
-  </div>
-
-  <!-- Raccourcis -->
-  <div class="dash-shortcuts">
-    <div class="dash-shortcut" onclick="showPage('bibliotheque')">Uploader un document</div>
-    <div class="dash-shortcut" onclick="showPage('redaction')">Rédiger un acte</div>
-    <div class="dash-shortcut" onclick="showPage('analyse')">Analyser un document</div>
-    <div class="dash-shortcut" onclick="showPage('dossiers')">Nouveau dossier</div>
-    <div class="dash-shortcut" onclick="showPage('chat')">Poser une question</div>
-  </div>
-
-  <!-- Deux colonnes -->
-  <div class="dash-two-col">
-    <!-- Documents récents -->
-    <div class="dash-panel">
-      <div class="dash-panel-hdr">
-        <span class="dash-panel-title">Documents récents</span>
-        <span class="dash-panel-link" onclick="showPage('bibliotheque')">Voir tout</span>
-      </div>
-      <div class="dash-panel-body" id="dash-docs-recent">
-        <div class="dash-empty">Aucun document</div>
-      </div>
-    </div>
-
-    <!-- Actes récents -->
-    <div class="dash-panel">
-      <div class="dash-panel-hdr">
-        <span class="dash-panel-title">Activité récente</span>
-        <span class="dash-panel-link" onclick="showPage('redaction')">Rédiger</span>
-      </div>
-      <div class="dash-panel-body" id="dash-activite-recent">
-        <div class="dash-empty">Aucune activité</div>
+      <div class="dash-layout" style="overflow-y:auto;">
+        <!-- Bienvenue -->
+        <div style="padding:20px 24px 0;">
+          <h2 id="dash-greeting" style="font-size:18px;font-weight:600;color:#0A0A0A;">Bonjour, Maître</h2>
+          <p id="dash-date" style="font-size:11px;color:#A3A3A3;margin-top:2px;"></p>
+        </div>
+        <!-- Alerte -->
+        <div id="dash-alert" style="display:none;margin:12px 24px 0;padding:10px 14px;border-radius:6px;border:0.5px solid #FCD34D;background:#FFFBEB;font-size:11px;color:#92400E;"></div>
+        <!-- KPIs -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 24px;">
+          <div style="background:#fff;border:0.5px solid #E5E5E5;border-radius:8px;padding:14px 16px;">
+            <div id="kpi-docs" style="font-size:22px;font-weight:700;color:#0A0A0A;">—</div>
+            <div style="font-size:10px;color:#A3A3A3;margin-top:3px;">Documents indexés</div>
+          </div>
+          <div style="background:#fff;border:0.5px solid #E5E5E5;border-radius:8px;padding:14px 16px;">
+            <div id="kpi-dossiers" style="font-size:22px;font-weight:700;color:#0A0A0A;">—</div>
+            <div style="font-size:10px;color:#A3A3A3;margin-top:3px;">Dossiers actifs</div>
+          </div>
+          <div style="background:#fff;border:0.5px solid #E5E5E5;border-radius:8px;padding:14px 16px;">
+            <div id="kpi-actes" style="font-size:22px;font-weight:700;color:#0A0A0A;">—</div>
+            <div style="font-size:10px;color:#A3A3A3;margin-top:3px;">Actes générés</div>
+          </div>
+          <div style="background:#fff;border:0.5px solid #E5E5E5;border-radius:8px;padding:14px 16px;">
+            <div id="kpi-jours" style="font-size:22px;font-weight:700;color:#0A0A0A;">—</div>
+            <div style="font-size:10px;color:#A3A3A3;margin-top:3px;">Jours restants</div>
+          </div>
+        </div>
+        <!-- Raccourcis -->
+        <div style="display:flex;gap:8px;padding:0 24px 16px;flex-wrap:wrap;">
+          <div onclick="showPage('bibliotheque')" style="padding:8px 14px;border-radius:6px;border:0.5px solid #E5E5E5;background:#fff;cursor:pointer;font-size:12px;font-weight:500;color:#0A0A0A;">Uploader un document</div>
+          <div onclick="showPage('redaction')" style="padding:8px 14px;border-radius:6px;border:0.5px solid #E5E5E5;background:#fff;cursor:pointer;font-size:12px;font-weight:500;color:#0A0A0A;">Rédiger un acte</div>
+          <div onclick="showPage('analyse')" style="padding:8px 14px;border-radius:6px;border:0.5px solid #E5E5E5;background:#fff;cursor:pointer;font-size:12px;font-weight:500;color:#0A0A0A;">Analyser un document</div>
+          <div onclick="toggleChat()" style="padding:8px 14px;border-radius:6px;border:0.5px solid #E5E5E5;background:#fff;cursor:pointer;font-size:12px;font-weight:500;color:#0A0A0A;">Poser une question</div>
+        </div>
+        <!-- Deux colonnes -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 24px 24px;">
+          <div style="background:#fff;border:0.5px solid #E5E5E5;border-radius:8px;overflow:hidden;">
+            <div style="padding:12px 16px;border-bottom:0.5px solid #E5E5E5;display:flex;justify-content:space-between;">
+              <span style="font-size:11px;font-weight:600;color:#0A0A0A;">Documents récents</span>
+              <span onclick="showPage('bibliotheque')" style="font-size:10px;color:#6B7280;cursor:pointer;">Voir tout</span>
+            </div>
+            <div id="dash-docs-recent" style="padding:8px 0;">
+              <div style="padding:20px;text-align:center;font-size:11px;color:#A3A3A3;">Aucun document</div>
+            </div>
+          </div>
+          <div style="background:#fff;border:0.5px solid #E5E5E5;border-radius:8px;overflow:hidden;">
+            <div style="padding:12px 16px;border-bottom:0.5px solid #E5E5E5;display:flex;justify-content:space-between;">
+              <span style="font-size:11px;font-weight:600;color:#0A0A0A;">Activité récente</span>
+              <span onclick="showPage('redaction')" style="font-size:10px;color:#6B7280;cursor:pointer;">Rédiger</span>
+            </div>
+            <div id="dash-activite-recent" style="padding:8px 0;">
+              <div style="padding:20px;text-align:center;font-size:11px;color:#A3A3A3;">Générez votre premier acte</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+
+    <!-- ── BIBLIOTHEQUE ─────────────────────────────── -->
+    <div class="page" id="page-bibliotheque">
+      <div class="bib-layout-v2">
+        <!-- Toolbar -->
+        <div class="bib-toolbar-v2">
+          <div class="bib-search-box">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#A3A3A3" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="10" y1="10" x2="14" y2="14"/></svg>
+            <input type="text" id="bib-search" placeholder="Rechercher un document..." oninput="filtrerDocs(this.value)"/>
+          </div>
+          <button class="btn-sm" id="btn-carte-mentale" onclick="afficherCarteMentale()" style="display:none;">🗺 Carte mentale</button>
+          <button class="btn-sm" id="btn-export-carte" onclick="exporterCartePNG()" style="display:none;">⬇ Exporter carte</button>
+          <input type="file" id="file-input-bib" accept=".pdf" style="display:none" onchange="uploadFichier(this.files[0],null)"/>
+        </div>
+
+        <!-- Corps -->
+        <div class="bib-body">
+          <!-- Liste gauche -->
+          <div class="bib-list-col">
+            <!-- Zone upload dans sidebar -->
+            <div style="padding:10px 12px;border-bottom:0.5px solid #F0F0F0;">
+              <div style="border:1px dashed #D4D4D4;border-radius:8px;padding:12px;text-align:center;cursor:pointer;background:#FAFAFA;transition:.15s;" 
+                onclick="document.getElementById('file-input-bib').click()"
+                onmouseover="this.style.background='#F0F0F0'" onmouseout="this.style.background='#FAFAFA'">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" stroke-width="1.5" style="display:block;margin:0 auto 6px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                <div style="font-size:11px;font-weight:500;color:#525252;">Uploader un PDF</div>
+                <div style="font-size:10px;color:#A3A3A3;margin-top:2px;">Glisser ou cliquer</div>
+              </div>
+              <div style="display:flex;gap:6px;margin-top:8px;">
+                <label class="opt-tag" id="opt-sensible-bib" style="flex:1;justify-content:center;">
+                  <input type="checkbox" id="chk-sensible-bib" onchange="toggleOpt('opt-sensible-bib')"/>
+                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="10" height="8" rx="1"/><path d="M5 7V5a3 3 0 016 0v2"/></svg>
+                  Chiffré
+                </label>
+                <label class="opt-tag" id="opt-manuscrit-bib" style="flex:1;justify-content:center;">
+                  <input type="checkbox" id="chk-manuscrit-bib" onchange="toggleOpt('opt-manuscrit-bib')"/>
+                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-9 2 2-9 9H3v-2z"/></svg>
+                  Manuscrit
+                </label>
+              </div>
+            </div>
+
+            <div class="bib-doc-list" id="bib-docs-list"></div>
+            <div class="docs-group" style="font-size:9px;font-weight:500;color:#A3A3A3;padding:8px 12px 3px;letter-spacing:0.5px;text-transform:uppercase;">Générés</div>
+            <div id="bib-generes-list"></div>
+          </div>
+
+          <!-- Viewer droite -->
+          <div class="bib-viewer-col" id="bib-viewer">
+            <div class="bib-empty-viewer">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#E5E5E5" stroke-width="1">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>
+              </svg>
+              <div style="font-size:13px;font-weight:500;color:#D4D4D4;">Sélectionnez un document</div>
+              <div style="font-size:12px;color:#E5E5E5;max-width:220px;line-height:1.6;">Uploadez un PDF ou cliquez sur un document dans la liste</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ANALYSE ──────────────────────────────────── -->
+    <div class="page" id="page-analyse">
+      <div class="analyse-layout" style="flex:1;display:flex;">
+        <div class="analyse-form" id="analyse-form-col" style="width:340px;min-width:220px;max-width:520px;flex-shrink:0;">
+          <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;">Analyse juridique</div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">
+            Décrivez votre situation juridique. L'analyse s'appuie sur la base documentaire et la jurisprudence OHADA/CEMAC.
+          </div>
+
+          <div class="form-step-indicator" id="fsi">
+            <div class="fsi-dot active"></div>
+            <div class="fsi-dot"></div>
+            <div class="fsi-dot"></div>
+            <div class="fsi-dot"></div>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label">Domaine juridique</label>
+            <div class="domains-grid">
+              <div class="domain-chip" onclick="selectDomain(this,'commercial')">Commercial OHADA</div>
+              <div class="domain-chip" onclick="selectDomain(this,'societaire')">Sociétaire OHADA</div>
+              <div class="domain-chip" onclick="selectDomain(this,'recouvrement')">Recouvrement OHADA</div>
+              <div class="domain-chip" onclick="selectDomain(this,'surete')">Sûretés OHADA</div>
+              <div class="domain-chip" onclick="selectDomain(this,'arbitrage')">Arbitrage OHADA</div>
+              <div class="domain-chip" onclick="selectDomain(this,'bancaire')">Bancaire COBAC</div>
+              <div class="domain-chip" onclick="selectDomain(this,'assurance')">Assurance CIMA</div>
+              <div class="domain-chip" onclick="selectDomain(this,'travail')">Droit du travail</div>
+              <div class="domain-chip" onclick="selectDomain(this,'foncier')">Foncier CMR</div>
+              <div class="domain-chip" onclick="selectDomain(this,'penal')">Pénal CMR</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-section">
+              <label class="form-label">Partie demanderesse</label>
+              <input class="form-input" id="an-demandeur" placeholder="Nom ou dénomination"/>
+            </div>
+            <div class="form-section">
+              <label class="form-label">Partie défenderesse</label>
+              <input class="form-input" id="an-defendeur" placeholder="Nom ou dénomination"/>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label">Exposé des faits</label>
+            <textarea class="form-textarea" id="an-faits" placeholder="Décrivez les faits de manière chronologique et précise..."></textarea>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label">Question juridique principale</label>
+            <input class="form-input" id="an-question" placeholder="Ex : La clause de résiliation anticipée est-elle valide ?"/>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label">Textes invoqués (optionnel)</label>
+            <input class="form-input" id="an-textes" placeholder="Ex : AU OHADA Art. 134, Code civil CMR Art. 1134..."/>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label">Enjeu et demandes</label>
+            <textarea class="form-textarea" id="an-enjeu" style="min-height:60px;" placeholder="Quel est l'enjeu financier ou juridique ? Que demandez-vous ?"></textarea>
+          </div>
+
+          <button class="btn-full" id="btn-analyser" onclick="lancerAnalyse()">Lancer l'analyse</button>
+        </div>
+
+        <div class="resizer" id="resizer-analyse"></div>
+        <div class="analyse-result" id="analyse-result">
+          <div class="result-empty">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <div style="font-size:13px;font-weight:500;color:var(--text2);">Aucune analyse en cours</div>
+            <div style="font-size:11px;color:var(--text3);text-align:center;max-width:260px;line-height:1.6;">
+              Sélectionnez un domaine juridique, décrivez les faits et posez votre question. L'analyse s'appuie sur vos documents indexés.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COMPARAISON ──────────────────────────────── -->
+      <div class="page" id="page-comparaison">
+        <div class="comp-layout" style="flex:1;display:flex;">
+          <div class="comp-form" id="comp-form-col" style="width:340px;min-width:220px;max-width:520px;flex-shrink:0;">
+            <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;">Profil juge & stratégie</div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">
+              Renseignez le juge et votre affaire. L'outil analyse le profil décisionnel et vous prépare une stratégie d'audience.
+            </div>
+
+            <div class="form-section">
+              <label class="form-label">Nom du juge</label>
+              <input class="form-input" id="cmp-juge" placeholder="Ex : Nom du juge"/>
+            </div>
+            <div class="form-row">
+              <div class="form-section">
+                <label class="form-label">Juridiction</label>
+                <input class="form-input" id="cmp-juridiction" placeholder="Ex : TPI Douala"/>
+              </div>
+              <div class="form-section">
+                <label class="form-label">Chambre</label>
+                <input class="form-input" id="cmp-chambre" placeholder="Ex : Civile"/>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <label class="form-label">Domaine de l'affaire</label>
+              <select class="form-select" id="cmp-domaine">
+                <option value="">Tous les domaines</option>
+                <option value="commercial">Commercial OHADA</option>
+                <option value="societaire">Sociétaire OHADA</option>
+                <option value="recouvrement">Recouvrement OHADA</option>
+                <option value="surete">Sûretés OHADA</option>
+                <option value="bancaire">Bancaire COBAC</option>
+                <option value="assurance">Assurance CIMA</option>
+                <option value="travail">Droit du travail</option>
+                <option value="foncier">Foncier CMR</option>
+                <option value="penal">Pénal CMR</option>
+              </select>
+            </div>
+
+            <div class="form-section">
+              <label class="form-label">Résumé de votre affaire</label>
+              <textarea class="form-textarea" id="cmp-affaire" placeholder="Décrivez brièvement les faits, les parties, l'enjeu et votre position..."></textarea>
+            </div>
+
+            <div class="form-section">
+              <label class="form-label">Arguments principaux</label>
+              <textarea class="form-textarea" id="cmp-arguments" style="min-height:60px;" placeholder="Quels sont vos arguments de fond ?"></textarea>
+            </div>
+
+            <div class="form-section">
+              <label class="form-label">Antécédents connus du juge (optionnel)</label>
+              <textarea class="form-textarea" id="cmp-antecedents" style="min-height:60px;" placeholder="Avez-vous déjà plaider devant ce juge ? Tendances observées..."></textarea>
+            </div>
+
+            <!-- Section décisions du juge -->
+            <div class="form-section" style="display:block;">
+              <label class="form-label">Décisions connues de ce juge (optionnel)</label>
+              <div style="background:var(--bg2);border:0.5px solid #E5E5E5;border-radius:var(--r);padding:10px 12px;margin-bottom:8px;">
+                <div style="font-size:10px;color:var(--text2);margin-bottom:8px;line-height:1.5;">
+                  Uploadez des décisions manuscrites ou tapées de ce juge. Elles resteront privées à votre cabinet et enrichiront l'analyse.
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+                  <button class="btn-sm" onclick="document.getElementById('file-input-dec').click()" style="font-size:10px;">
+                    + Ajouter une décision PDF
+                  </button>
+                  <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);cursor:pointer;">
+                    <input type="checkbox" id="chk-dec-manuscrit" style="accent-color:#0A0A0A;"/>
+                    Manuscrit / Scanné
+                  </label>
+                </div>
+                <input type="file" id="file-input-dec" accept=".pdf" style="display:none" onchange="uploadDecision(this.files[0])"/>
+                <div id="decisions-list" style="display:flex;flex-direction:column;gap:4px;"></div>
+              </div>
+            </div>
+
+            <button class="btn-full" onclick="lancerComparaison()">Analyser le profil juge</button>
+            <div class="save-confirm" id="cmp-save-confirm">✓ Dossier enregistré dans la base documentaire</div>
+          </div>
+
+          <div class="resizer" id="resizer-comp"></div>
+          <div class="comp-result" id="comp-result">
+            <div class="result-empty">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1">
+                <path d="M12 2L3 7v6c0 5 4 9.3 9 10 5-.7 9-5 9-10V7L12 2z"/>
+              </svg>
+              <div style="font-size:13px;font-weight:500;color:var(--text2);">Aucun profil juge analysé</div>
+              <div style="font-size:11px;color:var(--text3);text-align:center;max-width:260px;line-height:1.6;">
+                Renseignez le nom du juge, la juridiction et votre affaire pour obtenir son profil décisionnel et une stratégie d'audience.
+              </div>
+            </div>
+          </div><!-- fin comp-result -->
+        </div><!-- fin comp-layout -->
+      </div><!-- fin page-comparaison -->
+
+    <!-- ── RÉDACTION ─────────────────────────────────── -->
+      <div class="page" id="page-redaction">
+        <div class="redac-layout">
+
+          <!-- Colonne gauche : choix acte + champs -->
+          <div class="redac-form-col" id="redac-form-col">
+            <div>
+              <div class="redac-section-title">Choisir un acte</div>
+              <div class="redac-acte-list" id="redac-acte-list"></div>
+            </div>
+            <div id="redac-champs-zone" style="display:none;">
+              <div style="height:0.5px;background:#E5E5E5;margin:4px 0 12px;"></div>
+              <div class="redac-section-title" id="redac-champs-title">Champs</div>
+              <div class="redac-champs" id="redac-champs"></div>
+              <button onclick="lancerRedaction()" style="margin-top:12px;width:100%;padding:10px;background:#0A0A0A;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;transition:.15s;">Générer le document</button>
+            </div>
+          </div>
+
+          <!-- Colonne droite : résultat -->
+          <div class="redac-result-col">
+            <div class="redac-result-toolbar">
+              <span style="font-size:12px;font-weight:500;color:#0A0A0A;flex:1;" id="redac-result-title">Document</span>
+              <button class="btn-sm" id="btn-redac-email" onclick="ouvrirEnvoiEmail()" style="display:none;">✉ Envoyer</button>
+              <button class="btn-sm" id="btn-redac-save" onclick="enregistrerRedaction()" style="display:none;" onclick="ouvrirSaveModal()">💾 Enregistrer</button>
+              <button class="btn-sm primary" id="btn-redac-export" onclick="exporterRedaction()" style="display:none;">Exporter PDF</button>
+            </div>
+            <div class="redac-result-body" id="redac-result-body" style="padding:0;overflow:auto;">
+              <div id="quill-editor" style="min-height:calc(100vh - 100px);font-size:13px;background:#fff;"></div>
+            </div>
+          </div>
+
+        </div>
+  </div><!-- fin page-redaction -->
+
+ <!-- ── PROFIL ─────────────────────────────────────── -->
+
+
 </div><!-- fin page-dashboard -->
 
     <!-- ══ CHAT FLOTTANT ═══════════════════════════════════ -->
@@ -1596,6 +1768,7 @@ async function doLogout() {
 let quill = null;
 
 function initQuill() {
+  if (!document.getElementById('quill-editor')) return;
   if (typeof Quill !== 'undefined' && !quill) {
     quill = new Quill('#quill-editor', {
   theme: 'snow',
@@ -1621,13 +1794,14 @@ async function init() {
   const now = new Date();
   const h = now.getHours();
   const greeting = h < 12 ? 'Bonjour' : h < 18 ? 'Bon après-midi' : 'Bonsoir';
-  document.getElementById('dash-greeting').textContent = greeting + ', Maître';
-  document.getElementById('dash-date').textContent = now.toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const _grEl = document.getElementById('dash-greeting');
+  const _dtEl = document.getElementById('dash-date');
+  if (_grEl) _grEl.textContent = greeting + ', Maître';
+  if (_dtEl) _dtEl.textContent = now.toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
   await chargerStats();
   await chargerDocsBib();
   setTimeout(initAllResizers, 100);
   initRedaction();
-  await chargerProfil();
 };
 
 // ── NAVIGATION ───────────────────────────────────────
@@ -1635,11 +1809,11 @@ function showPage(p) {
   document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
   document.getElementById('page-' + p).classList.add('active');
-  document.getElementById('nav-' + p).classList.add('active');
+  const _navEl = document.getElementById('nav-' + p); if (_navEl) _navEl.classList.add('active');
   if (p === 'bibliotheque') chargerDocsBib();
   if (p === 'dashboard') chargerStats();
   if (p === 'redaction') initQuill();
-  if (p === 'profil') chargerProfil();
+
 }
 
 // ── STATS DASHBOARD ──────────────────────────────────
@@ -2594,7 +2768,89 @@ function showLoading(show) {
   document.getElementById('loading').classList.toggle('show', show);
 }
 
-function chargerDashboard() { chargerStats(); }
+async function chargerDashboard() {
+  const now   = new Date();
+  const heure = now.getHours();
+  const salut = heure < 12 ? 'Bonjour' : heure < 18 ? 'Bon après-midi' : 'Bonsoir';
+  const jours = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  const mois  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const dateStr = jours[now.getDay()] + ' ' + now.getDate() + ' ' + mois[now.getMonth()] + ' ' + now.getFullYear();
+
+  const grEl = document.getElementById('dash-greeting');
+  const dtEl = document.getElementById('dash-date');
+  if (dtEl) dtEl.textContent = dateStr;
+
+  // Nom avocat
+  try {
+    const profil = await apiFetch('/profil', 'GET');
+    const nom = (profil && (profil.display_name || profil.full_name)) || 'Maître';
+    if (grEl) grEl.textContent = salut + ', ' + nom;
+    // Mettre à jour entête
+    const hdrEl = document.getElementById('hdr-pays');
+    if (hdrEl) hdrEl.textContent = 'Maître ' + nom;
+  } catch(e) {
+    if (grEl) grEl.textContent = salut + ', Maître';
+  }
+
+  // Stats documents et dossiers
+  try {
+    const stats = await apiFetch('/stats', 'GET');
+    if (stats) {
+      const kD  = document.getElementById('kpi-docs');
+      const kDo = document.getElementById('kpi-dossiers');
+      const kA  = document.getElementById('kpi-actes');
+      if (kD)  kD.textContent  = stats.documents || 0;
+      if (kDo) kDo.textContent = stats.dossiers  || 0;
+      if (kA)  kA.textContent  = (typeof ACTES_GENERES_HIST !== 'undefined') ? ACTES_GENERES_HIST.length : 0;
+    }
+  } catch(e) {}
+
+  // Abonnement
+  try {
+    const abo = await apiFetch('/abonnement/statut', 'GET');
+    const kJ    = document.getElementById('kpi-jours');
+    const alert = document.getElementById('dash-alert');
+    if (abo) {
+      const j = abo.jours_restants || 0;
+      if (kJ) kJ.textContent = abo.actif ? j : '0';
+      if (alert && j <= 7 && abo.actif) {
+        alert.textContent = 'Attention : votre abonnement expire dans ' + j + ' jour' + (j > 1 ? 's' : '') + '.';
+        alert.style.display = 'block';
+      }
+    }
+  } catch(e) {}
+
+  // Documents récents
+  try {
+    const docs = await apiFetch('/liste_documents', 'GET');
+    const container = document.getElementById('dash-docs-recent');
+    if (container && docs && docs.length) {
+      container.innerHTML = docs.slice(0, 5).map(function(d) {
+        const nom  = (d.nom || d.filename || 'Document').replace('.pdf','');
+        const date = d.created_at ? new Date(d.created_at).toLocaleDateString('fr-FR') : '';
+        return '<div onclick="showPage(\'bibliotheque\')" style="display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:0.5px solid #F5F5F5;cursor:pointer;">'
+          + '<div style="width:6px;height:6px;border-radius:50%;background:#22C55E;flex-shrink:0;"></div>'
+          + '<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:500;color:#0A0A0A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + nom + '</div>'
+          + '<div style="font-size:10px;color:#A3A3A3;">PDF</div></div>'
+          + '<div style="font-size:10px;color:#A3A3A3;">' + date + '</div></div>';
+      }).join('');
+    }
+  } catch(e) {}
+
+  // Activité actes générés
+  const actContainer = document.getElementById('dash-activite-recent');
+  if (actContainer && typeof ACTES_GENERES_HIST !== 'undefined' && ACTES_GENERES_HIST.length) {
+    actContainer.innerHTML = ACTES_GENERES_HIST.slice(-5).reverse().map(function(a) {
+      return '<div onclick="showPage(\'redaction\')" style="display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:0.5px solid #F5F5F5;cursor:pointer;">'
+        + '<div style="width:6px;height:6px;border-radius:50%;background:#1A6B9A;flex-shrink:0;"></div>'
+        + '<div style="flex:1;"><div style="font-size:12px;font-weight:500;color:#0A0A0A;">' + a.nom + '</div>'
+        + '<div style="font-size:10px;color:#A3A3A3;">Acte généré</div></div>'
+        + '<div style="font-size:10px;color:#A3A3A3;">' + a.heure + '</div></div>';
+    }).join('');
+  }
+
+  chargerStats();
+}
 
 // ── ONGLET RÉDACTION ─────────────────────────────────
 const TOUS_ACTES = [
@@ -3140,9 +3396,10 @@ async function chargerProfil() {
   
     // Afficher infos dans sidebar
     const sbNomEl = document.getElementById('sb-avocat-nom');
-    const sbBarEl = document.getElementById('sb-avocat-barreau');
-    if (sbNomEl) sbNomEl.textContent = u.display_name || u.full_name || 'Maître';
-    if (sbBarEl) sbBarEl.textContent = a.barreau || 'Barreau';
+    const hdrPaysEl = document.getElementById('hdr-pays');
+    const _nomAv = u.display_name || u.full_name || 'Maître';
+    if (sbNomEl) sbNomEl.textContent = _nomAv;
+    if (hdrPaysEl) hdrPaysEl.textContent = 'Maître ' + _nomAv;
   } catch(e) {}
 }
 
@@ -3178,8 +3435,7 @@ async function uploaderAsset(file, type) {
     showLoading(false);
     if (d.succes) {
       showToast(type + ' uploadé');
-      await chargerProfil();
-    } else {
+        } else {
       showToast('Erreur : ' + (d.erreur || 'Upload échoué'), true);
     }
   } catch(e) {
@@ -3195,8 +3451,7 @@ async function supprimerSignature(assetId) {
       type: 'signature', asset_id: assetId
     });
     showToast('Signature supprimée');
-    await chargerProfil();
-  } catch(e) { showToast('Erreur', true); }
+    } catch(e) { showToast('Erreur', true); }
 }
 
 function insererSignatureDansQuill(url) {
@@ -3218,12 +3473,12 @@ const CHAMPS_LABELS = {
   'requérant':'Demandeur / Requérant','adversaire':'Partie adverse / Défendeur',
   'tribunal':'Tribunal compétent','demandeur':'Demandeur','defendeur':'Défendeur',
   'faits':'Exposé des faits','montant':'Montant (FCFA)','objet':'Objet / Description',
-  'nature_creance':'Nature de la creance','date_exigibilite':"Date d'exigibilite",
+  'nature_creance':'Nature de la créance','date_exigibilite':"Date d'exigibilite",
   'creancier':'Créancier','debiteur':'Débiteur','suretes':'Sûretés / Garanties',
-  'date_debut':'Date de debut','date_fin':'Date de fin','duree':'Durée',
+  'date_debut':'Date de début','date_fin':'Date de fin','duree':'Durée',
   'bailleur':'Bailleur','preneur':'Preneur / Locataire','adresse':'Adresse / Localisation',
   'superficie':'Superficie','activite':'Activité commerciale',
-  'depot_garantie':'Depot de garantie','employeur':'Employeur',
+  'depot_garantie':'Dépôt de garantie','employeur':'Employeur',
   'salarie':'Salarié','poste':'Poste / Fonction','motif_cdd':'Motif du CDD',
   'periode_essai':"Periode d'essai",'avantages':'Avantages en nature',
   'ancienneté':'Ancienneté','motif_licenciement':'Motif du licenciement',
@@ -3238,7 +3493,7 @@ const CHAMPS_LABELS = {
   'nullites':'Nullités soulevées','cause_dissolution':'Cause de dissolution',
   'perspectives':'Perspectives de redressement','fautes':'Fautes de gestion',
   'actif':'Actif (FCFA)','passif':'Passif (FCFA)',
-  'date_cessation':'Date de cessation','pieces':'Pièces jointes',
+  'date_cessation':'Date de cessation de paiements','pieces':'Pièces jointes',
   'contrat':'Contrat de référence','clause_arbitrage':"Clause d'arbitrage",
   'droit_applicable':'Droit applicable','juge':'Nom du juge',
   'juridiction':'Juridiction','chambre':'Chambre','domaine':'Domaine juridique',
@@ -3248,18 +3503,18 @@ const CHAMPS_LABELS = {
   'moyens_appel':"Moyens d'appel",'pays_origine':"Pays d'origine",
   'decision':'Décision étrangère','acte_attaque':'Acte administratif attaqué',
   'date_acte':"Date de l'acte",'titre_foncier':'Titre foncier',
-  'localisation':'Localisation du bien','droit_requérant':'Droit du requerant',
+  'localisation':'Localisation du bien','droit_requérant':'Droit du requérant',
   'delai':'Délai accordé','consequences':'Conséquences annoncées',
   'reference_sentence':'Référence de la sentence','date_sentence':'Date de la sentence',
-  'objet_consultation':"Objet de la consultation",
+  'objet_consultation':'Objet de la consultation',
   'faits_resumes':'Résumé des faits','analyse_juridique':'Analyse juridique',
   'recommandations':'Recommandations','concession_a':'Concessions de la partie A',
   'concession_b':'Concessions de la partie B',
-  'fumus_boni_juris':"Fumus boni juris",
+  'fumus_boni_juris':'Fumus boni juris (apparence du droit)',
   'fondements_juridiques':'Fondements juridiques',
   'demandes_reconventionnelles':'Demandes reconventionnelles',
   'type_conclusions':'Type de conclusions','salarie_porte':'Salarié porté',
-  'date_dec':'Date de la decision','source':'Source','actif_net':'Actif net',
+  'date_dec':'Date de la décision','source':'Source','actif_net':'Actif net',
   'commandites':'Associés commandités','commanditaires':'Associés commanditaires',
   'quota':'Quote-parts','partage':'Partage des récoltes',
   'day_rate':'Rémunération (day-rate)','zone':"Zone d'operation",
@@ -3498,7 +3753,6 @@ async function wizardGenerer() {
     }
 
     showToast('Document généré avec succès');
-    enregistrerActeGenere(ACTE_ACTIF?.nom || 'Document');
 
   } catch(e) {
     showToast('Erreur : ' + e.message, true);
@@ -3697,124 +3951,6 @@ async function saveConfirmer() {
 
   btn.disabled    = false;
   btn.textContent = 'Enregistrer la version';
-}
-
-
-
-// ══════════════════════════════════════════════════════════════════════════════
-// NOUVEAU DASHBOARD
-// ══════════════════════════════════════════════════════════════════════════════
-
-// Historique local des actes générés (en session)
-let ACTES_GENERES_HIST = [];
-
-async function chargerDashboard() {
-  // Date et heure
-  const now  = new Date();
-  const heure = now.getHours();
-  const salut = heure < 12 ? 'Bonjour' : heure < 18 ? 'Bon après-midi' : 'Bonsoir';
-  const jours = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
-  const mois  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-  const dateStr = `${jours[now.getDay()]} ${now.getDate()} ${mois[now.getMonth()]} ${now.getFullYear()}`;
-
-  const greetEl = document.getElementById('dash-greeting-new');
-  const dateEl  = document.getElementById('dash-date-new');
-  if (greetEl) {
-    // Récupérer le nom de l'avocat
-    try {
-      const profil = await apiFetch('/profil', 'GET');
-      const nom = profil?.display_name || profil?.full_name || 'Maître';
-      greetEl.textContent = `${salut}, ${nom}`;
-    } catch(e) {
-      greetEl.textContent = `${salut}, Maître`;
-    }
-  }
-  if (dateEl) dateEl.textContent = dateStr;
-
-  // Abonnement
-  try {
-    const abo = await apiFetch('/abonnement/statut', 'GET');
-    const badge = document.getElementById('dash-abo-badge');
-    const alert = document.getElementById('dash-alert');
-    if (abo && badge) {
-      badge.style.display = 'inline-flex';
-      const j = abo.jours_restants || 0;
-      if (!abo.actif) {
-        badge.className = 'dash-abonnement expired';
-        badge.textContent = 'Abonnement expiré';
-        if (alert) { alert.textContent = 'Votre abonnement a expiré. Contactez-nous pour renouveler.'; alert.classList.add('visible'); }
-      } else if (j <= 7) {
-        badge.className = 'dash-abonnement warn';
-        badge.textContent = `${j} jour${j > 1 ? 's' : ''} restant${j > 1 ? 's' : ''}`;
-        if (alert) { alert.textContent = `Attention : votre abonnement expire dans ${j} jour${j > 1 ? 's' : ''}. Pensez à renouveler.`; alert.classList.add('visible'); }
-      } else {
-        badge.className = 'dash-abonnement';
-        badge.textContent = `${j} jours restants`;
-      }
-      const kpiJ = document.getElementById('kpi-jours');
-      if (kpiJ) kpiJ.textContent = abo.actif ? j : '0';
-    }
-  } catch(e) {}
-
-  // Stats
-  try {
-    const stats = await apiFetch('/stats', 'GET');
-    if (stats) {
-      const kpiD = document.getElementById('kpi-docs');
-      const kpiDos = document.getElementById('kpi-dossiers');
-      const kpiA = document.getElementById('kpi-actes');
-      if (kpiD)   kpiD.textContent   = stats.documents || 0;
-      if (kpiDos) kpiDos.textContent = stats.dossiers  || 0;
-      if (kpiA)   kpiA.textContent   = ACTES_GENERES_HIST.length || 0;
-    }
-  } catch(e) {}
-
-  // Documents récents
-  try {
-    const docs = await apiFetch('/liste_documents', 'GET');
-    const container = document.getElementById('dash-docs-recent');
-    if (container && docs && docs.length) {
-      container.innerHTML = docs.slice(0, 5).map(d => {
-        const nom  = d.nom || d.filename || 'Document';
-        const date = d.created_at ? new Date(d.created_at).toLocaleDateString('fr-FR') : '';
-        return `<div class="dash-item" onclick="showPage('bibliotheque')">
-          <div class="dash-item-dot active"></div>
-          <div class="dash-item-info">
-            <div class="dash-item-name">${nom.replace('.pdf','')}</div>
-            <div class="dash-item-sub">PDF · ${d.storage_tier || 'hot'}</div>
-          </div>
-          <div class="dash-item-date">${date}</div>
-        </div>`;
-      }).join('');
-    }
-  } catch(e) {}
-
-  // Activité récente (actes générés en session)
-  const actContainer = document.getElementById('dash-activite-recent');
-  if (actContainer) {
-    if (ACTES_GENERES_HIST.length) {
-      actContainer.innerHTML = ACTES_GENERES_HIST.slice(-5).reverse().map(a => `
-        <div class="dash-item" onclick="showPage('redaction')">
-          <div class="dash-item-dot" style="background:#1A6B9A;"></div>
-          <div class="dash-item-info">
-            <div class="dash-item-name">${a.nom}</div>
-            <div class="dash-item-sub">Acte généré</div>
-          </div>
-          <div class="dash-item-date">${a.heure}</div>
-        </div>`).join('');
-    } else {
-      actContainer.innerHTML = '<div class="dash-empty">Générez votre premier acte</div>';
-    }
-  }
-}
-
-// Enregistrer chaque acte généré dans l'historique
-function enregistrerActeGenere(nomActe) {
-  const heure = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
-  ACTES_GENERES_HIST.push({nom: nomActe, heure});
-  // Mettre à jour le KPI
-  const kpiA = document.getElementById('kpi-actes');
-  if (kpiA) kpiA.textContent = ACTES_GENERES_HIST.length;
 }
 
 </script>
