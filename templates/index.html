@@ -936,6 +936,330 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .aff-acte-btn:hover{border-color:#0A0A0A;background:#F0F0F0;}
 .aff-acte-name{font-size:11px;font-weight:500;color:#0A0A0A;margin-bottom:2px;}
 .aff-acte-desc{font-size:9px;color:#A3A3A3;}
+
+/* ── WIZARD MODAL ─────────────────────────────────────────────────── */
+.wizard-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.55);
+  z-index:1000;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.wizard-overlay.open{opacity:1;pointer-events:all;}
+.wizard-modal{
+  background:var(--bg);border:0.5px solid #E5E5E5;border-radius:12px;
+  width:520px;max-width:95vw;max-height:88vh;
+  display:flex;flex-direction:column;
+  box-shadow:0 16px 48px rgba(0,0,0,0.18);
+  transform:translateY(12px);transition:transform .2s;
+}
+.wizard-overlay.open .wizard-modal{transform:translateY(0);}
+.wizard-header{
+  padding:20px 24px 16px;border-bottom:0.5px solid #E5E5E5;
+  display:flex;justify-content:space-between;align-items:flex-start;
+  flex-shrink:0;
+}
+.wizard-title{font-size:14px;font-weight:600;color:#0A0A0A;line-height:1.3;}
+.wizard-subtitle{font-size:11px;color:#A3A3A3;margin-top:2px;}
+.wizard-close{
+  background:none;border:none;cursor:pointer;
+  font-size:18px;color:#A3A3A3;padding:0;line-height:1;
+  flex-shrink:0;margin-left:12px;
+}
+.wizard-close:hover{color:#0A0A0A;}
+.wizard-steps{
+  display:flex;align-items:center;gap:0;
+  padding:14px 24px;border-bottom:0.5px solid #E5E5E5;
+  flex-shrink:0;
+}
+.wizard-step{
+  display:flex;align-items:center;gap:6px;font-size:11px;
+  color:#A3A3A3;font-weight:500;
+}
+.wizard-step.active{color:#0A0A0A;}
+.wizard-step.done{color:#22c55e;}
+.wizard-step-num{
+  width:20px;height:20px;border-radius:50%;
+  border:1.5px solid currentColor;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:600;flex-shrink:0;
+}
+.wizard-step.active .wizard-step-num{background:#0A0A0A;color:#fff;border-color:#0A0A0A;}
+.wizard-step.done .wizard-step-num{background:#22c55e;color:#fff;border-color:#22c55e;}
+.wizard-sep{flex:1;height:1px;background:#E5E5E5;margin:0 8px;}
+.wizard-body{flex:1;overflow-y:auto;padding:20px 24px;}
+.wizard-field{margin-bottom:16px;}
+.wizard-label{
+  display:block;font-size:11px;font-weight:600;
+  color:#0A0A0A;margin-bottom:5px;letter-spacing:0.02em;
+}
+.wizard-label span{color:#A3A3A3;font-weight:400;}
+.wizard-input,.wizard-textarea{
+  width:100%;border:0.5px solid #E5E5E5;border-radius:6px;
+  padding:9px 12px;font-size:12px;color:#0A0A0A;
+  background:#fff;outline:none;font-family:inherit;
+  box-sizing:border-box;transition:border-color .15s;
+}
+.wizard-input:focus,.wizard-textarea:focus{border-color:#0A0A0A;}
+.wizard-textarea{resize:vertical;min-height:80px;line-height:1.6;}
+.wizard-footer{
+  padding:14px 24px;border-top:0.5px solid #E5E5E5;
+  display:flex;justify-content:space-between;align-items:center;
+  flex-shrink:0;
+}
+.wizard-progress{font-size:10px;color:#A3A3A3;}
+.wizard-btns{display:flex;gap:8px;}
+.wizard-btn-back{
+  padding:8px 16px;border:0.5px solid #E5E5E5;border-radius:6px;
+  background:#fff;font-size:12px;color:#0A0A0A;cursor:pointer;
+}
+.wizard-btn-back:hover{background:#F5F5F5;}
+.wizard-btn-next{
+  padding:8px 20px;border:none;border-radius:6px;
+  background:#0A0A0A;color:#fff;font-size:12px;
+  font-weight:500;cursor:pointer;
+}
+.wizard-btn-next:hover{background:#333;}
+.wizard-btn-next:disabled{background:#D4D4D4;cursor:not-allowed;}
+.wizard-btn-generate{
+  padding:8px 20px;border:none;border-radius:6px;
+  background:#0A0A0A;color:#fff;font-size:12px;
+  font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;
+}
+.wizard-btn-generate:hover{background:#333;}
+.wizard-spinner{
+  width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .6s linear infinite;display:none;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+
+/* ── MODAL EXPORT PDF ─────────────────────────────────────────────── */
+.export-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.55);
+  z-index:1100;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.export-overlay.open{opacity:1;pointer-events:all;}
+.export-modal{
+  background:var(--bg);border:0.5px solid #E5E5E5;border-radius:12px;
+  width:420px;max-width:95vw;
+  box-shadow:0 16px 48px rgba(0,0,0,0.18);
+  transform:translateY(12px);transition:transform .2s;
+}
+.export-overlay.open .export-modal{transform:translateY(0);}
+.export-modal-hdr{
+  padding:18px 20px 14px;border-bottom:0.5px solid #E5E5E5;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.export-modal-title{font-size:13px;font-weight:600;color:#0A0A0A;}
+.export-modal-close{
+  background:none;border:none;cursor:pointer;
+  font-size:16px;color:#A3A3A3;padding:0;
+}
+.export-modal-close:hover{color:#0A0A0A;}
+.export-modal-body{padding:18px 20px;}
+.export-field{margin-bottom:14px;}
+.export-label{
+  display:block;font-size:11px;font-weight:600;
+  color:#0A0A0A;margin-bottom:4px;
+}
+.export-input{
+  width:100%;border:0.5px solid #E5E5E5;border-radius:6px;
+  padding:8px 10px;font-size:12px;color:#0A0A0A;
+  background:#fff;outline:none;font-family:inherit;
+  box-sizing:border-box;
+}
+.export-input:focus{border-color:#0A0A0A;}
+.export-asset-row{
+  display:flex;align-items:center;gap:10px;
+  border:0.5px solid #E5E5E5;border-radius:6px;
+  padding:10px 12px;cursor:pointer;
+  transition:border-color .15s;
+}
+.export-asset-row:hover{border-color:#0A0A0A;}
+.export-asset-preview{
+  width:40px;height:40px;border-radius:4px;
+  object-fit:contain;border:0.5px solid #E5E5E5;
+  background:#F5F5F5;display:none;
+}
+.export-asset-label{font-size:11px;color:#6B7280;flex:1;}
+.export-asset-btn{
+  font-size:10px;padding:4px 10px;border-radius:4px;
+  border:0.5px solid #E5E5E5;background:#fff;
+  cursor:pointer;color:#0A0A0A;white-space:nowrap;
+}
+.export-asset-btn:hover{background:#F5F5F5;}
+.export-modal-ftr{
+  padding:12px 20px;border-top:0.5px solid #E5E5E5;
+  display:flex;justify-content:flex-end;gap:8px;
+}
+.export-btn-cancel{
+  padding:8px 16px;border:0.5px solid #E5E5E5;border-radius:6px;
+  background:#fff;font-size:12px;color:#0A0A0A;cursor:pointer;
+}
+.export-btn-confirm{
+  padding:8px 18px;border:none;border-radius:6px;
+  background:#0A0A0A;color:#fff;font-size:12px;
+  font-weight:500;cursor:pointer;
+}
+.export-btn-confirm:hover{background:#333;}
+
+
+/* ── MODAL SAUVEGARDE VERSION ─────────────────────────────────────── */
+.save-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.55);
+  z-index:1200;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.save-overlay.open{opacity:1;pointer-events:all;}
+.save-modal{
+  background:var(--bg);border:0.5px solid #E5E5E5;border-radius:12px;
+  width:400px;max-width:95vw;
+  box-shadow:0 16px 48px rgba(0,0,0,0.18);
+  transform:translateY(12px);transition:transform .2s;
+}
+.save-overlay.open .save-modal{transform:translateY(0);}
+.save-modal-hdr{
+  padding:18px 20px 14px;border-bottom:0.5px solid #E5E5E5;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.save-modal-title{font-size:13px;font-weight:600;color:#0A0A0A;}
+.save-modal-close{
+  background:none;border:none;cursor:pointer;
+  font-size:16px;color:#A3A3A3;padding:0;
+}
+.save-modal-close:hover{color:#0A0A0A;}
+.save-modal-body{padding:18px 20px;}
+.save-modal-info{
+  font-size:12px;color:#6B7280;margin-bottom:16px;
+  line-height:1.6;
+}
+.save-modal-ftr{
+  padding:12px 20px;border-top:0.5px solid #E5E5E5;
+  display:flex;justify-content:flex-end;gap:8px;
+}
+.save-btn-cancel{
+  padding:8px 16px;border:0.5px solid #E5E5E5;border-radius:6px;
+  background:#fff;font-size:12px;color:#0A0A0A;cursor:pointer;
+}
+.save-btn-confirm{
+  padding:8px 18px;border:none;border-radius:6px;
+  background:#0A0A0A;color:#fff;font-size:12px;
+  font-weight:500;cursor:pointer;
+}
+.save-btn-confirm:hover{background:#333;}
+.save-versions-list{
+  margin-top:12px;border-top:0.5px solid #F0F0F0;padding-top:12px;
+}
+.save-version-item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;border-bottom:0.5px solid #F5F5F5;
+  font-size:11px;color:#6B7280;
+}
+.save-version-item:last-child{border-bottom:none;}
+.save-version-note{font-weight:500;color:#0A0A0A;max-width:200px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.save-version-restore{
+  font-size:10px;padding:2px 8px;border-radius:4px;
+  border:0.5px solid #E5E5E5;background:#fff;cursor:pointer;
+  color:#0A0A0A;
+}
+.save-version-restore:hover{background:#F5F5F5;}
+
+
+/* ── NOUVEAU DASHBOARD ─────────────────────────────────────────────── */
+.dash-welcome-new{
+  padding:20px 24px 0;
+}
+.dash-greeting{
+  font-size:18px;font-weight:600;color:#0A0A0A;
+  font-family:var(--serif,Georgia,serif);
+}
+.dash-date-str{font-size:11px;color:#A3A3A3;margin-top:2px;}
+.dash-abonnement{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:8px;padding:4px 10px;border-radius:20px;
+  background:#F0FDF4;border:0.5px solid #86EFAC;
+  font-size:10px;font-weight:500;color:#16A34A;
+}
+.dash-abonnement.warn{
+  background:#FFF7ED;border-color:#FCD34D;color:#D97706;
+}
+.dash-abonnement.expired{
+  background:#FEF2F2;border-color:#FCA5A5;color:#DC2626;
+}
+.dash-kpis{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+  padding:16px 24px;
+}
+.dash-kpi{
+  background:#fff;border:0.5px solid #E5E5E5;border-radius:8px;
+  padding:14px 16px;cursor:default;
+}
+.dash-kpi-val{
+  font-size:24px;font-weight:700;color:#0A0A0A;
+  font-family:var(--serif,Georgia,serif);
+}
+.dash-kpi-label{font-size:10px;color:#A3A3A3;margin-top:3px;font-weight:500;}
+.dash-kpi-sub{font-size:10px;color:#6B7280;margin-top:2px;}
+.dash-shortcuts{
+  display:flex;gap:8px;padding:0 24px 16px;flex-wrap:wrap;
+}
+.dash-shortcut{
+  display:flex;align-items:center;gap:6px;
+  padding:8px 14px;border-radius:6px;border:0.5px solid #E5E5E5;
+  background:#fff;cursor:pointer;font-size:12px;font-weight:500;
+  color:#0A0A0A;transition:all .15s;white-space:nowrap;
+}
+.dash-shortcut:hover{background:#0A0A0A;color:#fff;border-color:#0A0A0A;}
+.dash-two-col{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+  padding:0 24px 24px;
+}
+.dash-panel{
+  background:#fff;border:0.5px solid #E5E5E5;border-radius:8px;
+  overflow:hidden;
+}
+.dash-panel-hdr{
+  padding:12px 16px;border-bottom:0.5px solid #E5E5E5;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.dash-panel-title{font-size:11px;font-weight:600;color:#0A0A0A;}
+.dash-panel-link{font-size:10px;color:#6B7280;cursor:pointer;}
+.dash-panel-link:hover{color:#0A0A0A;}
+.dash-panel-body{padding:8px 0;}
+.dash-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 16px;border-bottom:0.5px solid #F5F5F5;
+  cursor:pointer;transition:background .1s;
+}
+.dash-item:last-child{border-bottom:none;}
+.dash-item:hover{background:#F9F9F9;}
+.dash-item-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:#E5E5E5;flex-shrink:0;
+}
+.dash-item-dot.active{background:#22C55E;}
+.dash-item-dot.warn{background:#F59E0B;}
+.dash-item-info{flex:1;min-width:0;}
+.dash-item-name{
+  font-size:12px;font-weight:500;color:#0A0A0A;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.dash-item-sub{font-size:10px;color:#A3A3A3;margin-top:1px;}
+.dash-item-date{font-size:10px;color:#A3A3A3;flex-shrink:0;}
+.dash-empty{
+  padding:20px 16px;text-align:center;
+  font-size:11px;color:#A3A3A3;
+}
+.dash-alert{
+  margin:0 24px 12px;padding:10px 14px;
+  border-radius:6px;border:0.5px solid #FCD34D;
+  background:#FFFBEB;font-size:11px;color:#92400E;
+  display:none;
+}
+.dash-alert.visible{display:block;}
+
 </style>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.6/quill.snow.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.6/quill.min.js"></script>
@@ -1052,14 +1376,6 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
       </div>
     </div>
 
-    <div class="sb-sep"></div>
-<div class="nav-item" onclick="showPage('profil')" id="nav-profil">
-  <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-    <path d="M2 2h4v12H2zM6 2h4v12H6zM10 4l4 2-4 2"/>
-  </svg>
-  Paramètres rédaction
-</div>
-
 <div class="sb-sep"></div>
 
 <!-- Infos avocat en bas -->
@@ -1076,387 +1392,71 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 
     <!-- ── TABLEAU DE BORD ──────────────────────────── -->
     <div class="page active" id="page-dashboard">
-      <div class="dash-layout">
-        <div class="dash-welcome">
-          <h1 id="dash-greeting">Bonjour, Maître Boubou</h1>
-          <p id="dash-date">Chargement...</p>
-        </div>
-        <div class="dash-grid" style="grid-template-columns:repeat(2,1fr);">
-  <div class="stat-card">
-    <div class="stat-icon">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#525252" stroke-width="1.5">
-        <path d="M2 2h4v12H2zM6 2h4v12H6z"/>
-      </svg>
-    </div>
-    <div class="stat-val" id="stat-docs">0</div>
-    <div class="stat-label">Documents indexés</div>
+  <!-- Alerte abonnement -->
+  <div class="dash-alert" id="dash-alert"></div>
+
+  <!-- Bienvenue -->
+  <div class="dash-welcome-new">
+    <div class="dash-greeting" id="dash-greeting-new">Bonjour, Maître</div>
+    <div class="dash-date-str" id="dash-date-new"></div>
+    <div class="dash-abonnement" id="dash-abo-badge" style="display:none;"></div>
   </div>
-  <div class="stat-card">
-    <div class="stat-icon">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#525252" stroke-width="1.5">
-        <path d="M3 12L6 6l3 4 2-3 2 5"/>
-      </svg>
+
+  <!-- KPIs -->
+  <div class="dash-kpis">
+    <div class="dash-kpi">
+      <div class="dash-kpi-val" id="kpi-docs">—</div>
+      <div class="dash-kpi-label">Documents indexés</div>
     </div>
-    <div class="stat-val" id="stat-actes">0</div>
-    <div class="stat-label">Actes générés</div>
-  </div>
-</div>
-<div class="dash-row">
-  <div class="dash-card" style="grid-column:1/-1;">
-    <div class="dash-card-hdr">
-      <span class="dash-card-title">Documents récents</span>
+    <div class="dash-kpi">
+      <div class="dash-kpi-val" id="kpi-dossiers">—</div>
+      <div class="dash-kpi-label">Dossiers actifs</div>
     </div>
-    <div class="dash-card-body" id="dash-docs-list">
-      <div style="font-size:11px;color:var(--text3);padding:8px 0;">Aucun document</div>
+    <div class="dash-kpi">
+      <div class="dash-kpi-val" id="kpi-actes">—</div>
+      <div class="dash-kpi-label">Actes générés</div>
+      <div class="dash-kpi-sub">ce mois</div>
+    </div>
+    <div class="dash-kpi">
+      <div class="dash-kpi-val" id="kpi-jours">—</div>
+      <div class="dash-kpi-label">Jours d'abonnement</div>
+      <div class="dash-kpi-sub">restants</div>
     </div>
   </div>
-</div>
+
+  <!-- Raccourcis -->
+  <div class="dash-shortcuts">
+    <div class="dash-shortcut" onclick="showPage('bibliotheque')">Uploader un document</div>
+    <div class="dash-shortcut" onclick="showPage('redaction')">Rédiger un acte</div>
+    <div class="dash-shortcut" onclick="showPage('analyse')">Analyser un document</div>
+    <div class="dash-shortcut" onclick="showPage('dossiers')">Nouveau dossier</div>
+    <div class="dash-shortcut" onclick="showPage('chat')">Poser une question</div>
+  </div>
+
+  <!-- Deux colonnes -->
+  <div class="dash-two-col">
+    <!-- Documents récents -->
+    <div class="dash-panel">
+      <div class="dash-panel-hdr">
+        <span class="dash-panel-title">Documents récents</span>
+        <span class="dash-panel-link" onclick="showPage('bibliotheque')">Voir tout</span>
+      </div>
+      <div class="dash-panel-body" id="dash-docs-recent">
+        <div class="dash-empty">Aucun document</div>
       </div>
     </div>
 
-    <!-- ── BIBLIOTHEQUE ─────────────────────────────── -->
-    <div class="page" id="page-bibliotheque">
-      <div class="bib-layout-v2">
-        <!-- Toolbar -->
-        <div class="bib-toolbar-v2">
-          <div class="bib-search-box">
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#A3A3A3" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="10" y1="10" x2="14" y2="14"/></svg>
-            <input type="text" id="bib-search" placeholder="Rechercher un document..." oninput="filtrerDocs(this.value)"/>
-          </div>
-          <button class="btn-sm" id="btn-carte-mentale" onclick="afficherCarteMentale()" style="display:none;">🗺 Carte mentale</button>
-          <button class="btn-sm" id="btn-export-carte" onclick="exporterCartePNG()" style="display:none;">⬇ Exporter carte</button>
-          <input type="file" id="file-input-bib" accept=".pdf" style="display:none" onchange="uploadFichier(this.files[0],null)"/>
-        </div>
-
-        <!-- Corps -->
-        <div class="bib-body">
-          <!-- Liste gauche -->
-          <div class="bib-list-col">
-            <!-- Zone upload dans sidebar -->
-            <div style="padding:10px 12px;border-bottom:0.5px solid #F0F0F0;">
-              <div style="border:1px dashed #D4D4D4;border-radius:8px;padding:12px;text-align:center;cursor:pointer;background:#FAFAFA;transition:.15s;" 
-                onclick="document.getElementById('file-input-bib').click()"
-                onmouseover="this.style.background='#F0F0F0'" onmouseout="this.style.background='#FAFAFA'">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" stroke-width="1.5" style="display:block;margin:0 auto 6px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-                <div style="font-size:11px;font-weight:500;color:#525252;">Uploader un PDF</div>
-                <div style="font-size:10px;color:#A3A3A3;margin-top:2px;">Glisser ou cliquer</div>
-              </div>
-              <div style="display:flex;gap:6px;margin-top:8px;">
-                <label class="opt-tag" id="opt-sensible-bib" style="flex:1;justify-content:center;">
-                  <input type="checkbox" id="chk-sensible-bib" onchange="toggleOpt('opt-sensible-bib')"/>
-                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="10" height="8" rx="1"/><path d="M5 7V5a3 3 0 016 0v2"/></svg>
-                  Chiffré
-                </label>
-                <label class="opt-tag" id="opt-manuscrit-bib" style="flex:1;justify-content:center;">
-                  <input type="checkbox" id="chk-manuscrit-bib" onchange="toggleOpt('opt-manuscrit-bib')"/>
-                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-9 2 2-9 9H3v-2z"/></svg>
-                  Manuscrit
-                </label>
-              </div>
-            </div>
-
-            <div class="bib-doc-list" id="bib-docs-list"></div>
-            <div class="docs-group" style="font-size:9px;font-weight:500;color:#A3A3A3;padding:8px 12px 3px;letter-spacing:0.5px;text-transform:uppercase;">Générés</div>
-            <div id="bib-generes-list"></div>
-          </div>
-
-          <!-- Viewer droite -->
-          <div class="bib-viewer-col" id="bib-viewer">
-            <div class="bib-empty-viewer">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#E5E5E5" stroke-width="1">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>
-              </svg>
-              <div style="font-size:13px;font-weight:500;color:#D4D4D4;">Sélectionnez un document</div>
-              <div style="font-size:12px;color:#E5E5E5;max-width:220px;line-height:1.6;">Uploadez un PDF ou cliquez sur un document dans la liste</div>
-            </div>
-          </div>
-        </div>
+    <!-- Actes récents -->
+    <div class="dash-panel">
+      <div class="dash-panel-hdr">
+        <span class="dash-panel-title">Activité récente</span>
+        <span class="dash-panel-link" onclick="showPage('redaction')">Rédiger</span>
+      </div>
+      <div class="dash-panel-body" id="dash-activite-recent">
+        <div class="dash-empty">Aucune activité</div>
       </div>
     </div>
-
-    <!-- ── ANALYSE ──────────────────────────────────── -->
-    <div class="page" id="page-analyse">
-      <div class="analyse-layout" style="flex:1;display:flex;">
-        <div class="analyse-form" id="analyse-form-col" style="width:340px;min-width:220px;max-width:520px;flex-shrink:0;">
-          <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;">Analyse juridique</div>
-          <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">
-            Décrivez votre situation juridique. L'analyse s'appuie sur la base documentaire et la jurisprudence OHADA/CEMAC.
-          </div>
-
-          <div class="form-step-indicator" id="fsi">
-            <div class="fsi-dot active"></div>
-            <div class="fsi-dot"></div>
-            <div class="fsi-dot"></div>
-            <div class="fsi-dot"></div>
-          </div>
-
-          <div class="form-section">
-            <label class="form-label">Domaine juridique</label>
-            <div class="domains-grid">
-              <div class="domain-chip" onclick="selectDomain(this,'commercial')">Commercial OHADA</div>
-              <div class="domain-chip" onclick="selectDomain(this,'societaire')">Sociétaire OHADA</div>
-              <div class="domain-chip" onclick="selectDomain(this,'recouvrement')">Recouvrement OHADA</div>
-              <div class="domain-chip" onclick="selectDomain(this,'surete')">Sûretés OHADA</div>
-              <div class="domain-chip" onclick="selectDomain(this,'arbitrage')">Arbitrage OHADA</div>
-              <div class="domain-chip" onclick="selectDomain(this,'bancaire')">Bancaire COBAC</div>
-              <div class="domain-chip" onclick="selectDomain(this,'assurance')">Assurance CIMA</div>
-              <div class="domain-chip" onclick="selectDomain(this,'travail')">Droit du travail</div>
-              <div class="domain-chip" onclick="selectDomain(this,'foncier')">Foncier CMR</div>
-              <div class="domain-chip" onclick="selectDomain(this,'penal')">Pénal CMR</div>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-section">
-              <label class="form-label">Partie demanderesse</label>
-              <input class="form-input" id="an-demandeur" placeholder="Nom ou dénomination"/>
-            </div>
-            <div class="form-section">
-              <label class="form-label">Partie défenderesse</label>
-              <input class="form-input" id="an-defendeur" placeholder="Nom ou dénomination"/>
-            </div>
-          </div>
-
-          <div class="form-section">
-            <label class="form-label">Exposé des faits</label>
-            <textarea class="form-textarea" id="an-faits" placeholder="Décrivez les faits de manière chronologique et précise..."></textarea>
-          </div>
-
-          <div class="form-section">
-            <label class="form-label">Question juridique principale</label>
-            <input class="form-input" id="an-question" placeholder="Ex : La clause de résiliation anticipée est-elle valide ?"/>
-          </div>
-
-          <div class="form-section">
-            <label class="form-label">Textes invoqués (optionnel)</label>
-            <input class="form-input" id="an-textes" placeholder="Ex : AU OHADA Art. 134, Code civil CMR Art. 1134..."/>
-          </div>
-
-          <div class="form-section">
-            <label class="form-label">Enjeu et demandes</label>
-            <textarea class="form-textarea" id="an-enjeu" style="min-height:60px;" placeholder="Quel est l'enjeu financier ou juridique ? Que demandez-vous ?"></textarea>
-          </div>
-
-          <button class="btn-full" id="btn-analyser" onclick="lancerAnalyse()">Lancer l'analyse</button>
-        </div>
-
-        <div class="resizer" id="resizer-analyse"></div>
-        <div class="analyse-result" id="analyse-result">
-          <div class="result-empty">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <div style="font-size:13px;font-weight:500;color:var(--text2);">Aucune analyse en cours</div>
-            <div style="font-size:11px;color:var(--text3);text-align:center;max-width:260px;line-height:1.6;">
-              Sélectionnez un domaine juridique, décrivez les faits et posez votre question. L'analyse s'appuie sur vos documents indexés.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── COMPARAISON ──────────────────────────────── -->
-      <div class="page" id="page-comparaison">
-        <div class="comp-layout" style="flex:1;display:flex;">
-          <div class="comp-form" id="comp-form-col" style="width:340px;min-width:220px;max-width:520px;flex-shrink:0;">
-            <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;">Profil juge & stratégie</div>
-            <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">
-              Renseignez le juge et votre affaire. L'outil analyse le profil décisionnel et vous prépare une stratégie d'audience.
-            </div>
-
-            <div class="form-section">
-              <label class="form-label">Nom du juge</label>
-              <input class="form-input" id="cmp-juge" placeholder="Ex : Nom du juge"/>
-            </div>
-            <div class="form-row">
-              <div class="form-section">
-                <label class="form-label">Juridiction</label>
-                <input class="form-input" id="cmp-juridiction" placeholder="Ex : TPI Douala"/>
-              </div>
-              <div class="form-section">
-                <label class="form-label">Chambre</label>
-                <input class="form-input" id="cmp-chambre" placeholder="Ex : Civile"/>
-              </div>
-            </div>
-
-            <div class="form-section">
-              <label class="form-label">Domaine de l'affaire</label>
-              <select class="form-select" id="cmp-domaine">
-                <option value="">Tous les domaines</option>
-                <option value="commercial">Commercial OHADA</option>
-                <option value="societaire">Sociétaire OHADA</option>
-                <option value="recouvrement">Recouvrement OHADA</option>
-                <option value="surete">Sûretés OHADA</option>
-                <option value="bancaire">Bancaire COBAC</option>
-                <option value="assurance">Assurance CIMA</option>
-                <option value="travail">Droit du travail</option>
-                <option value="foncier">Foncier CMR</option>
-                <option value="penal">Pénal CMR</option>
-              </select>
-            </div>
-
-            <div class="form-section">
-              <label class="form-label">Résumé de votre affaire</label>
-              <textarea class="form-textarea" id="cmp-affaire" placeholder="Décrivez brièvement les faits, les parties, l'enjeu et votre position..."></textarea>
-            </div>
-
-            <div class="form-section">
-              <label class="form-label">Arguments principaux</label>
-              <textarea class="form-textarea" id="cmp-arguments" style="min-height:60px;" placeholder="Quels sont vos arguments de fond ?"></textarea>
-            </div>
-
-            <div class="form-section">
-              <label class="form-label">Antécédents connus du juge (optionnel)</label>
-              <textarea class="form-textarea" id="cmp-antecedents" style="min-height:60px;" placeholder="Avez-vous déjà plaider devant ce juge ? Tendances observées..."></textarea>
-            </div>
-
-            <!-- Section décisions du juge -->
-            <div class="form-section" style="display:block;">
-              <label class="form-label">Décisions connues de ce juge (optionnel)</label>
-              <div style="background:var(--bg2);border:0.5px solid #E5E5E5;border-radius:var(--r);padding:10px 12px;margin-bottom:8px;">
-                <div style="font-size:10px;color:var(--text2);margin-bottom:8px;line-height:1.5;">
-                  Uploadez des décisions manuscrites ou tapées de ce juge. Elles resteront privées à votre cabinet et enrichiront l'analyse.
-                </div>
-                <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-                  <button class="btn-sm" onclick="document.getElementById('file-input-dec').click()" style="font-size:10px;">
-                    + Ajouter une décision PDF
-                  </button>
-                  <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);cursor:pointer;">
-                    <input type="checkbox" id="chk-dec-manuscrit" style="accent-color:#0A0A0A;"/>
-                    Manuscrit / Scanné
-                  </label>
-                </div>
-                <input type="file" id="file-input-dec" accept=".pdf" style="display:none" onchange="uploadDecision(this.files[0])"/>
-                <div id="decisions-list" style="display:flex;flex-direction:column;gap:4px;"></div>
-              </div>
-            </div>
-
-            <button class="btn-full" onclick="lancerComparaison()">Analyser le profil juge</button>
-            <div class="save-confirm" id="cmp-save-confirm">✓ Dossier enregistré dans la base documentaire</div>
-          </div>
-
-          <div class="resizer" id="resizer-comp"></div>
-          <div class="comp-result" id="comp-result">
-            <div class="result-empty">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1">
-                <path d="M12 2L3 7v6c0 5 4 9.3 9 10 5-.7 9-5 9-10V7L12 2z"/>
-              </svg>
-              <div style="font-size:13px;font-weight:500;color:var(--text2);">Aucun profil juge analysé</div>
-              <div style="font-size:11px;color:var(--text3);text-align:center;max-width:260px;line-height:1.6;">
-                Renseignez le nom du juge, la juridiction et votre affaire pour obtenir son profil décisionnel et une stratégie d'audience.
-              </div>
-            </div>
-          </div><!-- fin comp-result -->
-        </div><!-- fin comp-layout -->
-      </div><!-- fin page-comparaison -->
-
-    <!-- ── RÉDACTION ─────────────────────────────────── -->
-      <div class="page" id="page-redaction">
-        <div class="redac-layout">
-
-          <!-- Colonne gauche : choix acte + champs -->
-          <div class="redac-form-col" id="redac-form-col">
-            <div>
-              <div class="redac-section-title">Choisir un acte</div>
-              <div class="redac-acte-list" id="redac-acte-list"></div>
-            </div>
-            <div id="redac-champs-zone" style="display:none;">
-              <div style="height:0.5px;background:#E5E5E5;margin:4px 0 12px;"></div>
-              <div class="redac-section-title" id="redac-champs-title">Champs</div>
-              <div class="redac-champs" id="redac-champs"></div>
-              <button onclick="lancerRedaction()" style="margin-top:12px;width:100%;padding:10px;background:#0A0A0A;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;transition:.15s;">Générer le document</button>
-            </div>
-          </div>
-
-          <!-- Colonne droite : résultat -->
-          <div class="redac-result-col">
-            <div class="redac-result-toolbar">
-              <span style="font-size:12px;font-weight:500;color:#0A0A0A;flex:1;" id="redac-result-title">Document</span>
-              <button class="btn-sm" id="btn-redac-email" onclick="ouvrirEnvoiEmail()" style="display:none;">✉ Envoyer</button>
-              <button class="btn-sm" id="btn-redac-save" onclick="enregistrerRedaction()" style="display:none;">💾 Enregistrer</button>
-              <button class="btn-sm primary" id="btn-redac-export" onclick="exporterRedaction()" style="display:none;">Exporter PDF</button>
-            </div>
-            <div class="redac-result-body" id="redac-result-body" style="padding:0;overflow:hidden;">
-              <div id="quill-editor" style="min-height:calc(100vh - 100px);font-size:13px;background:#fff;"></div>
-            </div>
-          </div>
-
-        </div>
-  </div><!-- fin page-redaction -->
-
- <!-- ── PROFIL ─────────────────────────────────────── -->
-<div class="page" id="page-profil">
-  <div style="flex:1;overflow-y:auto;padding:20px;height:100%;">
-    <div class="dash-welcome">
-      <h1 style="font-family:var(--serif);font-size:24px;font-weight:500;color:var(--navy);">Paramètres rédaction</h1>
-      <p style="font-size:12px;color:var(--text2);margin-top:4px;">Logo, tampon et signatures pour vos documents générés</p>
-    </div>
-
-    <!-- Informations -->
-    <div style="background:#fff;border:0.5px solid #E5E5E5;border-radius:12px;overflow:hidden;margin-bottom:16px;">
-      <div style="padding:10px 16px;background:#FAFAFA;border-bottom:0.5px solid #E5E5E5;font-size:11px;font-weight:600;color:#525252;text-transform:uppercase;letter-spacing:0.4px;">Informations</div>
-      <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
-        <div class="redac-champ">
-          <label>Nom d'affichage</label>
-          <input type="text" id="profil-nom" placeholder="Nom et prénom"/>
-        </div>
-        <div class="redac-champ">
-          <label>Barreau</label>
-          <input type="text" id="profil-barreau" placeholder="Barreau du Cameroun"/>
-        </div>
-        <div class="redac-champ">
-          <label>Pays</label>
-          <input type="text" id="profil-pays" placeholder="Cameroun"/>
-        </div>
-      </div>
-    </div>
-
-    <!-- Logo -->
-    <div style="background:#fff;border:0.5px solid #E5E5E5;border-radius:12px;overflow:hidden;margin-bottom:16px;">
-      <div style="padding:10px 16px;background:#FAFAFA;border-bottom:0.5px solid #E5E5E5;font-size:11px;font-weight:600;color:#525252;text-transform:uppercase;letter-spacing:0.4px;">Logo du cabinet</div>
-      <div style="padding:16px;display:flex;align-items:center;gap:16px;">
-        <div id="profil-logo-preview" style="width:80px;height:80px;background:#F5F5F5;border:0.5px solid #E5E5E5;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#A3A3A3;">Logo</div>
-        <div>
-          <button class="btn-sm" onclick="document.getElementById('input-logo').click()">Uploader logo</button>
-          <div style="font-size:10px;color:#A3A3A3;margin-top:6px;">PNG ou JPG — max 5 Mo</div>
-          <input type="file" id="input-logo" accept=".png,.jpg,.jpeg" style="display:none" onchange="uploaderAsset(this.files[0],'logo')"/>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tampon -->
-    <div style="background:#fff;border:0.5px solid #E5E5E5;border-radius:12px;overflow:hidden;margin-bottom:16px;">
-      <div style="padding:10px 16px;background:#FAFAFA;border-bottom:0.5px solid #E5E5E5;font-size:11px;font-weight:600;color:#525252;text-transform:uppercase;letter-spacing:0.4px;">Tampon</div>
-      <div style="padding:16px;display:flex;align-items:center;gap:16px;">
-        <div id="profil-tampon-preview" style="width:80px;height:80px;background:#F5F5F5;border:0.5px solid #E5E5E5;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#A3A3A3;">Tampon</div>
-        <div>
-          <button class="btn-sm" onclick="document.getElementById('input-tampon').click()">Uploader tampon</button>
-          <div style="font-size:10px;color:#A3A3A3;margin-top:6px;">PNG transparent recommandé</div>
-          <input type="file" id="input-tampon" accept=".png,.jpg,.jpeg" style="display:none" onchange="uploaderAsset(this.files[0],'tampon')"/>
-        </div>
-      </div>
-    </div>
-
-    <!-- Signatures -->
-    <div style="background:#fff;border:0.5px solid #E5E5E5;border-radius:12px;overflow:hidden;margin-bottom:16px;">
-      <div style="padding:10px 16px;background:#FAFAFA;border-bottom:0.5px solid #E5E5E5;font-size:11px;font-weight:600;color:#525252;text-transform:uppercase;letter-spacing:0.4px;">Signatures</div>
-      <div style="padding:16px;">
-        <div id="profil-signatures-list" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;"></div>
-        <button class="btn-sm" onclick="document.getElementById('input-signature').click()">+ Ajouter une signature</button>
-        <div style="font-size:10px;color:#A3A3A3;margin-top:6px;">PNG transparent recommandé</div>
-        <input type="file" id="input-signature" accept=".png,.jpg,.jpeg" style="display:none" onchange="uploaderAsset(this.files[0],'signature')"/>
-      </div>
-    </div>
-
-    <!-- Bouton sauvegarder -->
-    <div style="margin-top:16px;">
-      <button onclick="sauvegarderProfil()" style="width:100%;padding:12px;background:#0A0A0A;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;transition:.15s;">Sauvegarder le profil</button>
-      <div id="profil-save-confirm" style="display:none;margin-top:8px;padding:8px 12px;background:#DCFCE7;border:0.5px solid #86EFAC;border-radius:6px;font-size:11px;color:#16A34A;text-align:center;">✓ Profil sauvegardé avec succès</div>
-    </div>
-
-  </div><!-- fin contenu profil -->
-</div><!-- fin page-profil -->
-
+  </div>
 </div><!-- fin page-dashboard -->
 
     <!-- ══ CHAT FLOTTANT ═══════════════════════════════════ -->
@@ -2953,6 +2953,9 @@ function selectionnerActe(acte, el) {
   document.querySelectorAll('.redac-acte-item').forEach(x => x.classList.remove('active'));
   el.classList.add('active');
   ACTE_ACTIF = acte;
+  // Ouvrir le wizard modal
+  ouvrirWizard(acte);
+  return;
   const zone = document.getElementById('redac-champs-zone');
   const title = document.getElementById('redac-champs-title');
   const champs = document.getElementById('redac-champs');
@@ -3021,19 +3024,7 @@ async function lancerRedaction() {
 
 async function exporterRedaction() {
   if (!REDAC_CONTENU) return;
-  try {
-    const r = await fetch('/export_pdf', {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},
-      body: JSON.stringify({contenu: REDAC_CONTENU, nom: ACTE_ACTIF?.nom || 'Document'})
-    });
-    const blob = await r.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = (ACTE_ACTIF?.nom || 'document').replace(/ /g,'_') + '.pdf';
-    a.click();
-    showToast('PDF exporté');
-  } catch(e) { showToast('Erreur export', true); }
+  ouvrirExportModal(REDAC_CONTENU, ACTE_ACTIF?.nom || 'Document');
 }
 
 function copierRedaction() {
@@ -3217,6 +3208,718 @@ function insererSignatureDansQuill(url) {
     showToast('Signature insérée — redimensionnez avec la souris');
   }, 300);
 }
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// WIZARD MODAL — Rédaction d'actes OHADA
+// ══════════════════════════════════════════════════════════════════════════════
+
+const CHAMPS_LABELS = {
+  'requérant':'Demandeur / Requérant','adversaire':'Partie adverse / Défendeur',
+  'tribunal':'Tribunal compétent','demandeur':'Demandeur','defendeur':'Défendeur',
+  'faits':'Exposé des faits','montant':'Montant (FCFA)','objet':'Objet / Description',
+  'nature_creance':'Nature de la creance','date_exigibilite':"Date d'exigibilite",
+  'creancier':'Créancier','debiteur':'Débiteur','suretes':'Sûretés / Garanties',
+  'date_debut':'Date de debut','date_fin':'Date de fin','duree':'Durée',
+  'bailleur':'Bailleur','preneur':'Preneur / Locataire','adresse':'Adresse / Localisation',
+  'superficie':'Superficie','activite':'Activité commerciale',
+  'depot_garantie':'Depot de garantie','employeur':'Employeur',
+  'salarie':'Salarié','poste':'Poste / Fonction','motif_cdd':'Motif du CDD',
+  'periode_essai':"Periode d'essai",'avantages':'Avantages en nature',
+  'ancienneté':'Ancienneté','motif_licenciement':'Motif du licenciement',
+  'societe':'Dénomination sociale','capital':'Capital social (FCFA)',
+  'arguments':'Arguments juridiques','demandes':'Prétentions / Demandes',
+  'moyens':'Moyens de droit','reference_jugement':'Référence de la décision',
+  'date_signification':'Date de signification','urgence':'Urgence / Péril',
+  'biens_vises':'Biens visés par la saisie','tiers_saisi':'Tiers saisi',
+  'titre_executoire':'Titre exécutoire','garanties':'Garanties offertes',
+  'caution':'Montant de la caution','lieu_detention':'Lieu de détention',
+  'chefs_inculpation':"Chefs d'inculpation",'these_defensive':'Thèse défensive',
+  'nullites':'Nullités soulevées','cause_dissolution':'Cause de dissolution',
+  'perspectives':'Perspectives de redressement','fautes':'Fautes de gestion',
+  'actif':'Actif (FCFA)','passif':'Passif (FCFA)',
+  'date_cessation':'Date de cessation','pieces':'Pièces jointes',
+  'contrat':'Contrat de référence','clause_arbitrage':"Clause d'arbitrage",
+  'droit_applicable':'Droit applicable','juge':'Nom du juge',
+  'juridiction':'Juridiction','chambre':'Chambre','domaine':'Domaine juridique',
+  'periode':'Période','affaire':"Description de l'affaire",
+  'arguments_defense':'Arguments de la défense','antecedents':'Antécédents judiciaires',
+  'appellant':'Appelant','intime':'Intimé','decision_attaquee':'Décision attaquée',
+  'moyens_appel':"Moyens d'appel",'pays_origine':"Pays d'origine",
+  'decision':'Décision étrangère','acte_attaque':'Acte administratif attaqué',
+  'date_acte':"Date de l'acte",'titre_foncier':'Titre foncier',
+  'localisation':'Localisation du bien','droit_requérant':'Droit du requerant',
+  'delai':'Délai accordé','consequences':'Conséquences annoncées',
+  'reference_sentence':'Référence de la sentence','date_sentence':'Date de la sentence',
+  'objet_consultation':"Objet de la consultation",
+  'faits_resumes':'Résumé des faits','analyse_juridique':'Analyse juridique',
+  'recommandations':'Recommandations','concession_a':'Concessions de la partie A',
+  'concession_b':'Concessions de la partie B',
+  'fumus_boni_juris':"Fumus boni juris",
+  'fondements_juridiques':'Fondements juridiques',
+  'demandes_reconventionnelles':'Demandes reconventionnelles',
+  'type_conclusions':'Type de conclusions','salarie_porte':'Salarié porté',
+  'date_dec':'Date de la decision','source':'Source','actif_net':'Actif net',
+  'commandites':'Associés commandités','commanditaires':'Associés commanditaires',
+  'quota':'Quote-parts','partage':'Partage des récoltes',
+  'day_rate':'Rémunération (day-rate)','zone':"Zone d'operation",
+  'substances':'Substances minérales','budget_env':'Budget environnemental',
+  'legataires':'Légataires','lots':'Lots attribués','soultes':'Soultes',
+  'beneficiaire':'Bénéficiaire','souscripteur':'Souscripteur',
+  'clause_beneficiaire':'Clause bénéficiaire','valeur_rachat':'Valeur de rachat',
+  'plafond':'Plafond de garantie','franchise':'Franchise',
+  'systemes':'Systèmes couverts','sla':'SLA / Niveau de service',
+  'cookies':'Politique cookies','dpo':'Email DPO',
+  'mandat':'Mission du mandataire','jalons':'Jalons de livraison',
+  'spec':'Spécifications techniques','incoterm':'Incoterm applicable',
+  'devise':'Devise','fret':'Fret / Prix transport','surestaries':'Surestaries',
+  'debiteur_proc':'Débiteur en procédure','partenaire_prive':'Partenaire privé',
+  'indicateurs':'Indicateurs de performance','rang':"Rang de l'hypotheque",
+  'porteur':"Porteur d'actions",'donneur_ordre':"Donneur d'ordre",
+  'zone_geo':'Zone géographique','contrepartie':'Contrepartie financière',
+  'objet_env':'Objet de la convention','mesures':'Mesures de mitigation',
+  'budget_ppp':'Budget PPP','risques':'Répartition des risques',
+  'hotel':"Description de l'hotel",'nb_chambres':'Nombre de chambres',
+  'evenement':"Description de l'evenement",'acompte':'Acompte',
+  'programme':'Programme immobilier','classe':'Classe / Niveau',
+  'formation':'Formation visée','organe':'Organisme de formation',
+  'critere':'Critère de performance','enveloppe':'Enveloppe maximale',
+  'soins':'Soins / Prestations médicales','partenariat_med':'Objet du partenariat',
+  'nb_postes':'Nombre de postes supprimés','motif_eco':'Motif économique',
+  'jours_tt':'Jours de télétravail par semaine','indemnite_tt':'Indemnité mensuelle',
+  'redev':'Redevance / Royalties','exclusivite':'Exclusivité',
+  'success_fee':'Success fee','vacation':'Vacation horaire',
+  'min_vente':'Objectifs de vente minimaux','produits':'Produits distribués',
+  'concept':'Concept / Savoir-faire','droit_entree':"Droit d'entree",
+  'canon':'Canon emphytéotique','mairie':'Autorité concédante',
+  'service':'Service public délégué','tarifs':'Tarifs',
+  'investissement':'Investissement (FCFA)','type_credit':'Type de crédit',
+  'commissions':'Commissions bancaires','fiduciaire':'Fiduciaire',
+  'mode':'Mode de rupture','solde':'Solde dû',
+  'reference_jugement': 'Référence du jugement / Numéro OAPI',
+  'moyens_cassation': 'Moyens de cassation',
+  'fondements_juridiques': 'Fondements juridiques',
+};
+
+const PLACEHOLDERS = {
+  'requérant':'Ex: Maître Dupont, avocat au Barreau de Douala',
+  'adversaire':'Ex: Société ABC SARL, Akwa Douala',
+  'tribunal':'Ex: Tribunal de Grande Instance du Wouri',
+  'montant':'Ex: 5 000 000',
+  'objet':"Ex: Description precise de l'objet",
+  'adresse':'Ex: Rue Joss, Akwa, Douala, Cameroun',
+  'faits':'Décrivez les faits de manière chronologique et précise...',
+  'bailleur':'Ex: M. Jean MBARGA, propriétaire',
+  'preneur':'Ex: SARL TechCam, représentée par son gérant',
+  'superficie':'Ex: 150 m²',
+  'duree':'Ex: 2 ans renouvelable',
+  'employeur':'Ex: SARL Industries du Cameroun',
+  'salarie':'Ex: M. Paul NKENG, ingénieur',
+  'poste':'Ex: Directeur Commercial',
+  'montant':'Ex: 450 000 FCFA brut mensuel',
+  'societe':'Ex: SARL KENGNE & Associés',
+  'capital':'Ex: 1 000 000',
+  'creancier':'Ex: Banque Commerciale du Cameroun',
+  'debiteur':'Ex: M. Thomas BIYA',
+};
+
+// Groupement des champs par étapes (max 4 champs par étape)
+function grouperChamps(champs) {
+  const groupes = [];
+  const taille = 4;
+  for (let i = 0; i < champs.length; i += taille) {
+    groupes.push(champs.slice(i, i + taille));
+  }
+  // Si une seule étape, pas de regroupement
+  if (groupes.length === 1) return [champs];
+  return groupes;
+}
+
+let WIZARD_ACTE    = null;
+let WIZARD_ETAPES  = [];
+let WIZARD_STEP    = 0;
+let WIZARD_DONNEES = {};
+
+function ouvrirWizard(acte) {
+  WIZARD_ACTE    = acte;
+  WIZARD_DONNEES = {};
+  WIZARD_ETAPES  = grouperChamps(acte.champs || []);
+  WIZARD_STEP    = 0;
+
+  document.getElementById('wizard-title').textContent   = acte.nom;
+  document.getElementById('wizard-subtitle').textContent = acte.desc || '';
+
+  wizardRendreEtape();
+  wizardRendreSteps();
+
+  const overlay = document.getElementById('wizard-overlay');
+  overlay.classList.add('open');
+}
+
+function fermerWizard() {
+  document.getElementById('wizard-overlay').classList.remove('open');
+  WIZARD_ACTE = null;
+}
+
+function wizardClickOverlay(e) {
+  if (e.target === document.getElementById('wizard-overlay')) fermerWizard();
+}
+
+function wizardRendreSteps() {
+  const container = document.getElementById('wizard-steps');
+  const n = WIZARD_ETAPES.length;
+  if (n <= 1) { container.innerHTML = ''; return; }
+
+  let html = '';
+  for (let i = 0; i < n; i++) {
+    const classe = i < WIZARD_STEP ? 'done' : i === WIZARD_STEP ? 'active' : '';
+    const label  = i === 0 ? 'Informations' : i === n-1 ? 'Finalisation' : `Étape ${i+1}`;
+    html += `<div class="wizard-step ${classe}">
+      <div class="wizard-step-num">${i < WIZARD_STEP ? '✓' : i+1}</div>
+      <span>${label}</span>
+    </div>`;
+    if (i < n-1) html += '<div class="wizard-sep"></div>';
+  }
+  container.innerHTML = html;
+}
+
+function wizardRendreEtape() {
+  const champs = WIZARD_ETAPES[WIZARD_STEP] || [];
+  const n      = WIZARD_ETAPES.length;
+  let html = '';
+
+  for (const champ of champs) {
+    const label = CHAMPS_LABELS[champ] || champ.replace(/_/g,' ').replace(/\w/g, l => l.toUpperCase());
+    const isTA  = CHAMPS_TEXTAREA.includes(champ);
+    const ph    = PLACEHOLDERS[champ] || '';
+    const val   = WIZARD_DONNEES[champ] || '';
+
+    html += `<div class="wizard-field">
+      <label class="wizard-label" for="wz_${champ}">${label}</label>`;
+
+    if (isTA) {
+      html += `<textarea class="wizard-textarea" id="wz_${champ}" 
+        placeholder="${ph}" rows="4">${val}</textarea>`;
+    } else {
+      html += `<input class="wizard-input" type="text" id="wz_${champ}" 
+        placeholder="${ph}" value="${val}">`;
+    }
+    html += '</div>';
+  }
+
+  document.getElementById('wizard-body').innerHTML = html;
+  document.getElementById('wizard-progress').textContent = 
+    n > 1 ? `Étape ${WIZARD_STEP + 1} sur ${n}` : '';
+
+  // Boutons
+  const btnBack     = document.getElementById('wizard-btn-back');
+  const btnNext     = document.getElementById('wizard-btn-next');
+  const btnGenerate = document.getElementById('wizard-btn-generate');
+
+  btnBack.style.display     = WIZARD_STEP > 0 ? '' : 'none';
+  btnNext.style.display     = WIZARD_STEP < n - 1 ? '' : 'none';
+  btnGenerate.style.display = WIZARD_STEP === n - 1 ? '' : 'none';
+
+  // Focus premier champ
+  setTimeout(() => {
+    const first = document.getElementById(`wz_${champs[0]}`);
+    if (first) first.focus();
+  }, 50);
+}
+
+function wizardSauvegarderEtape() {
+  const champs = WIZARD_ETAPES[WIZARD_STEP] || [];
+  for (const champ of champs) {
+    const el = document.getElementById(`wz_${champ}`);
+    if (el) WIZARD_DONNEES[champ] = el.value.trim();
+  }
+}
+
+function wizardSuivant() {
+  wizardSauvegarderEtape();
+  if (WIZARD_STEP < WIZARD_ETAPES.length - 1) {
+    WIZARD_STEP++;
+    wizardRendreEtape();
+    wizardRendreSteps();
+    document.getElementById('wizard-body').scrollTop = 0;
+  }
+}
+
+function wizardPrecedent() {
+  wizardSauvegarderEtape();
+  if (WIZARD_STEP > 0) {
+    WIZARD_STEP--;
+    wizardRendreEtape();
+    wizardRendreSteps();
+    document.getElementById('wizard-body').scrollTop = 0;
+  }
+}
+
+async function wizardGenerer() {
+  wizardSauvegarderEtape();
+
+  const btn     = document.getElementById('wizard-btn-generate');
+  const spinner = document.getElementById('wizard-spinner');
+  btn.disabled  = true;
+  spinner.style.display = 'inline-block';
+  btn.querySelector('span:last-child') && (btn.lastChild.textContent = ' Génération...');
+
+  try {
+    const r = await apiFetch('/rediger', 'POST', {
+      type    : WIZARD_ACTE.key,
+      donnees : WIZARD_DONNEES,
+      session_id: SESSION_ID
+    });
+
+    fermerWizard();
+
+    if (!r || !r.document) {
+      showToast('Erreur lors de la génération', true);
+      return;
+    }
+
+    REDAC_CONTENU = r.document;
+    document.getElementById('redac-result-title').textContent = r.nom || WIZARD_ACTE.nom;
+    document.getElementById('btn-redac-export').style.display  = 'inline-flex';
+    document.getElementById('btn-redac-email').style.display   = 'inline-flex';
+    document.getElementById('btn-redac-save').style.display    = 'inline-flex';
+
+    const html2 = r.document
+      .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+      .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+      .replace(/^# (.+)$/gm,'<h1>$1</h1>')
+      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g,'<em>$1</em>')
+      .replace(/^---+$/gm,'<hr/>')
+      .replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br/>');
+
+    if (typeof quill !== 'undefined' && quill) {
+      quill.root.innerHTML = '<p>' + html2 + '</p>';
+    }
+
+    showToast('Document généré avec succès');
+    enregistrerActeGenere(ACTE_ACTIF?.nom || 'Document');
+
+  } catch(e) {
+    showToast('Erreur : ' + e.message, true);
+  } finally {
+    btn.disabled = false;
+    spinner.style.display = 'none';
+  }
+}
+
+// Touche Escape pour fermer
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') fermerWizard();
+});
+
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MODAL EXPORT PDF
+// ══════════════════════════════════════════════════════════════════════════════
+
+let EXP_LOGO_B64 = null;
+let EXP_SIG_B64  = null;
+let EXP_CONTENU  = null;
+let EXP_NOM_DOC  = null;
+
+function ouvrirExportModal(contenu, nomDoc) {
+  EXP_CONTENU = contenu;
+  EXP_NOM_DOC = nomDoc;
+
+  // Préremplir avec les données du profil si disponibles
+  const nom = document.getElementById('exp-nom');
+  const bar = document.getElementById('exp-barreau');
+  if (!nom.value) nom.value = '';
+  if (!bar.value) bar.value = '';
+
+  document.getElementById('export-overlay').classList.add('open');
+}
+
+function fermerExportModal() {
+  document.getElementById('export-overlay').classList.remove('open');
+}
+
+function exportClickOverlay(e) {
+  if (e.target === document.getElementById('export-overlay')) fermerExportModal();
+}
+
+function expChargerImage(type, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const b64 = e.target.result; // data:image/png;base64,...
+    if (type === 'logo') {
+      EXP_LOGO_B64 = b64;
+      document.getElementById('exp-logo-preview').src = b64;
+      document.getElementById('exp-logo-preview').style.display = 'block';
+      document.getElementById('exp-logo-label').textContent = file.name;
+    } else {
+      EXP_SIG_B64 = b64;
+      document.getElementById('exp-sig-preview').src = b64;
+      document.getElementById('exp-sig-preview').style.display = 'block';
+      document.getElementById('exp-sig-label').textContent = file.name;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function expConfirmer() {
+  const btn = document.querySelector('.export-btn-confirm');
+  btn.disabled = true;
+  btn.textContent = 'Génération...';
+
+  try {
+    const payload = {
+      contenu    : EXP_CONTENU,
+      nom        : EXP_NOM_DOC,
+      nom_avocat : document.getElementById('exp-nom').value.trim() || 'Maître',
+      barreau    : document.getElementById('exp-barreau').value.trim(),
+      ville      : document.getElementById('exp-ville').value.trim() || 'Cameroun',
+      logo_b64   : EXP_LOGO_B64,
+      signature_b64 : EXP_SIG_B64,
+    };
+
+    const r = await fetch('/export_pdf', {
+      method : 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},
+      body   : JSON.stringify(payload)
+    });
+
+    const blob = await r.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = (EXP_NOM_DOC || 'document').replace(/ /g,'_') + '.pdf';
+    a.click();
+
+    fermerExportModal();
+    showToast('PDF exporté');
+  } catch(e) {
+    showToast('Erreur export : ' + e.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Exporter PDF';
+  }
+}
+
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MODAL SAUVEGARDE VERSION
+// ══════════════════════════════════════════════════════════════════════════════
+
+let SAVE_VERSIONS = []; // Historique local des versions
+
+function ouvrirSaveModal() {
+  document.getElementById('save-note').value = '';
+  chargerVersions();
+  document.getElementById('save-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('save-note').focus(), 100);
+}
+
+function fermerSaveModal() {
+  document.getElementById('save-overlay').classList.remove('open');
+}
+
+function saveClickOverlay(e) {
+  if (e.target === document.getElementById('save-overlay')) fermerSaveModal();
+}
+
+function chargerVersions() {
+  const container = document.getElementById('save-versions-container');
+  const list      = document.getElementById('save-versions-list');
+  if (!SAVE_VERSIONS.length) { container.style.display = 'none'; return; }
+
+  container.style.display = 'block';
+  list.innerHTML = SAVE_VERSIONS.slice(-5).reverse().map((v, i) => `
+    <div class="save-version-item">
+      <div>
+        <div class="save-version-note">${v.note || 'Version sans note'}</div>
+        <div style="font-size:10px;color:#A3A3A3;margin-top:1px;">${v.date}</div>
+      </div>
+      <button class="save-version-restore" onclick="restaurerVersion(${SAVE_VERSIONS.length - 1 - i})">
+        Restaurer
+      </button>
+    </div>
+  `).join('');
+}
+
+function restaurerVersion(idx) {
+  const v = SAVE_VERSIONS[idx];
+  if (!v) return;
+  if (!confirm('Restaurer cette version ? Les modifications actuelles seront perdues.')) return;
+  if (quill) quill.root.innerHTML = v.contenu;
+  REDAC_CONTENU = v.contenu_texte;
+  fermerSaveModal();
+  showToast('Version restaurée');
+}
+
+async function saveConfirmer() {
+  const btn  = document.querySelector('.save-btn-confirm');
+  const note = document.getElementById('save-note').value.trim();
+
+  // Récupérer le contenu actuel de Quill
+  const contenuHtml  = quill ? quill.root.innerHTML : '';
+  const contenuTexte = quill ? quill.getText() : REDAC_CONTENU || '';
+
+  // Sauvegarder dans l'historique local
+  const version = {
+    note        : note || 'Version sans note',
+    date        : new Date().toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
+    contenu     : contenuHtml,
+    contenu_texte: contenuTexte,
+    nom_doc     : ACTE_ACTIF?.nom || 'Document',
+  };
+  SAVE_VERSIONS.push(version);
+
+  // Mettre à jour REDAC_CONTENU avec le contenu Quill actuel
+  REDAC_CONTENU = contenuTexte;
+
+  btn.disabled    = true;
+  btn.textContent = 'Enregistrement...';
+
+  // Sauvegarde dans Supabase (optionnel — bonne pratique)
+  try {
+    await apiFetch('/document/sauvegarder_version', 'POST', {
+      nom     : version.nom_doc,
+      note    : version.note,
+      contenu : contenuTexte,
+    });
+  } catch(e) {
+    // Silencieux — la version est quand même sauvée localement
+  }
+
+  fermerSaveModal();
+  showToast('Version enregistrée — ' + (note || 'sans note'));
+
+  btn.disabled    = false;
+  btn.textContent = 'Enregistrer la version';
+}
+
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// NOUVEAU DASHBOARD
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Historique local des actes générés (en session)
+let ACTES_GENERES_HIST = [];
+
+async function chargerDashboard() {
+  // Date et heure
+  const now  = new Date();
+  const heure = now.getHours();
+  const salut = heure < 12 ? 'Bonjour' : heure < 18 ? 'Bon après-midi' : 'Bonsoir';
+  const jours = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  const mois  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const dateStr = `${jours[now.getDay()]} ${now.getDate()} ${mois[now.getMonth()]} ${now.getFullYear()}`;
+
+  const greetEl = document.getElementById('dash-greeting-new');
+  const dateEl  = document.getElementById('dash-date-new');
+  if (greetEl) {
+    // Récupérer le nom de l'avocat
+    try {
+      const profil = await apiFetch('/profil', 'GET');
+      const nom = profil?.display_name || profil?.full_name || 'Maître';
+      greetEl.textContent = `${salut}, ${nom}`;
+    } catch(e) {
+      greetEl.textContent = `${salut}, Maître`;
+    }
+  }
+  if (dateEl) dateEl.textContent = dateStr;
+
+  // Abonnement
+  try {
+    const abo = await apiFetch('/abonnement/statut', 'GET');
+    const badge = document.getElementById('dash-abo-badge');
+    const alert = document.getElementById('dash-alert');
+    if (abo && badge) {
+      badge.style.display = 'inline-flex';
+      const j = abo.jours_restants || 0;
+      if (!abo.actif) {
+        badge.className = 'dash-abonnement expired';
+        badge.textContent = 'Abonnement expiré';
+        if (alert) { alert.textContent = 'Votre abonnement a expiré. Contactez-nous pour renouveler.'; alert.classList.add('visible'); }
+      } else if (j <= 7) {
+        badge.className = 'dash-abonnement warn';
+        badge.textContent = `${j} jour${j > 1 ? 's' : ''} restant${j > 1 ? 's' : ''}`;
+        if (alert) { alert.textContent = `Attention : votre abonnement expire dans ${j} jour${j > 1 ? 's' : ''}. Pensez à renouveler.`; alert.classList.add('visible'); }
+      } else {
+        badge.className = 'dash-abonnement';
+        badge.textContent = `${j} jours restants`;
+      }
+      const kpiJ = document.getElementById('kpi-jours');
+      if (kpiJ) kpiJ.textContent = abo.actif ? j : '0';
+    }
+  } catch(e) {}
+
+  // Stats
+  try {
+    const stats = await apiFetch('/stats', 'GET');
+    if (stats) {
+      const kpiD = document.getElementById('kpi-docs');
+      const kpiDos = document.getElementById('kpi-dossiers');
+      const kpiA = document.getElementById('kpi-actes');
+      if (kpiD)   kpiD.textContent   = stats.documents || 0;
+      if (kpiDos) kpiDos.textContent = stats.dossiers  || 0;
+      if (kpiA)   kpiA.textContent   = ACTES_GENERES_HIST.length || 0;
+    }
+  } catch(e) {}
+
+  // Documents récents
+  try {
+    const docs = await apiFetch('/liste_documents', 'GET');
+    const container = document.getElementById('dash-docs-recent');
+    if (container && docs && docs.length) {
+      container.innerHTML = docs.slice(0, 5).map(d => {
+        const nom  = d.nom || d.filename || 'Document';
+        const date = d.created_at ? new Date(d.created_at).toLocaleDateString('fr-FR') : '';
+        return `<div class="dash-item" onclick="showPage('bibliotheque')">
+          <div class="dash-item-dot active"></div>
+          <div class="dash-item-info">
+            <div class="dash-item-name">${nom.replace('.pdf','')}</div>
+            <div class="dash-item-sub">PDF · ${d.storage_tier || 'hot'}</div>
+          </div>
+          <div class="dash-item-date">${date}</div>
+        </div>`;
+      }).join('');
+    }
+  } catch(e) {}
+
+  // Activité récente (actes générés en session)
+  const actContainer = document.getElementById('dash-activite-recent');
+  if (actContainer) {
+    if (ACTES_GENERES_HIST.length) {
+      actContainer.innerHTML = ACTES_GENERES_HIST.slice(-5).reverse().map(a => `
+        <div class="dash-item" onclick="showPage('redaction')">
+          <div class="dash-item-dot" style="background:#1A6B9A;"></div>
+          <div class="dash-item-info">
+            <div class="dash-item-name">${a.nom}</div>
+            <div class="dash-item-sub">Acte généré</div>
+          </div>
+          <div class="dash-item-date">${a.heure}</div>
+        </div>`).join('');
+    } else {
+      actContainer.innerHTML = '<div class="dash-empty">Générez votre premier acte</div>';
+    }
+  }
+}
+
+// Enregistrer chaque acte généré dans l'historique
+function enregistrerActeGenere(nomActe) {
+  const heure = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
+  ACTES_GENERES_HIST.push({nom: nomActe, heure});
+  // Mettre à jour le KPI
+  const kpiA = document.getElementById('kpi-actes');
+  if (kpiA) kpiA.textContent = ACTES_GENERES_HIST.length;
+}
+
 </script>
+
+<!-- WIZARD MODAL -->
+<div class="wizard-overlay" id="wizard-overlay" onclick="wizardClickOverlay(event)">
+  <div class="wizard-modal">
+    <div class="wizard-header">
+      <div>
+        <div class="wizard-title" id="wizard-title">Rédaction d'acte</div>
+        <div class="wizard-subtitle" id="wizard-subtitle"></div>
+      </div>
+      <button class="wizard-close" onclick="fermerWizard()">✕</button>
+    </div>
+    <div class="wizard-steps" id="wizard-steps"></div>
+    <div class="wizard-body" id="wizard-body"></div>
+    <div class="wizard-footer">
+      <div class="wizard-progress" id="wizard-progress"></div>
+      <div class="wizard-btns">
+        <button class="wizard-btn-back" id="wizard-btn-back" onclick="wizardPrecedent()" style="display:none">Précédent</button>
+        <button class="wizard-btn-next" id="wizard-btn-next" onclick="wizardSuivant()">Suivant</button>
+        <button class="wizard-btn-generate" id="wizard-btn-generate" onclick="wizardGenerer()" style="display:none">
+          <span class="wizard-spinner" id="wizard-spinner"></span>
+          Générer le document
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL EXPORT PDF -->
+<div class="export-overlay" id="export-overlay" onclick="exportClickOverlay(event)">
+  <div class="export-modal">
+    <div class="export-modal-hdr">
+      <div class="export-modal-title">Exporter en PDF</div>
+      <button class="export-modal-close" onclick="fermerExportModal()">✕</button>
+    </div>
+    <div class="export-modal-body">
+      <div class="export-field">
+        <label class="export-label">Nom de l'avocat</label>
+        <input class="export-input" id="exp-nom" type="text" placeholder="Ex: Maître Kengne Audrey">
+      </div>
+      <div class="export-field">
+        <label class="export-label">Barreau</label>
+        <input class="export-input" id="exp-barreau" type="text" placeholder="Ex: Barreau du Cameroun">
+      </div>
+      <div class="export-field">
+        <label class="export-label">Ville</label>
+        <input class="export-input" id="exp-ville" type="text" placeholder="Ex: Douala, Cameroun">
+      </div>
+      <div class="export-field">
+        <label class="export-label">Logo du cabinet <span style="font-weight:400;color:#A3A3A3">(optionnel)</span></label>
+        <div class="export-asset-row" onclick="document.getElementById('exp-logo-input').click()">
+          <img class="export-asset-preview" id="exp-logo-preview">
+          <span class="export-asset-label" id="exp-logo-label">Aucun logo sélectionné</span>
+          <button class="export-asset-btn" type="button">Choisir</button>
+        </div>
+        <input type="file" id="exp-logo-input" accept="image/*" style="display:none" onchange="expChargerImage('logo',this)">
+      </div>
+      <div class="export-field">
+        <label class="export-label">Signature <span style="font-weight:400;color:#A3A3A3">(optionnel)</span></label>
+        <div class="export-asset-row" onclick="document.getElementById('exp-sig-input').click()">
+          <img class="export-asset-preview" id="exp-sig-preview">
+          <span class="export-asset-label" id="exp-sig-label">Aucune signature sélectionnée</span>
+          <button class="export-asset-btn" type="button">Choisir</button>
+        </div>
+        <input type="file" id="exp-sig-input" accept="image/*" style="display:none" onchange="expChargerImage('sig',this)">
+      </div>
+    </div>
+    <div class="export-modal-ftr">
+      <button class="export-btn-cancel" onclick="fermerExportModal()">Annuler</button>
+      <button class="export-btn-confirm" onclick="expConfirmer()">Exporter PDF</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL SAUVEGARDE VERSION -->
+<div class="save-overlay" id="save-overlay" onclick="saveClickOverlay(event)">
+  <div class="save-modal">
+    <div class="save-modal-hdr">
+      <div class="save-modal-title">Enregistrer les modifications</div>
+      <button class="save-modal-close" onclick="fermerSaveModal()">✕</button>
+    </div>
+    <div class="save-modal-body">
+      <div class="save-modal-info">
+        Vous avez modifié ce document. Ajoutez une note pour identifier cette version.
+      </div>
+      <div class="export-field">
+        <label class="export-label">Note de version <span style="font-weight:400;color:#A3A3A3">(optionnel)</span></label>
+        <input class="export-input" id="save-note" type="text" 
+          placeholder="Ex: Correction clause résiliation, ajout article 5...">
+      </div>
+      <div id="save-versions-container" style="display:none;">
+        <div style="font-size:11px;font-weight:600;color:#0A0A0A;margin-bottom:8px;">Versions précédentes</div>
+        <div class="save-versions-list" id="save-versions-list"></div>
+      </div>
+    </div>
+    <div class="save-modal-ftr">
+      <button class="save-btn-cancel" onclick="fermerSaveModal()">Annuler</button>
+      <button class="save-btn-confirm" onclick="saveConfirmer()">Enregistrer la version</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
