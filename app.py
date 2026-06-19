@@ -306,6 +306,11 @@ def log_security_event(event_type: str, tenant_id: str = None, user_id: str = No
     except Exception as e:
         print(f"[SECURITY ERROR] {datetime.now(timezone.utc)}: {e}")
 
+
+from campay_integration import campay_bp, init_campay
+init_campay(supabase, get_current_tenant_id, log_audit_event, log_security_event, log_erreur)
+app.register_blueprint(campay_bp)
+
 def generer_otp(email: str) -> str:
     """Génère un OTP à 6 chiffres, le stocke hashé en base, l'envoie par email."""
     try:
