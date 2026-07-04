@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COR — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-app:    #0c0c0c;
+      --bg-side:   #111111;
+      --bg-card:   #161616;
+      --bg-hover:  #1e1e1e;
+      --bg-input:  #1a1a1a;
+      --border:    #272727;
+      --border-hi: #363636;
+
+      --text-1:    #f0f0f0;
+      --text-2:    #9a9a9a;
+      --text-3:    #555;
+
+      --orange:    #f55e29;
+      --orange-dim:#c44b20;
+      --orange-bg: rgba(245,94,41,.1);
+      --orange-bd: rgba(245,94,41,.3);
+
+      --blue:      #4da3ff;
+      --blue-bg:   rgba(77,163,255,.1);
+      --purple:    #b78af7;
+      --purple-bg: rgba(183,138,247,.1);
+      --green:     #3dd68c;
+      --green-bg:  rgba(61,214,140,.1);
+      --red:       #f56565;
+      --red-bg:    rgba(245,101,101,.1);
+      --warn:      #e9a23b;
+      --warn-bg:   rgba(233,162,59,.1);
+
+      --radius-sm: 6px;
+      --radius:    10px;
+      --radius-lg: 14px;
+
+      --sidebar-w: 220px;
+      --header-h:  56px;
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      background: var(--bg-app);
+      color: var(--text-1);
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      display: flex;
+    }
+
+    /* ═══════════════════════════════════════════
+       SIDEBAR
+    ═══════════════════════════════════════════ */
+    .sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      background: var(--bg-side);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-logo {
+      padding: 20px 18px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo-mark {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--orange);
+    }
+
+    .logo-tagline {
+      font-size: 10px;
+      color: var(--text-3);
+      margin-top: 2px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .sidebar-section {
+      padding: 16px 10px 6px;
+    }
+
+    .sidebar-section-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-3);
+      padding: 0 8px;
+      margin-bottom: 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      color: var(--text-2);
+      font-size: 13px;
+      font-weight: 500;
+      transition: all .15s;
+      border: 1px solid transparent;
+      user-select: none;
+    }
+
+    .nav-item:hover { background: var(--bg-hover); color: var(--text-1); }
+
+    .nav-item.active {
+      background: var(--orange-bg);
+      color: var(--orange);
+      border-color: var(--orange-bd);
+    }
+
+    .nav-icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+
+    .sidebar-status {
+      margin-top: auto;
+      padding: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .status-dot.idle    { background: var(--text-3); }
+    .status-dot.active  { background: var(--orange); box-shadow: 0 0 6px var(--orange); animation: blink 1.5s infinite; }
+    .status-dot.done    { background: var(--green); }
+
+    @keyframes blink {
+      0%,100% { opacity: 1; }
+      50%      { opacity: 0.3; }
+    }
+
+    .status-text { font-size: 12px; color: var(--text-2); flex: 1; }
+    .status-text strong { color: var(--text-1); display: block; font-size: 11px; }
+
+    /* ═══════════════════════════════════════════
+       MAIN AREA
+    ═══════════════════════════════════════════ */
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .topbar {
+      height: var(--header-h);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .topbar-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-1);
+    }
+
+    .topbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topbar-time {
+      font-size: 11px;
+      color: var(--text-3);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    .btn {
+      padding: 5px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-hi);
+      background: var(--bg-card);
+      color: var(--text-2);
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .btn:hover { background: var(--bg-hover); color: var(--text-1); border-color: var(--text-3); }
+
+    .btn-orange {
+      background: var(--orange-bg);
+      border-color: var(--orange-bd);
+      color: var(--orange);
+    }
+    .btn-orange:hover { background: var(--orange); color: #fff; border-color: var(--orange); }
+
+    /* ═══════════════════════════════════════════
+       CONTENT PANELS
+    ═══════════════════════════════════════════ */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-hi) transparent;
+    }
+    .content::-webkit-scrollbar { width: 5px; }
+    .content::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 3px; }
+
+    .panel { display: none; }
+    .panel.active { display: flex; flex-direction: column; gap: 16px; }
+
+    /* ═══════════════════════════════════════════
+       GRID SYSTEM
+    ═══════════════════════════════════════════ */
+    .row { display: grid; gap: 12px; }
+    .cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .cols-2 { grid-template-columns: 1fr 1fr; }
+    .cols-3 { grid-template-columns: 2fr 1fr; }
+    .cols-1 { grid-template-columns: 1fr; }
+
+    /* ═══════════════════════════════════════════
+       CARDS
+    ═══════════════════════════════════════════ */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+
+    .card-head {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-3);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .card-head-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-head-left::before {
+      content: '';
+      display: block;
+      width: 3px; height: 12px;
+      background: var(--orange);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════
+       STAT CARDS
+    ═══════════════════════════════════════════ */
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-3);
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      color: var(--text-1);
+      letter-spacing: -1px;
+      line-height: 1.1;
+    }
+
+    .stat-value.orange { color: var(--orange); }
+    .stat-value.blue   { color: var(--blue); }
+    .stat-value.purple { color: var(--purple); }
+    .stat-value.green  { color: var(--green); }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    /* ═══════════════════════════════════════════
+       PROGRESS
+    ═══════════════════════════════════════════ */
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-2);
+      margin-bottom: 8px;
+    }
+
+    .progress-track {
+      height: 4px;
+      background: var(--bg-input);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width .6s cubic-bezier(.4,0,.2,1);
+    }
+    .progress-fill.orange { background: var(--orange); }
+    .progress-fill.purple { background: var(--purple); }
+
+    .progress-desc {
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    /* ═══════════════════════════════════════════
+       CHARTS
+    ═══════════════════════════════════════════ */
+    .chart-wrap { position: relative; height: 220px; }
+
+    /* ═══════════════════════════════════════════
+       CONFIG GRID
+    ═══════════════════════════════════════════ */
+    .config-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .config-item {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+    }
+
+    .config-key {
+      font-size: 10px;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+
+    .config-val {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 13px;
+      color: var(--text-1);
+      margin-top: 2px;
+      display: block;
+    }
+
+    /* ═══════════════════════════════════════════
+       ARCHITECTURE DIAGRAM
+    ═══════════════════════════════════════════ */
+    .arch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 11px;
+    }
+
+    .arch-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 340px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .arch-box small { font-size: 9px; opacity: .6; margin-top: 2px; }
+
+    .arch-box.io      { background: var(--orange-bg); border: 1px solid var(--orange-bd); color: var(--orange); }
+    .arch-box.embed   { background: var(--green-bg);  border: 1px solid rgba(61,214,140,.3);  color: var(--green); }
+    .arch-box.dec     { background: var(--purple-bg); border: 1px solid rgba(183,138,247,.3); color: var(--purple); }
+    .arch-box.norm    { background: var(--warn-bg);   border: 1px solid rgba(233,162,59,.3);  color: var(--warn); }
+    .arch-box.head    { background: var(--red-bg);    border: 1px solid rgba(245,101,101,.3); color: var(--red); }
+
+    .arch-arrow { color: var(--text-3); margin: 3px 0; font-size: 14px; }
+    .arch-repeat { font-size: 9px; color: var(--text-3); margin: 2px 0; }
+
+    .arch-inner {
+      width: 100%;
+      max-width: 310px;
+      border: 1px dashed var(--border-hi);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .arch-inner .arch-box { max-width: 280px; }
+
+    /* ═══════════════════════════════════════════
+       LOGS
+    ═══════════════════════════════════════════ */
+    .log-filters {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .log-chip {
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-3);
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .15s;
+    }
+    .log-chip:hover { color: var(--text-2); border-color: var(--border-hi); }
+    .log-chip.active { background: var(--orange-bg); color: var(--orange); border-color: var(--orange-bd); }
+
+    .log-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      max-height: 360px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+    .log-list::-webkit-scrollbar { width: 4px; }
+    .log-list::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+
+    .log-entry {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 7px 10px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-input);
+      border: 1px solid transparent;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 11.5px;
+      border-left: 2px solid transparent;
+    }
+    .log-entry.ERROR { border-left-color: var(--red); }
+    .log-entry.WARN  { border-left-color: var(--warn); }
+    .log-entry.INFO  { border-left-color: var(--blue); }
+
+    .log-tag {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .log-tag.ERROR { background: var(--red-bg);  color: var(--red); }
+    .log-tag.WARN  { background: var(--warn-bg); color: var(--warn); }
+    .log-tag.INFO  { background: var(--blue-bg); color: var(--blue); }
+
+    .log-ts  { color: var(--text-3); font-size: 10.5px; white-space: nowrap; flex-shrink: 0; margin-top: 1px; }
+    .log-msg { color: var(--text-2); flex: 1; word-break: break-word; font-family: inherit; }
+
+    .log-empty { text-align: center; color: var(--text-3); padding: 28px; font-size: 12px; }
+
+    /* ═══════════════════════════════════════════
+       CHAT PANEL (test inference)
+    ═══════════════════════════════════════════ */
+    .chat-area {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 4px 0 16px;
+      min-height: 200px;
+      max-height: 420px;
+      scrollbar-width: thin;
+    }
+    .chat-area::-webkit-scrollbar { width: 4px; }
+    .chat-area::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+
+    .chat-msg {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .chat-msg.user { flex-direction: row-reverse; }
+
+    .chat-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .chat-avatar.cor  { background: var(--orange-bg); color: var(--orange); border: 1px solid var(--orange-bd); }
+    .chat-avatar.user { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(77,163,255,.3); }
+
+    .chat-bubble {
+      max-width: 76%;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      line-height: 1.6;
+      border: 1px solid var(--border);
+    }
+    .chat-msg.cor  .chat-bubble { background: var(--bg-card); color: var(--text-1); border-radius: 2px var(--radius) var(--radius) var(--radius); }
+    .chat-msg.user .chat-bubble { background: var(--orange-bg); color: var(--text-1); border-color: var(--orange-bd); border-radius: var(--radius) 2px var(--radius) var(--radius); }
+
+    .chat-meta { font-size: 10px; color: var(--text-3); margin-top: 4px; }
+
+    .chat-input-area {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .chat-input-wrap {
+      flex: 1;
+      position: relative;
+    }
+
+    .chat-input {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-hi);
+      border-radius: var(--radius);
+      color: var(--text-1);
+      font-family: inherit;
+      font-size: 13px;
+      resize: none;
+      outline: none;
+      transition: border-color .15s;
+      line-height: 1.5;
+      min-height: 44px;
+      max-height: 120px;
+    }
+    .chat-input:focus { border-color: var(--orange); }
+    .chat-input::placeholder { color: var(--text-3); }
+
+    .chat-send {
+      padding: 10px 16px;
+      background: var(--orange);
+      border: none;
+      border-radius: var(--radius);
+      color: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+      white-space: nowrap;
+      height: 44px;
+    }
+    .chat-send:hover { background: var(--orange-dim); }
+    .chat-send:disabled { background: var(--text-3); cursor: not-allowed; }
+
+    .chat-options {
+      display: flex;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--text-3);
+      padding: 8px 2px;
+      flex-wrap: wrap;
+    }
+    .chat-options label { display: flex; align-items: center; gap: 4px; }
+    .chat-options input[type=range] { width: 70px; accent-color: var(--orange); }
+    .chat-options span { color: var(--text-2); font-family: monospace; }
+
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      padding: 10px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 2px var(--radius) var(--radius) var(--radius);
+      width: fit-content;
+    }
+    .typing-dot {
+      width: 6px; height: 6px;
+      background: var(--text-3);
+      border-radius: 50%;
+      animation: typing 1.4s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: .2s; }
+    .typing-dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes typing {
+      0%,80%,100% { transform: translateY(0); opacity: .4; }
+      40%         { transform: translateY(-4px); opacity: 1; }
+    }
+
+    /* ═══════════════════════════════════════════
+       INFO BOX
+    ═══════════════════════════════════════════ */
+    .info-box {
+      background: var(--orange-bg);
+      border: 1px solid var(--orange-bd);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--text-2);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .info-box .icon { color: var(--orange); flex-shrink: 0; margin-top: 1px; }
+
+    /* ═══════════════════════════════════════════
+       TOKEN BADGE
+    ═══════════════════════════════════════════ */
+    .token-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      font-family: monospace;
+    }
+    .token-badge.rep { background: var(--red-bg); color: var(--red); border: 1px solid rgba(245,101,101,.3); }
+    .token-badge.sep { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(77,163,255,.3); }
+    .token-badge.bos { background: var(--green-bg); color: var(--green); border: 1px solid rgba(61,214,140,.3); }
+    .token-badge.pays { background: var(--orange-bg); color: var(--orange); border: 1px solid var(--orange-bd); }
+
+    /* ═══════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════ */
+    @media (max-width: 1100px) {
+      .cols-4 { grid-template-columns: 1fr 1fr; }
+      .cols-3 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .sidebar { display: none; }
+      .cols-2, .cols-4 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════════ -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">COR</div>
+    <div class="logo-tagline">Juridique africain · ODYXIA</div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Entraînement</div>
+    <div class="nav-item active" onclick="showPanel('panel-training', this)">
+      <span class="nav-icon">📈</span> Progression
+    </div>
+    <div class="nav-item" onclick="showPanel('panel-metrics', this)">
+      <span class="nav-icon">⊡</span> Métriques
+    </div>
+    <div class="nav-item" onclick="showPanel('panel-logs', this)">
+      <span class="nav-icon">◈</span> Logs
+      <span id="nav-log-badge" style="margin-left:auto;background:var(--red-bg);color:var(--red);border:1px solid rgba(245,101,101,.3);border-radius:20px;font-size:10px;padding:1px 6px;display:none;"></span>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Modèle</div>
+    <div class="nav-item" onclick="showPanel('panel-arch', this)">
+      <span class="nav-icon">◻</span> Architecture
+    </div>
+    <div class="nav-item" onclick="showPanel('panel-chat', this)">
+      <span class="nav-icon">◎</span> Tester COR
+    </div>
+  </div>
+
+  <div class="sidebar-status">
+    <div class="status-pill">
+      <div class="status-dot idle" id="side-dot"></div>
+      <div class="status-text">
+        <strong id="side-state">Idle</strong>
+        <span id="side-detail">En attente</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════ -->
+<div class="main-area">
+  <div class="topbar">
+    <span class="topbar-title" id="topbar-title">Progression de l'entraînement</span>
+    <span class="topbar-time" id="topbar-time">—</span>
+    <div class="topbar-right">
+      <button class="btn" onclick="loadAll()">↺ Actualiser</button>
+      <button class="btn btn-orange" onclick="resetMetrics()">Réinitialiser</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── PANEL: Training ───────────────────────────────── -->
+    <div class="panel active" id="panel-training">
+
+      <div class="row cols-4">
+        <div class="stat-card">
+          <div class="stat-label">Paramètres</div>
+          <div class="stat-value orange" id="stat-params">—</div>
+          <div class="stat-sub" id="stat-params-sub">modèle</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Tokens vocab</div>
+          <div class="stat-value blue" id="stat-vocab">8 000</div>
+          <div class="stat-sub">BPE juridique</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Meilleure val_loss</div>
+          <div class="stat-value green" id="stat-best-pre">—</div>
+          <div class="stat-sub">Pré-entraînement</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Meilleure val_loss</div>
+          <div class="stat-value purple" id="stat-best-ft">—</div>
+          <div class="stat-sub">Fine-tuning</div>
+        </div>
+      </div>
+
+      <div class="row cols-2">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-head-left">Pré-entraînement</div>
+            <span id="pre-pct" style="font-family:monospace;color:var(--orange);font-size:12px;">0%</span>
+          </div>
+          <div class="progress-row">
+            <span>Epoch <strong id="pre-epoch">0</strong> / <span id="pre-total-e">0</span></span>
+            <span>Step <strong id="pre-step">0</strong> / <span id="pre-total-s">0</span></span>
+          </div>
+          <div class="progress-track"><div class="progress-fill orange" id="pre-bar" style="width:0%"></div></div>
+          <div class="progress-desc">Apprendre le style juridique africain — OHADA · CEMAC · UEMOA</div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-head-left">Fine-tuning Q/R</div>
+            <span id="ft-pct" style="font-family:monospace;color:var(--purple);font-size:12px;">0%</span>
+          </div>
+          <div class="progress-row">
+            <span>Epoch <strong id="ft-epoch">0</strong> / <span id="ft-total-e">0</span></span>
+            <span id="ft-step-info" style="color:var(--text-3);font-size:11px;"></span>
+          </div>
+          <div class="progress-track"><div class="progress-fill purple" id="ft-bar" style="width:0%"></div></div>
+          <div class="progress-desc">Répondre aux questions avec masque <span class="token-badge rep">[REP]</span></div>
+        </div>
+      </div>
+
+      <div class="row cols-2">
+        <div class="card">
+          <div class="card-head"><div class="card-head-left">Loss — Pré-entraînement</div></div>
+          <div class="chart-wrap"><canvas id="chart-pretrain"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-head-left">Loss — Fine-tuning</div></div>
+          <div class="chart-wrap"><canvas id="chart-finetune"></canvas></div>
+        </div>
+      </div>
+
+      <div class="row cols-2">
+        <div class="card">
+          <div class="card-head"><div class="card-head-left">Perplexité (PPL)</div></div>
+          <div class="chart-wrap"><canvas id="chart-ppl"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-head-left">Learning Rate</div></div>
+          <div class="chart-wrap"><canvas id="chart-lr"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PANEL: Metrics ─────────────────────────────────── -->
+    <div class="panel" id="panel-metrics">
+      <div class="row cols-3">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="card">
+            <div class="card-head"><div class="card-head-left">Configuration modèle</div></div>
+            <div class="config-grid">
+              <div class="config-item"><span class="config-key">d_model</span><span class="config-val" id="cfg-dmodel">—</span></div>
+              <div class="config-item"><span class="config-key">n_heads</span><span class="config-val" id="cfg-nheads">—</span></div>
+              <div class="config-item"><span class="config-key">n_layers</span><span class="config-val" id="cfg-nlayers">—</span></div>
+              <div class="config-item"><span class="config-key">ffn_dim</span><span class="config-val" id="cfg-ffndim">—</span></div>
+              <div class="config-item"><span class="config-key">max_len</span><span class="config-val" id="cfg-maxlen">—</span></div>
+              <div class="config-item"><span class="config-key">vocab_size</span><span class="config-val" id="cfg-vocab">8 000</span></div>
+              <div class="config-item"><span class="config-key">dropout</span><span class="config-val" id="cfg-dropout">—</span></div>
+              <div class="config-item"><span class="config-key">rep_id</span><span class="config-val">7</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-head-left">Configuration entraînement</div></div>
+            <div class="config-grid">
+              <div class="config-item"><span class="config-key">batch_size</span><span class="config-val" id="cfg-batch">—</span></div>
+              <div class="config-item"><span class="config-key">accum steps</span><span class="config-val" id="cfg-accum">—</span></div>
+              <div class="config-item"><span class="config-key">epochs pre</span><span class="config-val" id="cfg-epre">—</span></div>
+              <div class="config-item"><span class="config-key">epochs ft</span><span class="config-val" id="cfg-eft">—</span></div>
+              <div class="config-item"><span class="config-key">warmup</span><span class="config-val" id="cfg-warmup">—</span></div>
+              <div class="config-item"><span class="config-key">patience</span><span class="config-val" id="cfg-patience">—</span></div>
+              <div class="config-item"><span class="config-key">lr_max</span><span class="config-val" id="cfg-lrmax">3e-4</span></div>
+              <div class="config-item"><span class="config-key">lr_min</span><span class="config-val" id="cfg-lrmin">1e-5</span></div>
+              <div class="config-item"><span class="config-key">grad_clip</span><span class="config-val" id="cfg-gradclip">—</span></div>
+              <div class="config-item"><span class="config-key">val_ratio</span><span class="config-val" id="cfg-valratio">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="card">
+            <div class="card-head"><div class="card-head-left">Schedule LR</div></div>
+            <div style="font-family:monospace;font-size:11.5px;line-height:1.9;color:var(--text-2);background:var(--bg-input);border-radius:6px;padding:12px;">
+              0 → <span style="color:var(--warn)" id="sch-warmup">warmup</span> steps<br/>
+              <span style="color:var(--text-3);">  lr = lr_max × (step / warmup)</span><br/><br/>
+              warmup → total<br/>
+              <span style="color:var(--text-3);">  lr = cosine decay</span><br/>
+              <span style="color:var(--text-3);">  <span style="color:var(--orange)" id="sch-lrmax">3e-4</span> → <span style="color:var(--purple)" id="sch-lrmin">1e-5</span></span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-head-left">Tokens spéciaux BPE</div></div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <span class="token-badge bos">[BOS] id=2</span>
+              <span class="token-badge bos">[EOS] id=3</span>
+              <span class="token-badge sep">[SEP] id=4</span>
+              <span class="token-badge sep">[PAD] id=0</span>
+              <span class="token-badge sep">[UNK] id=1</span>
+              <span class="token-badge rep">[REP] id=7</span>
+              <span class="token-badge pays">[CM] Cameroun</span>
+              <span class="token-badge pays">[GA] Gabon</span>
+              <span class="token-badge pays">[BJ] Bénin</span>
+              <span class="token-badge pays">[CI] Côte d'Ivoire</span>
+              <span class="token-badge pays">[OHADA]</span>
+              <span class="token-badge pays">[CEMAC]</span>
+              <span class="token-badge pays">[UEMOA]</span>
+            </div>
+            <div style="margin-top:12px;font-family:monospace;font-size:11px;background:var(--bg-input);border-radius:6px;padding:10px;line-height:2;color:var(--text-2);">
+              <span class="token-badge bos">[BOS]</span>
+              <span class="token-badge pays">[CM]</span>
+              <span style="color:var(--blue);">question</span>
+              <span class="token-badge sep">[SEP]</span>
+              <span style="color:var(--blue);">passage RAG</span>
+              <span class="token-badge rep">[REP]</span>
+              <span style="color:var(--green);">réponse</span>
+              <span class="token-badge bos">[EOS]</span><br/>
+              <span style="color:var(--text-3);">loss=0 ━━━━━━━━━━━━━━━━━━</span>
+              <span style="color:var(--green);">loss=1 ↑</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PANEL: Logs ────────────────────────────────────── -->
+    <div class="panel" id="panel-logs">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-left">Journal d'entraînement</div>
+          <span id="log-count" style="font-family:monospace;color:var(--text-3);font-size:11px;">0 entrées</span>
+        </div>
+        <div class="log-filters">
+          <button class="log-chip active" onclick="filterLogs('ALL', this)">Tous</button>
+          <button class="log-chip" onclick="filterLogs('ERROR', this)">Erreurs</button>
+          <button class="log-chip" onclick="filterLogs('WARN', this)">Avertissements</button>
+          <button class="log-chip" onclick="filterLogs('INFO', this)">Info</button>
+        </div>
+        <div class="log-list" id="log-list">
+          <div class="log-empty">Aucun log. L'entraînement n'a pas encore démarré.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PANEL: Architecture ───────────────────────────── -->
+    <div class="panel" id="panel-arch">
+      <div class="row cols-2">
+        <div class="card">
+          <div class="card-head"><div class="card-head-left">Decoder-Only — style LLaMA / Mistral</div></div>
+          <div style="display:flex;justify-content:center;">
+            <div class="arch">
+              <div class="arch-box io">input_ids (B, S)<small>tokens de la séquence</small></div>
+              <div class="arch-arrow">↓</div>
+              <div class="arch-box embed">Embedding + RoPE<small>encodage positionnel relatif</small></div>
+              <div class="arch-arrow">↓</div>
+              <div class="arch-repeat">× N couches (CoucheDecoder)</div>
+              <div class="arch-inner">
+                <div class="arch-box dec">RMSNorm<small>pre-norm</small></div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-box dec">Multi-Head Attention<small>masque causal · RoPE sur Q,K</small></div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-box embed">+ connexion résiduelle</div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-box dec">RMSNorm</div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-box dec">SwiGLU (FFN)<small>Swish(W1·x) ⊗ W3·x → W2</small></div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-box embed">+ connexion résiduelle</div>
+              </div>
+              <div class="arch-arrow">↓</div>
+              <div class="arch-box norm">RMSNorm finale</div>
+              <div class="arch-arrow">↓</div>
+              <div class="arch-box head">LM Head (weight tying)<small>partage les poids avec l'embedding</small></div>
+              <div class="arch-arrow">↓</div>
+              <div class="arch-box io">logits (B, S, vocab_size)<small>→ token suivant</small></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="card">
+            <div class="card-head"><div class="card-head-left">Flux d'inférence RAG</div></div>
+            <div class="arch" style="align-items:stretch;">
+              <div class="arch-box io" style="max-width:100%;">Question utilisateur</div>
+              <div class="arch-arrow" style="text-align:center;">↓</div>
+              <div class="arch-box norm" style="max-width:100%;">Retriever RAG<small>TF-IDF / SBERT · passages pertinents</small></div>
+              <div class="arch-arrow" style="text-align:center;">↓</div>
+              <div class="arch-box embed" style="max-width:100%;">Construction prompt<small>[BOS][CM] Q [SEP] RAG [REP]</small></div>
+              <div class="arch-arrow" style="text-align:center;">↓</div>
+              <div class="arch-box dec" style="max-width:100%;">COR — génération</div>
+              <div class="arch-arrow" style="text-align:center;">↓</div>
+              <div class="arch-box io" style="max-width:100%;">Réponse juridique<small>jusqu'à [EOS]</small></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-head-left">Composants clés</div></div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text-2);">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-input);border-radius:6px;">
+                <span>Normalisation</span><span style="color:var(--text-1);font-family:monospace;">RMSNorm</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-input);border-radius:6px;">
+                <span>Positionnement</span><span style="color:var(--text-1);font-family:monospace;">RoPE</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-input);border-radius:6px;">
+                <span>Activation FFN</span><span style="color:var(--text-1);font-family:monospace;">SwiGLU</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-input);border-radius:6px;">
+                <span>Weight tying</span><span style="color:var(--green);font-family:monospace;">✓ actif</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-input);border-radius:6px;">
+                <span>Masque loss</span><span style="color:var(--text-1);font-family:monospace;">après [REP]</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-input);border-radius:6px;">
+                <span>Scheduler</span><span style="color:var(--text-1);font-family:monospace;">warmup + cosine</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-input);border-radius:6px;">
+                <span>Early stopping</span><span style="color:var(--text-1);font-family:monospace;">patience=3</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PANEL: Chat ───────────────────────────────────── -->
+    <div class="panel" id="panel-chat">
+      <div class="info-box" id="chat-info-box">
+        <span class="icon">ℹ</span>
+        <span>Le serveur COR doit tourner en parallèle pour tester l'inférence.
+        Lance-le dans un second terminal : <code style="font-family:monospace;background:var(--bg-input);padding:1px 5px;border-radius:3px;">python -m api.app</code>
+        — la clé API est lue depuis <code style="font-family:monospace;background:var(--bg-input);padding:1px 5px;border-radius:3px;">.env</code> automatiquement.</span>
+      </div>
+
+      <div class="card" style="flex:1;display:flex;flex-direction:column;">
+        <div class="card-head">
+          <div class="card-head-left">Tester COR — Inférence juridique</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="chat-pays" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-2);padding:3px 8px;border-radius:5px;font-size:11px;font-family:inherit;">
+              <option value="">[pays auto]</option>
+              <option value="[CM]">[CM] Cameroun</option>
+              <option value="[GA]">[GA] Gabon</option>
+              <option value="[BJ]">[BJ] Bénin</option>
+              <option value="[CI]">[CI] Côte d'Ivoire</option>
+              <option value="[OHADA]">[OHADA]</option>
+              <option value="[CEMAC]">[CEMAC]</option>
+            </select>
+            <button class="btn" onclick="clearChat()">Effacer</button>
+          </div>
+        </div>
+
+        <div class="chat-area" id="chat-area">
+          <div class="chat-msg cor">
+            <div class="chat-avatar cor">C</div>
+            <div>
+              <div class="chat-bubble">
+                Bonjour. Je suis COR, le modèle de langage juridique africain d'ODYXIA.
+                Je suis spécialisé en droit OHADA, CEMAC, UEMOA et droit national (CM, GA, BJ, CI).
+                Posez-moi une question juridique.
+              </div>
+              <div class="chat-meta">COR · prêt</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px;">
+          <div class="chat-options">
+            <label>Temp. <input type="range" id="chat-temp" min="0.1" max="1.5" step="0.1" value="0.7" oninput="document.getElementById('chat-temp-val').textContent=this.value" /> <span id="chat-temp-val">0.7</span></label>
+            <label>Tokens <input type="range" id="chat-maxtok" min="20" max="300" step="10" value="150" oninput="document.getElementById('chat-tok-val').textContent=this.value" /> <span id="chat-tok-val">150</span></label>
+            <label>Top-p <input type="range" id="chat-topp" min="0.5" max="1" step="0.05" value="0.9" oninput="document.getElementById('chat-topp-val').textContent=this.value" /> <span id="chat-topp-val">0.9</span></label>
+          </div>
+          <div class="chat-input-area">
+            <div class="chat-input-wrap">
+              <textarea class="chat-input" id="chat-input"
+                placeholder="Ex : Quelle est la procédure d'injonction de payer en droit OHADA ?"
+                rows="1"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"
+                oninput="autoResize(this)"></textarea>
+            </div>
+            <button class="chat-send" id="chat-btn" onclick="sendChat()">Envoyer →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════ -->
+<script>
+  /* ── State ─────────────────────────────────────────── */
+  let allLogs   = [];
+  let logFilter = 'ALL';
+  let charts    = {};
+
+  const CHART_OPTS = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 400 },
+    plugins: {
+      legend: { labels: { color: '#666', font: { size: 11, family: 'Inter' }, boxWidth: 12, padding: 12 } }
+    },
+    scales: {
+      x: { ticks: { color: '#555', font: { size: 10 } }, grid: { color: 'rgba(50,50,50,.6)' } },
+      y: { ticks: { color: '#555', font: { size: 10 } }, grid: { color: 'rgba(50,50,50,.6)' } },
+    },
+  };
+
+  /* ── Panel navigation ──────────────────────────────── */
+  const PANEL_TITLES = {
+    'panel-training': 'Progression de l\'entraînement',
+    'panel-metrics' : 'Métriques & Configuration',
+    'panel-logs'    : 'Logs d\'entraînement',
+    'panel-arch'    : 'Architecture du modèle',
+    'panel-chat'    : 'Tester COR',
+  };
+
+  function showPanel(id, navEl) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (navEl) navEl.classList.add('active');
+    document.getElementById('topbar-title').textContent = PANEL_TITLES[id] || '';
+  }
+
+  /* ── Chart helpers ─────────────────────────────────── */
+  function mkChart(id, labels, datasets, opts) {
+    const ctx = document.getElementById(id).getContext('2d');
+    if (charts[id]) charts[id].destroy();
+    charts[id] = new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets },
+      options: { ...CHART_OPTS, ...(opts||{}),
+        elements: { point: { radius: 3, hoverRadius: 5 }, line: { tension: 0.35 } },
+      },
+    });
+  }
+
+  function ds(label, data, color, dashed) {
+    return {
+      label, data,
+      borderColor: color,
+      backgroundColor: color + '18',
+      borderWidth: 2,
+      fill: true,
+      borderDash: dashed ? [5,3] : [],
+    };
+  }
+
+  /* ── Load & apply ──────────────────────────────────── */
+  async function loadAll() {
+    try {
+      const r = await fetch('/api/metrics');
+      const d = await r.json();
+      applyMetrics(d);
+    } catch(e) { /* serveur non joignable */ }
+  }
+
+  function applyMetrics(d) {
+    const state   = d.training_state || 'idle';
+    const pre     = d.pretrain  || {};
+    const ft      = d.finetune  || {};
+    const mi      = d.model_info || {};
+    const cm      = d.config_modele || {};
+    const ce      = d.config_entrainement || {};
+
+    /* ── Sidebar status ──────────────────────── */
+    const dot = document.getElementById('side-dot');
+    dot.className = 'status-dot ' + (state === 'idle' || state === 'done' ? state : 'active');
+    const labels = { idle:'Idle', pretrain:'Pré-entraînement', finetune:'Fine-tuning',
+                     done:'Terminé', pretrain_done:'Pré-entraîn. terminé', finetune_done:'FT terminé' };
+    document.getElementById('side-state').textContent  = labels[state] || state;
+    document.getElementById('side-detail').textContent = d.last_updated || '—';
+
+    /* Topbar time */
+    document.getElementById('topbar-time').textContent =
+      d.last_updated ? 'Mis à jour ' + d.last_updated : '';
+
+    /* ── Stats ───────────────────────────────── */
+    if (mi.nb_params) {
+      const p = mi.nb_params;
+      document.getElementById('stat-params').textContent =
+        p >= 1e6 ? (p/1e6).toFixed(1)+'M' : (p/1e3).toFixed(0)+'K';
+      document.getElementById('stat-params-sub').textContent =
+        p >= 1e6 ? 'paramètres' : 'paramètres (dev)';
+    }
+    if (mi.vocab_size)
+      document.getElementById('stat-vocab').textContent = mi.vocab_size.toLocaleString('fr');
+
+    const bpre = d.pretrain_best_val;
+    const bft  = d.finetune_best_val;
+    document.getElementById('stat-best-pre').textContent = bpre != null ? bpre.toFixed(4) : '—';
+    document.getElementById('stat-best-ft').textContent  = bft  != null ? bft.toFixed(4)  : '—';
+
+    /* ── Progress ────────────────────────────── */
+    const preE   = pre.current_epoch || 0;
+    const preTe  = pre.total_epochs  || 0;
+    const preS   = pre.current_step  || 0;
+    const preTs  = pre.total_steps   || 0;
+    const prePct = preTe > 0 ? Math.min(100, Math.round(preE/preTe*100)) : 0;
+    document.getElementById('pre-epoch').textContent   = preE;
+    document.getElementById('pre-total-e').textContent = preTe;
+    document.getElementById('pre-step').textContent    = preS;
+    document.getElementById('pre-total-s').textContent = preTs;
+    document.getElementById('pre-bar').style.width     = prePct + '%';
+    document.getElementById('pre-pct').textContent     = prePct + '%';
+
+    const ftE   = ft.current_epoch || 0;
+    const ftTe  = ft.total_epochs  || 0;
+    const ftPct = ftTe > 0 ? Math.min(100, Math.round(ftE/ftTe*100)) : 0;
+    document.getElementById('ft-epoch').textContent   = ftE;
+    document.getElementById('ft-total-e').textContent = ftTe;
+    document.getElementById('ft-bar').style.width     = ftPct + '%';
+    document.getElementById('ft-pct').textContent     = ftPct + '%';
+
+    /* ── Charts ──────────────────────────────── */
+    if (pre.epochs && pre.epochs.length)
+      mkChart('chart-pretrain', pre.epochs.map(e=>'E'+e.epoch), [
+        ds('Train Loss', pre.epochs.map(e=>e.train_loss), '#f55e29'),
+        ds('Val Loss',   pre.epochs.map(e=>e.val_loss),   '#f56565', true),
+      ]);
+
+    if (ft.epochs && ft.epochs.length)
+      mkChart('chart-finetune', ft.epochs.map(e=>'E'+e.epoch), [
+        ds('Train Loss', ft.epochs.map(e=>e.train_loss), '#b78af7'),
+        ds('Val Loss',   ft.epochs.map(e=>e.val_loss),   '#e9a23b', true),
+      ]);
+
+    const allEps = (pre.epochs||[]).map(e=>({...e,ph:'Pre'}))
+                   .concat((ft.epochs||[]).map(e=>({...e,ph:'FT'})));
+    if (allEps.length)
+      mkChart('chart-ppl', allEps.map(e=>e.ph+' E'+e.epoch), [
+        ds('PPL Train', allEps.map(e=>e.ppl_train), '#3dd68c'),
+        ds('PPL Val',   allEps.map(e=>e.ppl_val),   '#e9a23b', true),
+      ]);
+
+    const ph    = (state==='finetune') ? ft : pre;
+    const steps = (ph.steps||[]).slice(-120);
+    if (steps.length) {
+      const ctx = document.getElementById('chart-lr').getContext('2d');
+      if (charts['chart-lr']) charts['chart-lr'].destroy();
+      charts['chart-lr'] = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: steps.map(s=>s.step),
+          datasets: [{ label:'LR', data: steps.map(s=>s.lr),
+            borderColor:'#e9a23b', backgroundColor:'rgba(233,162,59,.08)',
+            borderWidth:1.5, fill:true, pointRadius:0 }],
+        },
+        options: { ...CHART_OPTS,
+          scales: { ...CHART_OPTS.scales,
+            y: { ...CHART_OPTS.scales.y,
+                 ticks: { ...CHART_OPTS.scales.y.ticks, callback: v=>v.toExponential(1) } } },
+        },
+      });
+    }
+
+    /* ── Config ──────────────────────────────── */
+    const set = (id,v) => { const el=document.getElementById(id); if(el&&v!=null) el.textContent=v; };
+    set('cfg-dmodel',  cm.d_model);
+    set('cfg-nheads',  cm.n_heads);
+    set('cfg-nlayers', cm.n_layers);
+    set('cfg-ffndim',  cm.ffn_dim);
+    set('cfg-maxlen',  cm.max_len);
+    set('cfg-dropout', cm.dropout);
+    set('cfg-vocab',   cm.vocab_size ? cm.vocab_size.toLocaleString('fr') : null);
+    set('cfg-batch',   ce.batch_size);
+    set('cfg-accum',   ce.accumulation_steps ? `×${ce.accumulation_steps}` : null);
+    set('cfg-epre',    ce.epochs_pretrain);
+    set('cfg-eft',     ce.epochs_ft);
+    set('cfg-warmup',  ce.warmup_steps ? ce.warmup_steps+' steps' : null);
+    set('cfg-patience',ce.patience);
+    set('cfg-gradclip',ce.grad_clip);
+    set('cfg-valratio',ce.val_ratio ? Math.round(ce.val_ratio*100)+'%' : null);
+    set('cfg-lrmax',   ce.lr_max); set('sch-lrmax', ce.lr_max);
+    set('cfg-lrmin',   ce.lr_min); set('sch-lrmin', ce.lr_min);
+    set('sch-warmup',  ce.warmup_steps);
+
+    /* ── Logs ─────────────────────────────────── */
+    allLogs = (d.errors||[]).slice().reverse();
+    renderLogs();
+
+    /* Nav badge erreurs */
+    const errs = allLogs.filter(l=>l.type==='ERROR').length;
+    const badge = document.getElementById('nav-log-badge');
+    if (errs > 0) { badge.style.display=''; badge.textContent=errs; }
+    else           badge.style.display='none';
+  }
+
+  /* ── Logs ──────────────────────────────────────────── */
+  function filterLogs(type, btn) {
+    logFilter = type;
+    document.querySelectorAll('.log-chip').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderLogs();
+  }
+
+  function renderLogs() {
+    const list     = document.getElementById('log-list');
+    const filtered = logFilter==='ALL' ? allLogs : allLogs.filter(l=>l.type===logFilter);
+    document.getElementById('log-count').textContent = filtered.length + ' entrée' + (filtered.length!==1?'s':'');
+    if (!filtered.length) {
+      list.innerHTML = '<div class="log-empty">Aucun log' + (logFilter!=='ALL'?' pour ce niveau':'') + '.</div>';
+      return;
+    }
+    list.innerHTML = filtered.map(l=>`
+      <div class="log-entry ${l.type}">
+        <span class="log-tag ${l.type}">${l.type}</span>
+        <span class="log-ts">${l.timestamp}</span>
+        <span class="log-msg">${esc(l.message)}</span>
+      </div>`).join('');
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  /* ── Reset ─────────────────────────────────────────── */
+  async function resetMetrics() {
+    if (!confirm('Réinitialiser toutes les métriques d\'entraînement ?')) return;
+    await fetch('/api/reset', { method:'POST' });
+    loadAll();
+  }
+
+  /* ── Chat inference ────────────────────────────────── */
+  async function sendChat() {
+    const input = document.getElementById('chat-input');
+    const q     = input.value.trim();
+    if (!q) return;
+
+    const btn  = document.getElementById('chat-btn');
+    const area = document.getElementById('chat-area');
+
+    appendMsg('user', q);
+    input.value = '';
+    input.style.height = 'auto';
+    btn.disabled = true;
+    btn.textContent = '…';
+
+    const typing = appendTyping();
+
+    try {
+      const resp = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question   : q,
+          pays_token : document.getElementById('chat-pays').value || undefined,
+          max_tokens : parseInt(document.getElementById('chat-maxtok').value),
+          temperature: parseFloat(document.getElementById('chat-temp').value),
+          top_p      : parseFloat(document.getElementById('chat-topp').value),
+        }),
+      });
+
+      typing.remove();
+
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+
+      if (data.fallback) {
+        appendMsg('cor', '⚠ Cor est en mode fallback — le modèle n\'est pas encore entraîné ou COR_ACTIF=false.', true);
+      } else {
+        appendMsg('cor', data.reponse || '(réponse vide)', false, data.duree_ms);
+      }
+    } catch(e) {
+      typing.remove();
+      appendMsg('cor', '⚠ Impossible de joindre le serveur COR (localhost:5000). Vérifier que le serveur est démarré.', true);
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Envoyer →';
+    area.scrollTop = area.scrollHeight;
+  }
+
+  function appendMsg(role, text, warn, ms) {
+    const area = document.getElementById('chat-area');
+    const div  = document.createElement('div');
+    div.className = 'chat-msg ' + role;
+    const meta = role === 'cor'
+      ? `COR${ms ? ' · ' + ms + ' ms' : ''}${warn ? ' · fallback' : ''}`
+      : 'Vous';
+    div.innerHTML = `
+      <div class="chat-avatar ${role}">${role==='cor'?'C':'V'}</div>
+      <div>
+        <div class="chat-bubble" style="${warn?'color:var(--warn);':''}">${esc(text)}</div>
+        <div class="chat-meta">${meta}</div>
+      </div>`;
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+    return div;
+  }
+
+  function appendTyping() {
+    const area = document.getElementById('chat-area');
+    const div  = document.createElement('div');
+    div.className = 'chat-msg cor';
+    div.innerHTML = `
+      <div class="chat-avatar cor">C</div>
+      <div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>`;
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+    return div;
+  }
+
+  function clearChat() {
+    const area = document.getElementById('chat-area');
+    area.innerHTML = `
+      <div class="chat-msg cor">
+        <div class="chat-avatar cor">C</div>
+        <div>
+          <div class="chat-bubble">Conversation effacée. Je suis COR — posez-moi une question juridique.</div>
+          <div class="chat-meta">COR · prêt</div>
+        </div>
+      </div>`;
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  /* ── Auto-refresh ──────────────────────────────────── */
+  loadAll();
+  setInterval(loadAll, 5000);
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "training_state": "idle",
+  "last_updated": null,
+  "config_modele": {},
+  "config_entrainement": {},
+  "model_info": {},
+  "pretrain": {
+    "current_epoch": 0,
+    "total_epochs": 0,
+    "current_step": 0,
+    "total_steps": 0,
+    "epochs": [],
+    "steps": []
+  },
+  "finetune": {
+    "current_epoch": 0,
+    "total_epochs": 0,
+    "current_step": 0,
+    "total_steps": 0,
+    "epochs": [],
+    "steps": []
+  },
+  "pretrain_best_val": null,
+  "finetune_best_val": null,
+  "errors": []
+}
